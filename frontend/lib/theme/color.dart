@@ -24,7 +24,7 @@ class MyColors {
       'c300': const Color(0xFFFFEBA7),
       'c200': const Color(0xFFFFF0BC),
       'c100': const Color(0xFFFFF3CA),
-      'c50': Color.fromARGB(255, 251, 250, 244),
+      'c50': const Color.fromARGB(255, 251, 250, 244),
     },
   };
 

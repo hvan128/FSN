@@ -72,66 +72,64 @@ class _HeaderState extends State<MyHeader> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                if (!widget.disableLeftButton)
-                  widget.bgColor == Colors.transparent && widget.hasIconColor!
-                      ? GestureDetector(
-                          onTap: widget.disableLeftButton
-                              ? null
-                              : widget.onLeftPressed ??
-                                  _defaultOnLeftPressed(context),
-                          child: SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: Image.asset(
-                              'assets/icons/i16/back.png',
+                Row(children: [
+                  if (!widget.disableLeftButton)
+                    widget.bgColor == Colors.transparent && widget.hasIconColor!
+                        ? GestureDetector(
+                            onTap: widget.disableLeftButton
+                                ? null
+                                : widget.onLeftPressed ??
+                                    _defaultOnLeftPressed(context),
+                            child: SizedBox(
                               width: 16,
                               height: 16,
+                              child: Image.asset(
+                                'assets/icons/i16/back.png',
+                                width: 16,
+                                height: 16,
+                              ),
                             ),
-                          ),
+                          )
+                        : widget.leftIcon != null
+                            ? GestureDetector(
+                                onTap: widget.disableLeftButton
+                                    ? null
+                                    : widget.onLeftPressed ??
+                                        _defaultOnLeftPressed(context),
+                                child: Row(
+                                  children: [
+                                    widget.leftIcon!,
+                                  ],
+                                ))
+                            : MyIconButton(
+                                src: widget.srcLeftIcon,
+                                heightIcon: 16,
+                                widthIcon: 16,
+                                onPressed: widget.disableLeftButton
+                                    ? null
+                                    : widget.onLeftPressed ??
+                                        _defaultOnLeftPressed(context),
+                              ),
+                  if (widget.disableLeftButton)
+                    const SizedBox(
+                      width: 28,
+                      height: 28,
+                    ),
+                  widget.customTitle == null
+                      ? MyText(
+                          text: widget.title,
+                          fontSize: FontSize.z20,
+                          fontWeight: FontWeight.w700,
+                          color: MyColors.grey['c900']!,
                         )
-                      : widget.leftIcon != null
-                          ? GestureDetector(
-                              onTap: widget.disableLeftButton
-                                  ? null
-                                  : widget.onLeftPressed ??
-                                      _defaultOnLeftPressed(context),
-                              child: Row(
-                                children: [
-                                  const SizedBox(
-                                    width: 16,
-                                  ),
-                                  widget.leftIcon!,
-                                ],
-                              ))
-                          : MyIconButton(
-                              src: widget.srcLeftIcon,
-                              heightIcon: 16,
-                              widthIcon: 16,
-                              onPressed: widget.disableLeftButton
-                                  ? null
-                                  : widget.onLeftPressed ??
-                                      _defaultOnLeftPressed(context),
-                            ),
-                if (widget.disableLeftButton)
-                  const SizedBox(
-                    width: 28,
-                    height: 28,
-                  ),
-                widget.customTitle == null
-                    ? MyText(
-                        text: widget.title,
-                        fontSize: FontSize.z22,
-                        fontWeight: FontWeight.w700,
-                        color: MyColors.grey['c700']!,
-                      )
-                    : widget.customTitle!,
+                      : widget.customTitle!,
+                ]),
                 if (!widget.disableRightButton)
                   widget.bgColor == Colors.transparent && widget.hasIconColor!
                       ? GestureDetector(
                           onTap: widget.disableRightButton
                               ? null
-                              : widget.onRightPressed ??
-                                  _defaultOnRightPressed(context),
+                              : widget.onRightPressed,
                           child: SizedBox(
                               width: 16,
                               height: 16,
@@ -143,14 +141,10 @@ class _HeaderState extends State<MyHeader> {
                           ? GestureDetector(
                               onTap: widget.disableRightButton
                                   ? null
-                                  : widget.onRightPressed ??
-                                      _defaultOnRightPressed(context),
+                                  : widget.onRightPressed,
                               child: Row(
                                 children: [
                                   widget.rightIcon!,
-                                  const SizedBox(
-                                    width: 16,
-                                  )
                                 ],
                               ))
                           : MyIconButton(
@@ -159,8 +153,7 @@ class _HeaderState extends State<MyHeader> {
                               widthIcon: 16,
                               onPressed: widget.disableRightButton
                                   ? null
-                                  : widget.onRightPressed ??
-                                      _defaultOnRightPressed(context),
+                                  : widget.onRightPressed,
                               padding: 6,
                             ),
                 if (widget.disableRightButton)

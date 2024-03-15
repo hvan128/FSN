@@ -9,7 +9,9 @@ import 'package:frontend/widgets/tab_button.dart';
 import 'package:frontend/widgets/text.dart';
 
 class MyFridgeScreen extends StatefulWidget {
-  const MyFridgeScreen({super.key});
+  final Function(bool)? showBottomBar;
+  final Function(int)? navigateBottomBar;
+  const MyFridgeScreen({super.key, this.showBottomBar, this.navigateBottomBar});
 
   @override
   State<MyFridgeScreen> createState() => _MyFridgeScreenState();

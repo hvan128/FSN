@@ -5,64 +5,64 @@ List<Category> fruits = [
   Category('cam', 1, 'Cam', 'assets/icons/fruits/cam.png', 'fruits'),
   Category(
       'dau-tay', 1, 'Dâu tây', 'assets/icons/fruits/dau-tay.png', 'fruits'),
-  // Category('chuoi', 1, 'Chuối', 'assets/icons/fruits/chuoi.png', 'fruits'),
-  // Category('du-du', 1, 'Đu đủ', 'assets/icons/fruits/du-du.png', 'fruits'),
-  // Category('dao', 1, 'Đào', 'assets/icons/fruits/dao.png', 'fruits'),
-  // Category('o-liu', 1, 'Ô liu', 'assets/icons/fruits/o-liu.png', 'fruits'),
-  // Category('vai', 1, 'Vải', 'assets/icons/fruits/vai.png', 'fruits'),
-  // Category('viet-quat', 1, 'Việt quất', 'assets/icons/fruits/viet-quat.png',
-  //     'fruits'),
-  // Category(
-  //     'tao-xanh', 1, 'Táo xanh', 'assets/icons/fruits/tao-xanh.png', 'fruits'),
-  // Category(
-  //     'tao-tau', 1, 'Táo tàu', 'assets/icons/fruits/tao-tau.png', 'fruits'),
-  // Category('khe', 1, 'Khế', 'assets/icons/fruits/khe.png', 'fruits'),
-  // Category('sau-rieng', 1, 'Sầu riêng', 'assets/icons/fruits/sau-rieng.png',
-  //     'fruits'),
-  // Category('luu', 1, 'Lựu', 'assets/icons/fruits/luu.png', 'fruits'),
-  // Category('xoai', 1, 'Xoài', 'assets/icons/fruits/xoai.png', 'fruits'),
-  // Category('oi', 1, 'Ổi', 'assets/icons/fruits/oi.png', 'fruits'),
-  // Category('chom-chom', 1, 'Chôm chôm', 'assets/icons/fruits/chom-chom.png',
-  //     'fruits'),
-  // Category('bo', 1, 'Bơ', 'assets/icons/fruits/bo.png', 'fruits'),
-  // Category('thanh-long', 1, 'Thanh long', 'assets/icons/fruits/thanh-long.png',
-  //     'fruits'),
-  // Category('sung', 1, 'Sung', 'assets/icons/fruits/sung.png', 'fruits'),
-  // Category(
-  //     'nho-tim', 1, 'Nho tím', 'assets/icons/fruits/nho-tim.png', 'fruits'),
-  // Category('mong', 1, 'Mọng', 'assets/icons/fruits/mong.png', 'fruits'),
-  // Category('mo', 1, 'Mơ', 'assets/icons/fruits/mo.png', 'fruits'),
-  // Category(
-  //     'mang-cut', 1, 'Măng cụt', 'assets/icons/fruits/mang-cut.png', 'fruits'),
-  // Category('kiwi', 1, 'Kiwi', 'assets/icons/fruits/kiwi.png', 'fruits'),
-  // Category('hong', 1, 'Hồng', 'assets/icons/fruits/hong.png', 'fruits'),
-  // Category('dua', 1, 'Dứa', 'assets/icons/fruits/duas.png', 'fruits'),
-  // Category('sung', 1, 'Sung', 'assets/icons/fruits/sung.png', 'fruits'),
-  // Category(
-  //     'anh-dao', 1, 'Anh đào', 'assets/icons/fruits/anh-dao.png', 'fruits'),
-  // Category('quan-thoai', 1, 'Quả nho', 'assets/icons/fruits/quan-thoai.png',
-  //     'fruits'),
-  // Category('man', 1, 'Mận', 'assets/icons/fruits/man.png', 'fruits'),
-  // Category(
-  //     'dua-vang', 1, 'Dưa vàng', 'assets/icons/fruits/dua-vang.png', 'fruits'),
-  // Category('le', 1, 'Lê', 'assets/icons/fruits/le.png', 'fruits'),
-  // Category('nhan', 1, 'Nhãn', 'assets/icons/fruits/nhan.png', 'fruits'),
-  // Category('dua', 1, 'Dừa', 'assets/icons/fruits/duaf.png', 'fruits'),
-  // Category(
-  //     'dua-hau', 1, 'Dưa hấu', 'assets/icons/fruits/dua-hau.png', 'fruits'),
-  // Category(
-  //     'dua-luoi', 1, 'Dưa lưới', 'assets/icons/fruits/dua-luoi.png', 'fruits'),
-  // Category('quat', 1, 'Quất', 'assets/icons/fruits/quat.png', 'fruits'),
-  // Category('ca-chua-bi', 1, 'Cà chua bi', 'assets/icons/fruits/ca-chua-bi.png',
-  //     'fruits'),
-  // Category(
-  //     'ca-chua', 1, 'Cà chua', 'assets/icons/fruits/ca-chua.png', 'fruits'),
-  // Category('chuoi', 1, 'Chuối', 'assets/icons/fruits/chuoi.png', 'fruits'),
-  // Category('chanh-xanh', 1, 'Chanh xanh', 'assets/icons/fruits/chanh-xanh.png',
-  //     'fruits'),
-  // Category('chanh-vang', 1, 'Chanh vàng', 'assets/icons/fruits/chanh-vang.png',
-  //     'fruits'),
-  // Category('buoi', 1, 'Bưởi', 'assets/icons/fruits/buoi.png', 'fruits'),
+  Category('chuoi', 1, 'Chuối', 'assets/icons/fruits/chuoi.png', 'fruits'),
+  Category('du-du', 1, 'Đu đủ', 'assets/icons/fruits/du-du.png', 'fruits'),
+  Category('dao', 1, 'Đào', 'assets/icons/fruits/dao.png', 'fruits'),
+  Category('o-liu', 1, 'Ô liu', 'assets/icons/fruits/o-liu.png', 'fruits'),
+  Category('vai', 1, 'Vải', 'assets/icons/fruits/vai.png', 'fruits'),
+  Category('viet-quat', 1, 'Việt quất', 'assets/icons/fruits/viet-quat.png',
+      'fruits'),
+  Category(
+      'tao-xanh', 1, 'Táo xanh', 'assets/icons/fruits/tao-xanh.png', 'fruits'),
+  Category(
+      'tao-tau', 1, 'Táo tàu', 'assets/icons/fruits/tao-tau.png', 'fruits'),
+  Category('khe', 1, 'Khế', 'assets/icons/fruits/khe.png', 'fruits'),
+  Category('sau-rieng', 1, 'Sầu riêng', 'assets/icons/fruits/sau-rieng.png',
+      'fruits'),
+  Category('luu', 1, 'Lựu', 'assets/icons/fruits/luu.png', 'fruits'),
+  Category('xoai', 1, 'Xoài', 'assets/icons/fruits/xoai.png', 'fruits'),
+  Category('oi', 1, 'Ổi', 'assets/icons/fruits/oi.png', 'fruits'),
+  Category('chom-chom', 1, 'Chôm chôm', 'assets/icons/fruits/chom-chom.png',
+      'fruits'),
+  Category('bo', 1, 'Bơ', 'assets/icons/fruits/bo.png', 'fruits'),
+  Category('thanh-long', 1, 'Thanh long', 'assets/icons/fruits/thanh-long.png',
+      'fruits'),
+  Category('sung', 1, 'Sung', 'assets/icons/fruits/sung.png', 'fruits'),
+  Category(
+      'nho-tim', 1, 'Nho tím', 'assets/icons/fruits/nho-tim.png', 'fruits'),
+  Category('mong', 1, 'Mọng', 'assets/icons/fruits/mong.png', 'fruits'),
+  Category('mo', 1, 'Mơ', 'assets/icons/fruits/mo.png', 'fruits'),
+  Category(
+      'mang-cut', 1, 'Măng cụt', 'assets/icons/fruits/mang-cut.png', 'fruits'),
+  Category('kiwi', 1, 'Kiwi', 'assets/icons/fruits/kiwi.png', 'fruits'),
+  Category('hong', 1, 'Hồng', 'assets/icons/fruits/hong.png', 'fruits'),
+  Category('dua', 1, 'Dứa', 'assets/icons/fruits/duas.png', 'fruits'),
+  Category('sung', 1, 'Sung', 'assets/icons/fruits/sung.png', 'fruits'),
+  Category(
+      'anh-dao', 1, 'Anh đào', 'assets/icons/fruits/anh-dao.png', 'fruits'),
+  Category('quan-thoai', 1, 'Quả nho', 'assets/icons/fruits/quan-thoai.png',
+      'fruits'),
+  Category('man', 1, 'Mận', 'assets/icons/fruits/man.png', 'fruits'),
+  Category(
+      'dua-vang', 1, 'Dưa vàng', 'assets/icons/fruits/dua-vang.png', 'fruits'),
+  Category('le', 1, 'Lê', 'assets/icons/fruits/le.png', 'fruits'),
+  Category('nhan', 1, 'Nhãn', 'assets/icons/fruits/nhan.png', 'fruits'),
+  Category('dua', 1, 'Dừa', 'assets/icons/fruits/duaf.png', 'fruits'),
+  Category(
+      'dua-hau', 1, 'Dưa hấu', 'assets/icons/fruits/dua-hau.png', 'fruits'),
+  Category(
+      'dua-luoi', 1, 'Dưa lưới', 'assets/icons/fruits/dua-luoi.png', 'fruits'),
+  Category('quat', 1, 'Quất', 'assets/icons/fruits/quat.png', 'fruits'),
+  Category('ca-chua-bi', 1, 'Cà chua bi', 'assets/icons/fruits/ca-chua-bi.png',
+      'fruits'),
+  Category(
+      'ca-chua', 1, 'Cà chua', 'assets/icons/fruits/ca-chua.png', 'fruits'),
+  Category('chuoi', 1, 'Chuối', 'assets/icons/fruits/chuoi.png', 'fruits'),
+  Category('chanh-xanh', 1, 'Chanh xanh', 'assets/icons/fruits/chanh-xanh.png',
+      'fruits'),
+  Category('chanh-vang', 1, 'Chanh vàng', 'assets/icons/fruits/chanh-vang.png',
+      'fruits'),
+  Category('buoi', 1, 'Bưởi', 'assets/icons/fruits/buoi.png', 'fruits'),
 ];
 
 List<Category> vegetables = [
@@ -411,3 +411,4 @@ List<Food> foods = [
   Food(cereals, 'cereals', 'Ngũ cốc', 'assets/icons/cereals/cereals.png'),
   Food(etc, 'etc', 'Vân vân.', 'assets/icons/etc/etc.png'),
 ];
+

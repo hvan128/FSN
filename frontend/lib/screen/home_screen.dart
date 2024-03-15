@@ -17,12 +17,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  bool _isShowBottomBar = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _buildBody(),
-      bottomNavigationBar: _currentIndex == 2
+      bottomNavigationBar: !_isShowBottomBar
           ? null
           : Theme(
               data: ThemeData(
@@ -80,6 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ? MyColors.primary['CulturalYellow']!['c700']!
                                 : MyColors.grey['c500']!),
                       ),
+                      tooltip: "Todo",
                       label: ''),
                   BottomNavigationBarItem(
                     icon: _navigateItem(
@@ -125,11 +127,15 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildBody() {
     switch (_currentIndex) {
       case 0:
-        return const MyFridgeScreen();
+        return MyFridgeScreen(
+            showBottomBar: (bool value) => handleShowBottomBar(value),
+            navigateBottomBar: (int index) => handleNavigateBottomBar(index));
       case 1:
         return const CommunityScreen();
       case 2:
-        return const TodoScreen();
+        return TodoScreen(
+            showBottomBar: (bool value) => handleShowBottomBar(value),
+            navigateBottomBar: (int index) => handleNavigateBottomBar(index));
       case 3:
         return const ReportScreen();
       case 4:
@@ -156,5 +162,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 : MyColors.grey['c600']!)
       ],
     );
+  }
+
+  handleShowBottomBar(bool isShow) {
+    setState(() {
+      _isShowBottomBar = isShow;
+    });
+  }
+
+  handleNavigateBottomBar(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
   }
 }

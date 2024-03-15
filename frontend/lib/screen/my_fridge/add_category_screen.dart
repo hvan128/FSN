@@ -3,10 +3,12 @@ import 'package:frontend/components/item/item_category.dart';
 import 'package:frontend/components/item/item_food.dart';
 import 'package:frontend/screen/my_fridge/add_category_detail_screen.dart';
 import 'package:frontend/theme/color.dart';
+import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/food.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:frontend/widgets/divider.dart';
 import 'package:frontend/widgets/header.dart';
+import 'package:frontend/widgets/text.dart';
 
 class AddCategoryScreen extends StatefulWidget {
   const AddCategoryScreen({super.key});
@@ -52,48 +54,122 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                         color: MyColors.white['c900']!,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Column(children: [
-                        Wrap(
-                            spacing: 10,
-                            children: foods
-                                .map((e) => GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          selectedFood = e;
-                                        });
-                                      },
-                                      child: ItemFood(
-                                          label: e.label,
-                                          icon: e.icon,
-                                          isSelected: selectedFood == e),
-                                    ))
-                                .toList()),
-                        const SizedBox(height: 10),
-                        const MyDivider(),
-                        const SizedBox(height: 10),
-                        selectedFood != null
-                            ? Wrap(
-                                spacing: 10,
-                                children: selectedFood!.categories
-                                    .map((e) => GestureDetector(
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Wrap(spacing: 10, children: [
+                              ...foods
+                                  .map((e) => GestureDetector(
                                         onTap: () {
                                           setState(() {
-                                            selectedCategory = e;
+                                            selectedFood = e;
                                           });
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    AddCategoryDetailScreen(
-                                                        category: e),
-                                              ));
                                         },
                                         child: ItemFood(
-                                            label: e.label, icon: e.icon)))
-                                    .toList(),
+                                            label: e.label,
+                                            icon: e.icon,
+                                            isSelected: selectedFood == e),
+                                      ))
+                                  .toList(),
+                              Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: MyColors.grey['c100']!,
+                                        borderRadius: BorderRadius.circular(10),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: MyColors.grey['c300']!,
+                                              blurRadius: 4)
+                                        ],
+                                      ),
+                                      child: Image.asset(
+                                        'assets/icons/i16/plus.png',
+                                        width: 40,
+                                        height: 40,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 4),
+                                    child: MyText(
+                                      text: 'Tạo',
+                                      fontSize: FontSize.z12,
+                                      fontWeight: FontWeight.w600,
+                                      color: MyColors.grey['c700']!,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ],
                               )
-                            : Container()
-                      ]))
+                            ]),
+                            const SizedBox(height: 10),
+                            const MyDivider(),
+                            const SizedBox(height: 10),
+                            selectedFood != null
+                                ? Wrap(spacing: 10, children: [
+                                    ...selectedFood!.categories
+                                        .map((e) => GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                selectedCategory = e;
+                                              });
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        AddCategoryDetailScreen(
+                                                            category: e),
+                                                  ));
+                                            },
+                                            child: ItemFood(
+                                                label: e.label, icon: e.icon)))
+                                        .toList(),
+                                    Column(
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 10),
+                                          child: Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: MyColors.grey['c100']!,
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                    color:
+                                                        MyColors.grey['c300']!,
+                                                    blurRadius: 4)
+                                              ],
+                                            ),
+                                            child: Image.asset(
+                                              'assets/icons/i16/plus.png',
+                                              width: 40,
+                                              height: 40,
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 4),
+                                          child: MyText(
+                                            text: 'Tạo',
+                                            fontSize: FontSize.z12,
+                                            fontWeight: FontWeight.w600,
+                                            color: MyColors.grey['c700']!,
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  ])
+                                : Container()
+                          ]))
                 ],
               ),
             ),
