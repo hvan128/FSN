@@ -1,0 +1,38 @@
+name: frontend
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.2.5 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icons/
+    - assets/icons/i16/
+    - assets/icons/fruits/
+    - assets/icons/meats/
+    - assets/icons/vegetables/
+    - assets/icons/seafood/
+    - assets/icons/dairy_products/
+    - assets/icons/dishes/
+    - assets/icons/drinks/
+    - assets/icons/alcohol/
+    - assets/icons/sauces/
+    - assets/icons/spices/
+    - assets/icons/bread/
+    - assets/icons/desserts/
+    - assets/icons/nuts/
+    - assets/icons/cereals/
+    - assets/icons/etc/
+
