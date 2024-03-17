@@ -1,7 +1,11 @@
 class Item {
-  final String label;
   final String value;
+  final String label;
   final String? icon;
 
-  Item(this.value, this.label, this.icon);
+  Item({
+    required this.value,
+    required this.label,
+    this.icon,
+  });
 }

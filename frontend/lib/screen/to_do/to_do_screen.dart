@@ -22,13 +22,13 @@ class TodoScreen extends StatelessWidget {
       );
     }).toList();
     return Scaffold(
-      backgroundColor: MyColors.grey['c100']!,
+      backgroundColor: MyColors.primary['CulturalYellow']!['c50']!,
       body: SafeArea(
           child: DragNDropList(
-            listFoods: listFoods,
-            showBottomBar: showBottomBar,
-            navigateBottomBar: navigateBottomBar,
-          )),
+        listFoods: listFoods,
+        showBottomBar: showBottomBar,
+        navigateBottomBar: navigateBottomBar,
+      )),
     );
   }
 }

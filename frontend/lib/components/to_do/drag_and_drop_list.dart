@@ -82,11 +82,13 @@ class _DragNDropList extends State<DragNDropList> {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
+      //!Header
       MyHeader(
+        bgUnderColor: MyColors.primary['CulturalYellow']!['c50']!,
         title: isSelecting
             ? 'Đã chọn ${selectedListItems.length}'
             : "Danh sách mua sắm",
-        bgColor: MyColors.primary['CulturalYellow']!['c50']!,
+        bgColor: MyColors.white['c900']!,
         disableRightButton: isSelecting,
         rightIcon: Row(children: [
           GestureDetector(
@@ -152,89 +154,82 @@ class _DragNDropList extends State<DragNDropList> {
               : widget.navigateBottomBar!(0);
         },
       ),
-      const SizedBox(height: 10),
+      //! List food
       Expanded(
           child: Stack(children: [
         Padding(
-            padding: const EdgeInsets.all(10),
-            child: Container(
-                decoration: BoxDecoration(
-                  color: MyColors.primary['CulturalYellow']!['c50']!,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        isSelecting
-                            ? Row(
-                                children: [
-                                  Checkbox(
-                                    activeColor: MyColors
-                                        .primary['CulturalYellow']!['c600']!,
-                                    value: isSelectedAll,
-                                    onChanged: (bool? value) {
-                                      setState(() {
-                                        isSelectedAll = value!;
-                                        if (isSelectedAll) {
-                                          for (var item in allItems!) {
-                                            item.isSelected = true;
-                                            if (!selectedListItems
-                                                .contains(item)) {
-                                              selectedListItems.add(item);
-                                            }
-                                          }
-                                        } else {
-                                          for (var item in allItems!) {
-                                            item.isSelected = false;
-                                            if (selectedListItems
-                                                .contains(item)) {
-                                              selectedListItems.remove(item);
-                                            }
-                                          }
+                    isSelecting
+                        ? Row(
+                            children: [
+                              Checkbox(
+                                activeColor: MyColors
+                                    .primary['CulturalYellow']!['c600']!,
+                                value: isSelectedAll,
+                                onChanged: (bool? value) {
+                                  setState(() {
+                                    isSelectedAll = value!;
+                                    if (isSelectedAll) {
+                                      for (var item in allItems!) {
+                                        item.isSelected = true;
+                                        if (!selectedListItems.contains(item)) {
+                                          selectedListItems.add(item);
                                         }
-                                      });
-                                    },
-                                  ),
-                                  const SizedBox(width: 10),
-                                  MyText(
-                                      text: 'Chọn tất cả',
-                                      fontWeight: FontWeight.w600,
-                                      color: MyColors.grey['c900']!,
-                                      fontSize: FontSize.z18),
-                                ],
+                                      }
+                                    } else {
+                                      for (var item in allItems!) {
+                                        item.isSelected = false;
+                                        if (selectedListItems.contains(item)) {
+                                          selectedListItems.remove(item);
+                                        }
+                                      }
+                                    }
+                                  });
+                                },
+                              ),
+                              const SizedBox(width: 10),
+                              MyText(
+                                  text: 'Chọn tất cả',
+                                  fontWeight: FontWeight.w600,
+                                  color: MyColors.grey['c900']!,
+                                  fontSize: FontSize.z18),
+                            ],
+                          )
+                        : const SizedBox(),
+                    isSelecting
+                        ? const SizedBox()
+                        : Row(
+                            children: [
+                              MyText(
+                                  text: 'Phân loại',
+                                  fontWeight: FontWeight.w500,
+                                  color: MyColors.grey['c700']!,
+                                  fontSize: FontSize.z16),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              MySwitch(
+                                  value: classify,
+                                  onChange: (value) {
+                                    setState(() {
+                                      classify = value;
+                                    });
+                                  }),
+                              const SizedBox(
+                                width: 5,
                               )
-                            : const SizedBox(),
-                        isSelecting
-                            ? const SizedBox()
-                            : Row(
-                                children: [
-                                  MyText(
-                                      text: 'Phân loại',
-                                      fontWeight: FontWeight.w500,
-                                      color: MyColors.grey['c700']!,
-                                      fontSize: FontSize.z16),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  MySwitch(
-                                      value: classify,
-                                      onChange: (value) {
-                                        setState(() {
-                                          classify = value;
-                                        });
-                                      }),
-                                ],
-                              )
-                      ],
-                    ),
-                    const MyDivider(),
-                    const SizedBox(height: 10),
-                    Expanded(child: _buildList()),
+                            ],
+                          )
                   ],
-                ))),
+                ),
+                Expanded(child: _buildList()),
+              ],
+            )),
         AnimatedPositioned(
           duration: const Duration(milliseconds: 300),
           bottom: isSelecting ? 0 : -70,
@@ -276,80 +271,83 @@ class _DragNDropList extends State<DragNDropList> {
                     .map((item) => Column(
                           key: ValueKey(item.category.value),
                           children: [
-                            Row(
-                              children: [
-                                isSelecting
-                                    ? Checkbox(
-                                        activeColor: MyColors.primary[
-                                            'CulturalYellow']!['c600']!,
-                                        value: item.isSelected,
-                                        onChanged: (bool? value) {
-                                          print(selectedListItems.length);
-                                          setState(() {
-                                            item.isSelected = value!;
-                                            if (item.isSelected) {
-                                              selectedListItems.add(item);
-                                            } else {
-                                              selectedListItems.remove(item);
-                                            }
-                                          });
-                                        },
-                                      )
-                                    : Container(),
-                                Expanded(
-                                  child: ListTile(
-                                    leading: Image.asset(
-                                      item.category.icon,
-                                      width: 40,
-                                      height: 40,
-                                      color: item.isDeleted
-                                          ? MyColors.grey['c700']!
-                                              .withOpacity(0.4)
-                                          : null,
-                                      fit: BoxFit.cover,
+                            Container(
+                              color: MyColors.grey['c50']!,
+                              child: Row(
+                                children: [
+                                  isSelecting
+                                      ? Checkbox(
+                                          activeColor: MyColors.primary[
+                                              'CulturalYellow']!['c600']!,
+                                          value: item.isSelected,
+                                          onChanged: (bool? value) {
+                                            print(selectedListItems.length);
+                                            setState(() {
+                                              item.isSelected = value!;
+                                              if (item.isSelected) {
+                                                selectedListItems.add(item);
+                                              } else {
+                                                selectedListItems.remove(item);
+                                              }
+                                            });
+                                          },
+                                        )
+                                      : Container(),
+                                  Expanded(
+                                    child: ListTile(
+                                      leading: Image.asset(
+                                        item.category.icon,
+                                        width: 40,
+                                        height: 40,
+                                        color: item.isDeleted
+                                            ? MyColors.grey['c700']!
+                                                .withOpacity(0.4)
+                                            : null,
+                                        fit: BoxFit.cover,
+                                      ),
+                                      title: Text(
+                                        item.category.label,
+                                        style: item.isDeleted
+                                            ? const TextStyle(
+                                                // color: MyColors.grey['c500']!,
+                                                decoration:
+                                                    TextDecoration.lineThrough,
+                                                fontSize: FontSize.z14)
+                                            : const TextStyle(
+                                                fontSize: FontSize.z14,
+                                              ),
+                                      ),
+                                      onTap: () {
+                                        handleTapItem(item);
+                                      },
+                                      onLongPress: () {
+                                        setState(() {
+                                          isSelecting = true;
+                                          if (classify) {
+                                            classify = false;
+                                          }
+                                          item.isSelected = !item.isSelected;
+                                          if (item.isSelected) {
+                                            selectedListItems.add(item);
+                                          } else {
+                                            selectedListItems.remove(item);
+                                          }
+                                        });
+                                        widget.showBottomBar?.call(false);
+                                      },
                                     ),
-                                    title: Text(
-                                      item.category.label,
-                                      style: item.isDeleted
-                                          ? const TextStyle(
-                                              // color: MyColors.grey['c500']!,
-                                              decoration:
-                                                  TextDecoration.lineThrough,
-                                              fontSize: FontSize.z14)
-                                          : const TextStyle(
-                                              fontSize: FontSize.z14,
-                                            ),
-                                    ),
-                                    onTap: () {
-                                      handleTapItem(item);
-                                    },
-                                    onLongPress: () {
-                                      setState(() {
-                                        isSelecting = true;
-                                        if (classify) {
-                                          classify = false;
-                                        }
-                                        item.isSelected = !item.isSelected;
-                                        if (item.isSelected) {
-                                          selectedListItems.add(item);
-                                        } else {
-                                          selectedListItems.remove(item);
-                                        }
-                                      });
-                                      widget.showBottomBar?.call(false);
-                                    },
                                   ),
-                                ),
-                                !isSelecting && !item.isDeleted
-                                    ? Container(
-                                        padding:
-                                            const EdgeInsets.only(right: 10),
-                                        child: Icon(Icons.menu,
-                                            color: MyColors.primary[
-                                                'CulturalYellow']!['c600']!),
-                                      )
-                                    : Container(),
-                              ],
+                                  !isSelecting && !item.isDeleted
+                                      ? Container(
+                                          padding:
+                                              const EdgeInsets.only(right: 10),
+                                          child: Icon(Icons.menu,
+                                              color: MyColors.primary[
+                                                  'CulturalYellow']!['c600']!),
+                                        )
+                                      : Container(),
+                                ],
+                              ),
                             ),
                             const MyDivider(type: Type.solid),
                           ],

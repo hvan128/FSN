@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screen/home_screen.dart';
 import 'package:frontend/theme/color.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   runApp(const MainApp());
@@ -15,6 +15,8 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
         title: 'DK Mobile Banking',
         debugShowCheckedModeBanner: false,
+        localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
+        supportedLocales: const [Locale('vi'), Locale('en')],
         theme: ThemeData(
           textTheme: Theme.of(context).textTheme.apply(
                 fontFamily: 'Urbanist',

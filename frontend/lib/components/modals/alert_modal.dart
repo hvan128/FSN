@@ -35,8 +35,8 @@ class MyAlert extends StatelessWidget {
     Color? titleColor;
     Color? contentColor;
     IconData? icon;
-    const failIcon = 'assets/icons_final/i76/fail-1.png';
-    const successIcon = 'assets/icons_final/i76/complete.png';
+    const failIcon = 'assets/icons/i16/failed.png';
+    const successIcon = 'assets/icons/i16/success.png';
 
     switch (alertType) {
       case AlertType.success:

@@ -33,7 +33,7 @@ class MyHeader extends StatefulWidget {
     this.onRightPressed,
     this.disableLeftButton = false,
     this.disableRightButton = false,
-    this.height = 50,
+    this.height = 65,
     this.bgUnderColor,
     this.hasIconColor = false,
     this.bgColor = Colors.transparent,

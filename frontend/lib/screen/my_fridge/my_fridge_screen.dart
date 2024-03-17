@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/item/item_category.dart';
+import 'package:frontend/components/modals/alert_modal.dart';
+import 'package:frontend/components/modals/modal_select.dart';
+import 'package:frontend/screen/my_fridge/add_category_detail_screen.dart';
 import 'package:frontend/screen/my_fridge/add_category_screen.dart';
+import 'package:frontend/screen/search/search_screen.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
+import 'package:frontend/types/food.dart';
+import 'package:frontend/types/type.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:frontend/widgets/divider.dart';
 import 'package:frontend/widgets/tab_button.dart';
@@ -20,6 +26,26 @@ class MyFridgeScreen extends StatefulWidget {
 class _MyFridgeScreenState extends State<MyFridgeScreen> {
   String selectedFilter = '';
   int selectedTabIndex = 0;
+  bool isSelecting = false;
+  List<Category> isSelected = [];
+  final List<Item> listPositions = [
+    Item(
+      label: "Tủ lạnh",
+      value: 'cool',
+    ),
+    Item(
+      label: "Tủ đông",
+      value: 'freeze',
+    ),
+    Item(
+      label: "Bếp",
+      value: 'kitchen',
+    ),
+    Item(
+      label: "Khác",
+      value: 'other',
+    )
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,8 +114,9 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
             )),
           ),
         ),
-        Positioned(
-          bottom: 20,
+        AnimatedPositioned(
+          duration: const Duration(milliseconds: 500),
+          bottom: isSelecting && isSelected.isNotEmpty ? 70 : 20,
           right: 20,
           child: GestureDetector(
             onTap: () {
@@ -110,7 +137,14 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
               ),
             ),
           ),
-        )
+        ),
+        isSelected.isNotEmpty
+            ? AnimatedPositioned(
+                duration: const Duration(milliseconds: 500),
+                bottom: isSelecting ? 0 : -70,
+                child: _buildOptions(),
+              )
+            : const SizedBox(),
       ]),
     );
   }
@@ -150,42 +184,81 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              MyText(
-                text: 'Chào Ngô Hải Văn',
-                fontSize: FontSize.z16,
-                fontWeight: FontWeight.w600,
-                color: MyColors.grey['c900']!,
+              Row(
+                children: [
+                  isSelecting
+                      ? GestureDetector(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: Image.asset(
+                                'assets/icons/i16/close.png',
+                                width: 16,
+                                height: 16,
+                                color: MyColors.grey['c900']!,
+                              ),
+                            ),
+                          ),
+                          onTap: () {
+                            widget.showBottomBar?.call(true);
+                            setState(() {
+                              isSelecting = !isSelecting;
+                            });
+                            isSelected.clear();
+                          })
+                      : const SizedBox(),
+                  MyText(
+                    text: isSelecting
+                        ? 'Đã chọn ${isSelected.length}'
+                        : 'Chào Ngô Hải Văn',
+                    fontSize: FontSize.z16,
+                    fontWeight: FontWeight.w600,
+                    color: MyColors.grey['c900']!,
+                  ),
+                ],
               ),
-              Row(children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: MyColors.grey['c600']!.withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: MyText(
-                      text: 'Chọn',
-                      fontSize: FontSize.z15,
-                      fontWeight: FontWeight.w600,
-                      color: MyColors.white['c900']!),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: MyColors.grey['c600']!.withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Image.asset(
-                    'assets/icons/i16/three-dots.png',
-                    width: 30,
-                    height: 30,
-                    color: MyColors.white['c900'],
-                  ),
-                ),
-              ]),
+              !isSelecting
+                  ? Row(children: [
+                      GestureDetector(
+                        onTap: () {
+                          widget.showBottomBar?.call(false);
+                          setState(() {
+                            isSelecting = true;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: MyColors.grey['c600']!.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: MyText(
+                              text: 'Chọn',
+                              fontSize: FontSize.z15,
+                              fontWeight: FontWeight.w600,
+                              color: MyColors.white['c900']!),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: MyColors.grey['c600']!.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Image.asset(
+                          'assets/icons/i16/three-dots.png',
+                          width: 30,
+                          height: 30,
+                          color: MyColors.white['c900'],
+                        ),
+                      ),
+                    ])
+                  : const SizedBox(),
             ],
           ),
         ),
@@ -195,41 +268,49 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
         alignment: Alignment.bottomCenter,
         child: Padding(
             padding: const EdgeInsets.only(left: 20, bottom: 10, right: 20),
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                color: MyColors.primary['CulturalYellow']!['c50']!,
-                border: Border.all(
-                  color: MyColors.grey['c100']!,
-                ),
-                borderRadius: BorderRadius.circular(6),
-                boxShadow: [
-                  BoxShadow(
-                    color: MyColors.grey['c500']!.withOpacity(0.5),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: const Offset(0, 5),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return const SearchScreen(type: SearchType.mine);
+                }));
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                decoration: BoxDecoration(
+                  color: MyColors.primary['CulturalYellow']!['c50']!,
+                  border: Border.all(
+                    color: MyColors.grey['c100']!,
                   ),
-                ],
+                  borderRadius: BorderRadius.circular(6),
+                  boxShadow: [
+                    BoxShadow(
+                      color: MyColors.grey['c500']!.withOpacity(0.5),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Row(children: [
+                  Image.asset(
+                    'assets/icons/i16/search.png',
+                    width: 18,
+                    height: 18,
+                    color: MyColors.grey['c500'],
+                  ),
+                  const SizedBox(
+                    width: 12,
+                  ),
+                  MyText(
+                    text: 'Bạn đang muốn tìm kiếm thứ gì?',
+                    fontSize: FontSize.z16,
+                    fontWeight: FontWeight.w400,
+                    color: MyColors.grey['c500']!,
+                  )
+                ]),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Row(children: [
-                Image.asset(
-                  'assets/icons/i16/search.png',
-                  width: 18,
-                  height: 18,
-                  color: MyColors.grey['c500'],
-                ),
-                const SizedBox(
-                  width: 12,
-                ),
-                MyText(
-                  text: 'Bạn đang muốn tìm kiếm thứ gì?',
-                  fontSize: FontSize.z16,
-                  fontWeight: FontWeight.w400,
-                  color: MyColors.grey['c500']!,
-                )
-              ]),
             )),
       )),
     ]);
@@ -327,8 +408,37 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
                           spacing: 14,
                           runSpacing: 5,
                           children: food.categories
-                              .map((category) =>
-                                  ItemCategory(category: category))
+                              .map((category) => GestureDetector(
+                                  onTap: () {
+                                    if (isSelecting) {
+                                      if (isSelected.contains(category)) {
+                                        setState(() {
+                                          isSelected.remove(category);
+                                        });
+                                      } else {
+                                        setState(() {
+                                          isSelected.add(category);
+                                        });
+                                      }
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => AddCategoryDetailScreen(category: category),
+                                        )
+                                      );
+                                    }
+                                  },
+                                  onLongPress: () {
+                                    setState(() {
+                                      isSelected.add(category);
+                                      isSelecting = true;
+                                    });
+                                  },
+                                  child: ItemCategory(
+                                    category: category,
+                                    isSelected: isSelected.contains(category),
+                                  )))
                               .toList(),
                         ),
                       ),
@@ -356,5 +466,59 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
 
   Widget _renderFreezeTab() {
     return Container();
+  }
+
+  Widget _buildOptions() {
+    return Container(
+      height: 50,
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      width: MediaQuery.of(context).size.width,
+      decoration: BoxDecoration(
+        color: MyColors.primary['CulturalYellow']!['c700']!,
+      ),
+      child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return ModalSelect(
+                            title: 'Di chuyển tới',
+                            options: listPositions,
+                            onSelectItem: (value) {
+                              Navigator.of(context).pop();
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return MyAlert(
+                                      alertType: AlertType.success,
+                                      position: AlertPosition.topCenter,
+                                      title: 'Thành công',
+                                      description: 'Đã di chuyển ${isSelected.length} đồ ăn tới ${value.label}!',
+                                    );
+                                  });
+                            });
+                      });
+                },
+                child: _option('assets/icons/i16/save.png', 'Di chuyển')),
+            _option('assets/icons/i16/delete.png', 'Xóa'),
+          ]),
+    );
+  }
+
+  Widget _option(String icon, String label) {
+    return Column(
+      children: [
+        Image.asset(icon, width: 25, height: 25, color: MyColors.grey['c900']!),
+        MyText(
+            text: label,
+            fontSize: FontSize.z12,
+            fontWeight: FontWeight.w600,
+            color: MyColors.grey['c900']!),
+      ],
+    );
   }
 }

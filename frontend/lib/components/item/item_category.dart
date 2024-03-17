@@ -6,7 +6,9 @@ import 'package:frontend/widgets/text.dart';
 
 class ItemCategory extends StatelessWidget {
   final Category category;
-  const ItemCategory({super.key, required this.category});
+  final bool? isSelected;
+  const ItemCategory(
+      {super.key, required this.category, this.isSelected = false});
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +71,23 @@ class ItemCategory extends StatelessWidget {
             ),
           ),
         ),
-      )
+      ),
+      isSelected != null && isSelected! ? Positioned.fill(
+        child: Container(
+            decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: MyColors.primary['CulturalYellow']!['c700']!.withOpacity(0.5),
+        )),
+      ) : const SizedBox(),
+      isSelected != null && isSelected! ? Positioned.fill(
+          child: Align(
+              alignment: Alignment.center,
+              child: Image.asset(
+                'assets/icons/i16/check-outline.png',
+                width: 20,
+                height: 20,
+                color: MyColors.white['c900'],
+              ))) : const SizedBox(),
     ]);
   }
 }

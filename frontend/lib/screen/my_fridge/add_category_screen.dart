@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/components/item/item_category.dart';
 import 'package:frontend/components/item/item_food.dart';
 import 'package:frontend/screen/my_fridge/add_category_detail_screen.dart';
+import 'package:frontend/screen/my_fridge/add_food_screen.dart';
+import 'package:frontend/screen/search/search_screen.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/food.dart';
@@ -36,28 +37,42 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
           MyHeader(
             title: selectedFood != null && selectedFood?.label != null
                 ? selectedFood!.label
-                : "Add Category",
+                : "Thêm đồ ăn",
             bgColor: MyColors.white['c900']!,
+            rightIcon: IconButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SearchScreen()));
+                },
+                icon: const Icon(
+                  Icons.search,
+                  color: Colors.black,
+                  size: 28,
+                )),
+            leftIcon: IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () {
+                  Navigator.pop(context);
+                }),
           ),
           Expanded(
               child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
               child: Column(
                 children: [
-                  const SizedBox(
-                    height: 10,
-                  ),
                   Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
                         color: MyColors.white['c900']!,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Wrap(spacing: 10, children: [
+                            Wrap(spacing: 15, runSpacing: 5, children: [
                               ...foods
                                   .map((e) => GestureDetector(
                                         onTap: () {
@@ -71,47 +86,12 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                                             isSelected: selectedFood == e),
                                       ))
                                   .toList(),
-                              Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 10),
-                                    child: Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: MyColors.grey['c100']!,
-                                        borderRadius: BorderRadius.circular(10),
-                                        boxShadow: [
-                                          BoxShadow(
-                                              color: MyColors.grey['c300']!,
-                                              blurRadius: 4)
-                                        ],
-                                      ),
-                                      child: Image.asset(
-                                        'assets/icons/i16/plus.png',
-                                        width: 40,
-                                        height: 40,
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 4),
-                                    child: MyText(
-                                      text: 'Tạo',
-                                      fontSize: FontSize.z12,
-                                      fontWeight: FontWeight.w600,
-                                      color: MyColors.grey['c700']!,
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                ],
-                              )
                             ]),
                             const SizedBox(height: 10),
                             const MyDivider(),
                             const SizedBox(height: 10),
                             selectedFood != null
-                                ? Wrap(spacing: 10, children: [
+                                ? Wrap(spacing: 15, children: [
                                     ...selectedFood!.categories
                                         .map((e) => GestureDetector(
                                             onTap: () {
@@ -129,43 +109,59 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                                             child: ItemFood(
                                                 label: e.label, icon: e.icon)))
                                         .toList(),
-                                    Column(
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 10),
-                                          child: Container(
-                                            padding: const EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                              color: MyColors.grey['c100']!,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                    color:
-                                                        MyColors.grey['c300']!,
-                                                    blurRadius: 4)
-                                              ],
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    AddFoodScreen(
+                                                      type: selectedFood!.value,
+                                                    )));
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 9),
+                                        child: Column(
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 10),
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                  color: MyColors.grey['c100']!,
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                        color: MyColors
+                                                            .grey['c300']!,
+                                                        blurRadius: 4)
+                                                  ],
+                                                ),
+                                                child: Image.asset(
+                                                  'assets/icons/i16/plus.png',
+                                                  width: 40,
+                                                  height: 40,
+                                                ),
+                                              ),
                                             ),
-                                            child: Image.asset(
-                                              'assets/icons/i16/plus.png',
-                                              width: 40,
-                                              height: 40,
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 4),
+                                              child: MyText(
+                                                text: 'Tạo',
+                                                fontSize: FontSize.z12,
+                                                fontWeight: FontWeight.w600,
+                                                color: MyColors.grey['c700']!,
+                                                textAlign: TextAlign.center,
+                                              ),
                                             ),
-                                          ),
+                                          ],
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 4),
-                                          child: MyText(
-                                            text: 'Tạo',
-                                            fontSize: FontSize.z12,
-                                            fontWeight: FontWeight.w600,
-                                            color: MyColors.grey['c700']!,
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     )
                                   ])
                                 : Container()
