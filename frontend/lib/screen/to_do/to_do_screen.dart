@@ -13,12 +13,12 @@ class TodoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<Food> listFoods = foods.map((food) {
       return Food(
-        food.categories.length > 3
+        categories: food.categories.length > 3
             ? food.categories.sublist(0, 3)
             : food.categories,
-        food.value,
-        food.label,
-        food.icon,
+        value: food.value,
+        label: food.label,
+        icon: food.icon,
       );
     }).toList();
     return Scaffold(

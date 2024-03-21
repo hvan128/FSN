@@ -231,7 +231,7 @@ class _DragNDropList extends State<DragNDropList> {
               ],
             )),
         AnimatedPositioned(
-          duration: const Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 100),
           bottom: isSelecting ? 0 : -70,
           child: _buildOptions(),
         ),

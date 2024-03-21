@@ -64,7 +64,7 @@ class ItemCategory extends StatelessWidget {
                     color: MyColors.grey['c300']!,
                   )),
               child: MyText(
-                  text: 'D - ${category.duration.toInt()}',
+                  text: 'D - ${category.defaultDuration.toInt()}',
                   fontSize: FontSize.z10,
                   fontWeight: FontWeight.w600,
                   color: MyColors.grey['c700']!),
@@ -72,22 +72,27 @@ class ItemCategory extends StatelessWidget {
           ),
         ),
       ),
-      isSelected != null && isSelected! ? Positioned.fill(
-        child: Container(
-            decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: MyColors.primary['CulturalYellow']!['c700']!.withOpacity(0.5),
-        )),
-      ) : const SizedBox(),
-      isSelected != null && isSelected! ? Positioned.fill(
-          child: Align(
-              alignment: Alignment.center,
-              child: Image.asset(
-                'assets/icons/i16/check-outline.png',
-                width: 20,
-                height: 20,
-                color: MyColors.white['c900'],
-              ))) : const SizedBox(),
+      isSelected != null && isSelected!
+          ? Positioned.fill(
+              child: Container(
+                  decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: MyColors.primary['CulturalYellow']!['c700']!
+                    .withOpacity(0.5),
+              )),
+            )
+          : const SizedBox(),
+      isSelected != null && isSelected!
+          ? Positioned.fill(
+              child: Align(
+                  alignment: Alignment.center,
+                  child: Image.asset(
+                    'assets/icons/i16/check-outline.png',
+                    width: 20,
+                    height: 20,
+                    color: MyColors.white['c900'],
+                  )))
+          : const SizedBox(),
     ]);
   }
 }

@@ -4,7 +4,13 @@ class Food {
   final String icon;
   final List<Category> categories;
 
-  Food(this.categories, this.value, this.label, this.icon);
+  Food({
+    required this.categories,
+    required this.value,
+    required this.label,
+    required this.icon,
+  });
+
 }
 
 class Category {
@@ -12,7 +18,12 @@ class Category {
   final String value;
   final String icon;
   final String type;
-  final double duration;
+  final double defaultDuration;
 
-  Category(this.value, this.duration, this.label, this.icon, this.type);
+  Category(
+      {required this.label,
+      required this.value,
+      required this.icon,
+      required this.type,
+      required this.defaultDuration});
 }

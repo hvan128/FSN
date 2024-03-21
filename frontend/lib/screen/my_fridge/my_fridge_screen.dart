@@ -97,10 +97,11 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
                                     height: 16,
                                   ),
                                   selectedTabIndex == 0
-                                      ? _renderCoolTab()
+                                      ? _renderTab(
+                                          listFoodsTest.reversed.toList())
                                       : selectedTabIndex == 1
-                                          ? _renderFreezeTab()
-                                          : _renderKitchenTab(),
+                                          ? _renderTab(listFoodsTest)
+                                          : _renderTab(listFoodsTest)
                                 ],
                               ),
                             ),
@@ -359,7 +360,7 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
     );
   }
 
-  Widget _renderCoolTab() {
+  Widget _renderTab(List<Food> foods) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: foods.map((food) {
@@ -368,18 +369,6 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Container(
-                //     width: 80,
-                //     height: 80,
-                //     padding: const EdgeInsets.all(5),
-                //     decoration: BoxDecoration(
-                //       borderRadius: BorderRadius.circular(20),
-                //       color: MyColors.grey['c200']!,
-                //     ),
-                //     child: Image.asset(food.icon, width: 60, height: 60)),
-                // const SizedBox(
-                //   width: 10,
-                // ),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -422,14 +411,16 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
                                       }
                                     } else {
                                       Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => AddCategoryDetailScreen(category: category),
-                                        )
-                                      );
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                AddCategoryDetailScreen(
+                                                    category: category),
+                                          ));
                                     }
                                   },
                                   onLongPress: () {
+                                    widget.showBottomBar!(false);
                                     setState(() {
                                       isSelected.add(category);
                                       isSelecting = true;
@@ -497,7 +488,8 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
                                       alertType: AlertType.success,
                                       position: AlertPosition.topCenter,
                                       title: 'Thành công',
-                                      description: 'Đã di chuyển ${isSelected.length} đồ ăn tới ${value.label}!',
+                                      description:
+                                          'Đã di chuyển ${isSelected.length} đồ ăn tới ${value.label}!',
                                     );
                                   });
                             });
