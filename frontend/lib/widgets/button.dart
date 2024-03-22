@@ -78,7 +78,7 @@ class MyButton extends StatelessWidget {
           disabledBackgroundColor: MyColors.grey['c100']!,
           disabledForegroundColor: MyColors.grey['c400']!,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(100),
+            borderRadius: BorderRadius.circular(10),
           ),
         ),
         child: Row(

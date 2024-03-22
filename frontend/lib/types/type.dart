@@ -9,3 +9,14 @@ class Item {
     this.icon,
   });
 }
+
+class Reaction {
+  final String type;
+  final String quantity;
+  final bool? isSelected;
+  Reaction({
+    required this.type,
+    required this.quantity,
+    this.isSelected = false,
+  });
+}

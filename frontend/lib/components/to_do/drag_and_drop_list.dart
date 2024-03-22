@@ -42,6 +42,7 @@ class DragNDropList extends StatefulWidget {
       this.navigateBottomBar});
 
   @override
+  // ignore: library_private_types_in_public_api
   _DragNDropList createState() => _DragNDropList();
 }
 

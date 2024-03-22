@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+ import 'package:flutter/material.dart';
 import 'package:frontend/components/item/item_category.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
 import 'package:frontend/components/modals/modal_select.dart';
@@ -9,7 +9,7 @@ import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/food.dart';
 import 'package:frontend/types/type.dart';
-import 'package:frontend/utils/constants.dart';
+import 'package:frontend/utils/test_constants.dart';
 import 'package:frontend/widgets/divider.dart';
 import 'package:frontend/widgets/tab_button.dart';
 import 'package:frontend/widgets/text.dart';
@@ -28,6 +28,7 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
   int selectedTabIndex = 0;
   bool isSelecting = false;
   List<Category> isSelected = [];
+  PageController pageController = PageController(initialPage: 0);
   final List<Item> listPositions = [
     Item(
       label: "Tủ lạnh",
@@ -68,43 +69,42 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
                     height: 5,
                   ),
                   Expanded(
-                    child: SingleChildScrollView(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
-                              colors: [
-                                MyColors.primary['CulturalYellow']!['c50']!,
-                                MyColors.primary['CulturalYellow']!['c50']!
-                                    .withOpacity(0.0),
-                              ],
-                              stops: const [
-                                0.8,
-                                1.0
-                              ]),
-                        ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                            colors: [
+                              MyColors.primary['CulturalYellow']!['c50']!,
+                              MyColors.primary['CulturalYellow']!['c50']!
+                                  .withOpacity(0.0),
+                            ],
+                            stops: const [
+                              0.8,
+                              1.0
+                            ]),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const SizedBox(
-                                    height: 16,
-                                  ),
-                                  selectedTabIndex == 0
-                                      ? _renderTab(
-                                          listFoodsTest.reversed.toList())
-                                      : selectedTabIndex == 1
-                                          ? _renderTab(listFoodsTest)
-                                          : _renderTab(listFoodsTest)
-                                ],
-                              ),
+                            const SizedBox(
+                              height: 16,
                             ),
+                            Flexible(
+                              child: PageView(
+                                  controller: pageController,
+                                  onPageChanged: (value) => setState(() {
+                                        selectedTabIndex = value;
+                                      }),
+                                  children: [
+                                    _renderTab(listFoodsTest),
+                                    _renderTab(listFoodsTest2),
+                                    _renderTab(listFoodsTest3),
+                                  ]),
+                            )
                           ],
                         ),
                       ),
@@ -331,27 +331,21 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
               title: 'Lạnh',
               isSelected: selectedTabIndex == 0,
               onTap: () {
-                setState(() {
-                  selectedTabIndex = 0;
-                });
+                pageController.animateToPage(0, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
               },
             ),
             MyTabButton(
               title: 'Đông',
               isSelected: selectedTabIndex == 1,
               onTap: () {
-                setState(() {
-                  selectedTabIndex = 1;
-                });
+                pageController.animateToPage(1, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
               },
             ),
             MyTabButton(
               title: 'Bếp',
               isSelected: selectedTabIndex == 2,
               onTap: () {
-                setState(() {
-                  selectedTabIndex = 2;
-                });
+                pageController.animateToPage(2, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
               },
             ),
           ],
@@ -361,102 +355,96 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
   }
 
   Widget _renderTab(List<Food> foods) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: foods.map((food) {
-        return Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: MyText(
-                          text: '${food.label} (${food.categories.length})',
-                          fontSize: FontSize.z16,
-                          fontWeight: FontWeight.w600,
-                          color: MyColors.grey['c900']!,
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: foods.map((food) {
+          return Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: MyText(
+                            text: '${food.label} (${food.categories.length})',
+                            fontSize: FontSize.z16,
+                            fontWeight: FontWeight.w600,
+                            color: MyColors.grey['c900']!,
+                          ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: MyColors.grey['c100']!,
-                          borderRadius: BorderRadius.circular(20),
+                        const SizedBox(
+                          height: 5,
                         ),
-                        child: Wrap(
-                          spacing: 14,
-                          runSpacing: 5,
-                          children: food.categories
-                              .map((category) => GestureDetector(
-                                  onTap: () {
-                                    if (isSelecting) {
-                                      if (isSelected.contains(category)) {
-                                        setState(() {
-                                          isSelected.remove(category);
-                                        });
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: MyColors.grey['c100']!,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Wrap(
+                            spacing: 14,
+                            runSpacing: 5,
+                            children: food.categories
+                                .map((category) => GestureDetector(
+                                    onTap: () {
+                                      if (isSelecting) {
+                                        if (isSelected.contains(category)) {
+                                          setState(() {
+                                            isSelected.remove(category);
+                                          });
+                                        } else {
+                                          setState(() {
+                                            isSelected.add(category);
+                                          });
+                                        }
                                       } else {
-                                        setState(() {
-                                          isSelected.add(category);
-                                        });
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  AddCategoryDetailScreen(
+                                                      category: category),
+                                            ));
                                       }
-                                    } else {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                AddCategoryDetailScreen(
-                                                    category: category),
-                                          ));
-                                    }
-                                  },
-                                  onLongPress: () {
-                                    widget.showBottomBar!(false);
-                                    setState(() {
-                                      isSelected.add(category);
-                                      isSelecting = true;
-                                    });
-                                  },
-                                  child: ItemCategory(
-                                    category: category,
-                                    isSelected: isSelected.contains(category),
-                                  )))
-                              .toList(),
+                                    },
+                                    onLongPress: () {
+                                      widget.showBottomBar!(false);
+                                      setState(() {
+                                        isSelected.add(category);
+                                        isSelecting = true;
+                                      });
+                                    },
+                                    child: ItemCategory(
+                                      category: category,
+                                      isSelected: isSelected.contains(category),
+                                    )))
+                                .toList(),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            const MyDivider(),
-            const SizedBox(
-              height: 10,
-            )
-          ],
-        );
-      }).toList(),
+                ],
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              const MyDivider(),
+              const SizedBox(
+                height: 10,
+              )
+            ],
+          );
+        }).toList(),
+      ),
     );
-  }
-
-  Widget _renderKitchenTab() {
-    return Container();
-  }
-
-  Widget _renderFreezeTab() {
-    return Container();
   }
 
   Widget _buildOptions() {

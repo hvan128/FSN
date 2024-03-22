@@ -5,6 +5,7 @@ import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/food.dart';
 import 'package:frontend/utils/constants.dart';
+import 'package:frontend/utils/test_constants.dart';
 import 'package:tiengviet/tiengviet.dart';
 
 enum SearchType {
@@ -37,11 +38,11 @@ class _SearchScreenState extends State<SearchScreen> {
     } else {
       listCategories = [];
       if (widget.type == SearchType.mine) {
-        listCategoriesTest.forEach((element) {
+        for (var element in listCategoriesTest) {
           if (TiengViet.parse(element.label).contains(searchText)) {
             listCategories!.add(element);
           }
-        });
+        }
       } else {
         for (var element in allCategories) {
           if (TiengViet.parse(element.label).contains(searchText)) {

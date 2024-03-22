@@ -1,4 +1,5 @@
 import 'package:frontend/types/food.dart';
+import 'package:frontend/types/type.dart';
 
 List<Category> fruits = [
   Category(
@@ -3186,17 +3187,20 @@ List<Category> allCategories = [
   ...cereals,
   ...etc
 ];
-
-List<Food> listFoodsTest = foods.map((food) {
-  return Food(
-    categories: food.categories.length > 3
-        ? food.categories.sublist(0, 3)
-        : food.categories,
-    value: food.value,
-    label: food.label,
-    icon: food.icon,
-  );
-}).toList();
-
-List<Category> listCategoriesTest =
-    listFoodsTest.expand((food) => food.categories).toSet().toList();
+List<Item> reactions = [
+  Item(
+      value: 'delicious',
+      label: 'Delicious',
+      icon: 'assets/icons/i16/eat.png',
+    ),
+    Item(
+      value: 'love',
+      label: 'Yêu thích',
+      icon: 'assets/icons/i16/heart.png',
+    ),
+    Item(
+      value: 'like',
+      label: 'Thích',
+      icon: 'assets/icons/i16/vo-tay.png',
+    ),
+];

@@ -14,7 +14,7 @@ class MyTextArea extends StatefulWidget {
   final void Function(String)? onChange;
   final String? value;
 
-  MyTextArea({
+  const MyTextArea({
     super.key,
     this.hintText,
     required this.hasError, // Added hasError property
@@ -26,8 +26,9 @@ class MyTextArea extends StatefulWidget {
     this.onChange,
     this.value = '',
   });
-
+  
   @override
+  // ignore: library_private_types_in_public_api
   _MyTextAreaState createState() => _MyTextAreaState();
 }
 

@@ -31,7 +31,7 @@ class MyColors {
   static final secondary = {
     'DawnOrange': {
       'c900': const Color(0xFF904432),
-      'c800': const Color(0xFFCA5E42),
+      'c800': Color.fromARGB(255, 243, 118, 86),
       'c700': const Color(0xFFFF8A69),
       'c600': const Color(0xFFFB967A),
       'c500': const Color(0xFFFFA88F),

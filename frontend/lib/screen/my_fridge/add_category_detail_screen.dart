@@ -4,7 +4,7 @@ import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/food.dart';
 import 'package:frontend/types/type.dart';
 import 'package:frontend/utils/constants.dart';
-import 'package:frontend/utils/functions-core.dart';
+import 'package:frontend/utils/functions_core.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/date_picker.dart';
 import 'package:frontend/widgets/drop-down.dart';
@@ -269,7 +269,7 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
                           },
                           icon: const Icon(Icons.remove, size: 15))),
                   MyText(
-                      text: '${quantity}',
+                      text: '$quantity',
                       fontSize: FontSize.z15,
                       fontWeight: FontWeight.w700,
                       color: MyColors.white['c900']!),
@@ -314,7 +314,6 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
               label: 'Tạo mới',
             ),
             onTapOtherAction: () {
-              print('add');
             },
           )),
       const SizedBox(
@@ -325,7 +324,6 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
         content: MyDatePicker(
           label: 'Date of birth',
           onDateSelected: (DateTime date) {
-            print('Selected Date: $date');
           },
         ),
       ),
@@ -337,7 +335,6 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
         content: MyDatePicker(
           label: 'Date of birth',
           onDateSelected: (DateTime date) {
-            print('Selected Date: $date');
           },
 
         ),

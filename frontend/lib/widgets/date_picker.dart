@@ -35,7 +35,6 @@ class _MyDatePickerState extends State<MyDatePicker> {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: selectedDate,
-      locale: const Locale('vi', 'VN'),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
       builder: (context, child) {
