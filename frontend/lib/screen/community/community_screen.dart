@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/components/card/food_card.dart';
 import 'package:frontend/components/community/my_kitchen_dishes.dart';
 import 'package:frontend/components/community/recent_recipes.dart';
-import 'package:frontend/components/item/item_ingredient.dart';
 import 'package:frontend/screen/search/search_screen.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
-import 'package:frontend/types/dish.dart';
-import 'package:frontend/types/food.dart';
-import 'package:frontend/utils/constants.dart';
-import 'package:frontend/utils/test_constants.dart';
 import 'package:frontend/widgets/text.dart';
 
 class CommunityScreen extends StatefulWidget {

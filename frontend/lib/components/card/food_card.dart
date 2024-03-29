@@ -145,15 +145,15 @@ class _FoodCardState extends State<FoodCard> {
                                   widget.dish.isSaved!
                               ? Image.asset(
                                   'assets/icons/i16/save-book-mark.png',
-                                  width: 30,
-                                  height: 30,
+                                  width: 25,
+                                  height: 25,
                                   color: MyColors
                                       .primary['CulturalYellow']!['c700']!,
                                 )
                               : Image.asset(
                                   'assets/icons/i16/bookmark-outline.png',
-                                  width: 22,
-                                  height: 22,
+                                  width: 25,
+                                  height: 25,
                                   color: MyColors.white['c900']!,
                                 ),
                         )))

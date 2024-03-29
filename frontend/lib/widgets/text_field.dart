@@ -6,27 +6,47 @@ import 'package:frontend/widgets/text.dart';
 class MyTextField extends StatefulWidget {
   final String? hintText;
   final bool obscureText;
-  final bool hasError; // Added hasError property
+  final bool hasError;
   final String? errorText;
+  final double? height;
+  final double? width;
+  final double? fontSize;
   final String? label;
   final double? borderRadius;
   final String? value;
+  final FontWeight? hintFontWeight;
+  final FontWeight? labelFontWeight;
+  final Color? labelColor;
   final void Function(String)? onChange;
+  final TextEditingController? controller;
+  final bool? multipleLine;
+  final int? hintMaxLines;
+  final bool? isReadOnly;
 
   const MyTextField({
     super.key,
     this.hintText,
     required this.obscureText,
-    required this.hasError, // Added hasError property
+    required this.hasError,
     this.errorText,
-    required this.label,
+    this.label,
     this.borderRadius = 16,
     this.value = '',
     this.onChange,
+    this.controller,
+    this.height,
+    this.width,
+    this.fontSize,
+    this.labelFontWeight,
+    this.labelColor,
+    this.hintFontWeight,
+    this.multipleLine = false,
+    this.hintMaxLines = 10,
+    this.isReadOnly = false,
   });
 
   @override
-  _MyTextFieldState createState() => _MyTextFieldState();
+  State createState() => _MyTextFieldState();
 }
 
 class _MyTextFieldState extends State<MyTextField> {
@@ -44,53 +64,47 @@ class _MyTextFieldState extends State<MyTextField> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          height: 64,
+          width: widget.width ?? double.infinity,
           child: TextField(
-              maxLines: null,
-              expands: true,
-              controller: _controller,
+              readOnly: widget.isReadOnly!,
+              minLines: 1,
+              maxLines: 10,
+              cursorColor: MyColors.primary['CulturalYellow']!['c700']!,
+              keyboardType: widget.multipleLine!
+                  ? TextInputType.multiline
+                  : TextInputType.text,
+              controller: widget.controller ?? _controller,
+              style: TextStyle(
+                  color: widget.labelColor ?? MyColors.grey['c900']!,
+                  fontSize: widget.fontSize ?? FontSize.z16,
+                  fontWeight: widget.labelFontWeight ?? FontWeight.w900),
               onChanged: (value) {
                 setState(() {
-                  _controller.text = value;
+                  _controller.text = widget.controller?.text ?? value;
                 });
                 widget.onChange!(value);
               },
               obscureText: widget.obscureText,
               decoration: InputDecoration(
                 contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: !widget.hasError ? 1 : 2,
-                      color: !widget.hasError
-                          ? MyColors.grey['c200']!
-                          : MyColors.support['Error']!['c900']!,
-                    ),
-                    borderRadius: BorderRadius.circular(widget.borderRadius!)),
-                disabledBorder: OutlineInputBorder(
-                  borderSide:
-                      BorderSide(width: 1, color: MyColors.grey['c900']!),
-                  borderRadius: BorderRadius.circular(widget.borderRadius!),
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                hintMaxLines: widget.hintMaxLines,
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: MyColors.grey['c200']!),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      width: 2, color: MyColors.primary['KiduBlue']!['c700']!),
-                  borderRadius: BorderRadius.circular(widget.borderRadius!),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: MyColors.grey['c200']!),
                 ),
+                focusColor: MyColors.grey['c200']!,
                 fillColor: !widget.hasError
                     ? Colors.transparent
                     : MyColors.support['Error']!['c400']!,
                 filled: true,
-                label: MyText(
-                    text: widget.label ?? '',
-                    color: MyColors.grey['c500']!,
-                    fontSize: FontSize.z16,
-                    fontWeight: FontWeight.w600),
                 hintText: widget.hintText,
                 hintStyle: TextStyle(
-                    color: MyColors.grey['c200']!,
-                    fontSize: FontSize.z16,
-                    fontWeight: FontWeight.w600),
+                    color: MyColors.grey['c300']!,
+                    fontSize: widget.fontSize ?? FontSize.z16,
+                    fontWeight: widget.hintFontWeight ?? FontWeight.w400),
               )),
         ),
         !widget.hasError

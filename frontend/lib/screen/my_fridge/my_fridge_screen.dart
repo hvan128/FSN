@@ -252,7 +252,7 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Image.asset(
-                          'assets/icons/i16/three-dots.png',
+                          'assets/icons/i16/dots-vertical.png',
                           width: 30,
                           height: 30,
                           color: MyColors.white['c900'],

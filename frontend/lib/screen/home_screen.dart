@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend/screen/account/account_screen.dart';
 import 'package:frontend/screen/community/community_screen.dart';
 import 'package:frontend/screen/my_fridge/my_fridge_screen.dart';
@@ -42,11 +43,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 items: [
                   BottomNavigationBarItem(
-                    tooltip: "Home",
+                    tooltip: "Tủ lạnh",
                     icon: _navigateItem(
                         _currentIndex == 0 ? true : false,
-                        'Home',
-                        Image.asset('assets/icons/home.png',
+                        'Tủ lạnh',
+                        Image.asset('assets/icons/i16/home.png',
                             width: 25,
                             height: 25,
                             color: _currentIndex == 0
@@ -55,11 +56,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     label: '',
                   ),
                   BottomNavigationBarItem(
-                    tooltip: "Account",
+                    tooltip: "Cộng đồng",
                     icon: _navigateItem(
                         _currentIndex == 1 ? true : false,
-                        'Account',
-                        Image.asset('assets/icons/home.png',
+                        'Cộng đồng',
+                        Image.asset('assets/icons/i16/users.png',
                             width: 25,
                             height: 25,
                             color: _currentIndex == 1
@@ -68,26 +69,23 @@ class _HomeScreenState extends State<HomeScreen> {
                     label: '',
                   ),
                   BottomNavigationBarItem(
-                      icon: Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(100),
-                          color: MyColors.grey['c300'],
-                        ),
-                        child: Image.asset('assets/icons/home.png',
+                    tooltip: "Danh sách",
+                    icon: _navigateItem(
+                        _currentIndex == 2 ? true : false,
+                        'Account',
+                        Image.asset('assets/icons/i16/list.png',
                             width: 25,
                             height: 25,
                             color: _currentIndex == 2
                                 ? MyColors.primary['CulturalYellow']!['c700']!
-                                : MyColors.grey['c500']!),
-                      ),
-                      tooltip: "Todo",
-                      label: ''),
+                                : MyColors.grey['c500']!)),
+                    label: '',
+                  ),
                   BottomNavigationBarItem(
                     icon: _navigateItem(
                         _currentIndex == 3 ? true : false,
-                        'Withdrawal',
-                        Image.asset('assets/icons/home.png',
+                        'Báo cáo',
+                        Image.asset('assets/icons/i16/chart.png',
                             width: 25,
                             height: 25,
                             color: _currentIndex == 3
@@ -99,8 +97,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   BottomNavigationBarItem(
                     icon: _navigateItem(
                         _currentIndex == 4 ? true : false,
-                        'More',
-                        Image.asset('assets/icons/home.png',
+                        'Tài khoản',
+                        Image.asset('assets/icons/i16/account.png',
                             width: 25,
                             height: 25,
                             color: _currentIndex == 4

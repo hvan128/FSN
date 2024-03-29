@@ -7,6 +7,7 @@ import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/food.dart';
 import 'package:frontend/utils/constants.dart';
+import 'package:frontend/widgets/button_icon.dart';
 import 'package:frontend/widgets/divider.dart';
 import 'package:frontend/widgets/header.dart';
 import 'package:frontend/widgets/text.dart';
@@ -39,7 +40,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                 ? selectedFood!.label
                 : "Thêm đồ ăn",
             bgColor: MyColors.white['c900']!,
-            rightIcon: IconButton(
+            rightIcon: MyIconButton(
                 onPressed: () {
                   Navigator.push(
                       context,
@@ -51,7 +52,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                   color: Colors.black,
                   size: 28,
                 )),
-            leftIcon: IconButton(
+            leftIcon: MyIconButton(
                 icon: const Icon(Icons.close),
                 onPressed: () {
                   Navigator.pop(context);

@@ -1,4 +1,3 @@
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/components/card/food_card.dart';
@@ -65,11 +64,6 @@ class _DishDetailState extends State<DishDetail> {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      Image.asset(
-        widget.dish.image,
-        fit: BoxFit.fitHeight,
-        height: MediaQuery.of(context).size.height * 0.4,
-      ),
       Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -89,14 +83,14 @@ class _DishDetailState extends State<DishDetail> {
                 widget.dish.isSaved != null && widget.dish.isSaved!
                     ? Image.asset(
                         'assets/icons/i16/save-book-mark.png',
-                        width: 30,
-                        height: 30,
+                        width: 25,
+                        height: 25,
                         color: MyColors.primary['CulturalYellow']!['c700']!,
                       )
                     : Image.asset(
                         'assets/icons/i16/bookmark-outline.png',
-                        width: 22,
-                        height: 22,
+                        width: 25,
+                        height: 25,
                         color: MyColors.white['c900']!,
                       ),
               ],
@@ -305,7 +299,7 @@ class _DishDetailState extends State<DishDetail> {
                       width: 30,
                       height: 30,
                       decoration: BoxDecoration(
-                        color: MyColors.grey!['c700']!,
+                        color: MyColors.grey['c700']!,
                         borderRadius: BorderRadius.circular(100),
                       ),
                       child: Center(

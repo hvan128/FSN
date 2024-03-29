@@ -101,7 +101,7 @@ class _HeaderState extends State<MyHeader> {
                                     widget.leftIcon!,
                                   ],
                                 ))
-                            : MyIconButton(
+                            : MyIconButton2(
                                 src: widget.srcLeftIcon,
                                 heightIcon: 16,
                                 widthIcon: 16,
@@ -147,7 +147,7 @@ class _HeaderState extends State<MyHeader> {
                                   widget.rightIcon!,
                                 ],
                               ))
-                          : MyIconButton(
+                          : MyIconButton2(
                               src: widget.srcRightIcon,
                               heightIcon: 16,
                               widthIcon: 16,

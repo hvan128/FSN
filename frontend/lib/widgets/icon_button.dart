@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class MyIconButton extends StatelessWidget {
+class MyIconButton2 extends StatelessWidget {
   final Color? bgColor;
   final String src;
   final double widthIcon;
@@ -9,7 +9,7 @@ class MyIconButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final double padding;
 
-  const MyIconButton({
+  const MyIconButton2({
     super.key,
     this.bgColor,
     required this.src,

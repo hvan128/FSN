@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
+import 'package:frontend/widgets/button_icon.dart';
 import 'package:frontend/widgets/text.dart';
 
 enum AlertType { success, error, info }
@@ -123,11 +124,11 @@ class MyAlert extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      IconButton(
+                      MyIconButton(
                         icon: alertType == AlertType.success
                             ? Image.asset(successIcon, width: 70, height: 70)
                             : Image.asset(failIcon, width: 70, height: 70),
-                        onPressed: null,
+                        onPressed: () => Navigator.of(context).pop(),
                       ),
                     ],
                   ),

@@ -3,6 +3,7 @@ import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/food.dart';
+import 'package:frontend/widgets/button_icon.dart';
 import 'package:frontend/widgets/divider.dart';
 import 'package:frontend/widgets/header.dart';
 import 'package:frontend/widgets/switch_button.dart';
@@ -120,14 +121,14 @@ class _DragNDropList extends State<DragNDropList> {
             width: 8,
           ),
           Image.asset(
-            'assets/icons/i16/three-dots.png',
+            'assets/icons/i16/dots-vertical.png',
             width: 30,
             height: 30,
             color: MyColors.grey['c900'],
           ),
         ]),
         leftIcon: isSelecting
-            ? IconButton(
+            ? MyIconButton(
                 icon: Image.asset(
                   'assets/icons/i16/close.png',
                   width: 20,
