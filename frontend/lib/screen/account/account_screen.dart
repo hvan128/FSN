@@ -32,7 +32,9 @@ class _AccountScreenState extends State<AccountScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: CustomScrollView(slivers: [
+        body: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
       SliverAppBar(
           pinned: true,
           expandedHeight: 200,

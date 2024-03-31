@@ -36,30 +36,29 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
       body: SafeArea(
         child: Column(children: [
           MyHeader(
+            bgUnderColor: MyColors.primary['CulturalYellow']!['c50']!,
             title: selectedFood != null && selectedFood?.label != null
                 ? selectedFood!.label
                 : "Thêm đồ ăn",
             bgColor: MyColors.white['c900']!,
-            rightIcon: MyIconButton(
+            rightIcon: IconButton(
                 onPressed: () {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => const SearchScreen()));
                 },
-                icon: const Icon(
-                  Icons.search,
-                  color: Colors.black,
-                  size: 28,
-                )),
-            leftIcon: MyIconButton(
-                icon: const Icon(Icons.close),
+                icon: Image.asset('assets/icons/i16/search.png',
+                    width: 25, height: 25, color: MyColors.grey['c900']!)),
+            leftIcon: IconButton(
+                icon:  Icon(Icons.close, color: MyColors.grey['c900']!,),
                 onPressed: () {
                   Navigator.pop(context);
                 }),
           ),
           Expanded(
               child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
               child: Column(

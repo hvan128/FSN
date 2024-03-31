@@ -3,10 +3,8 @@ import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/food.dart';
-import 'package:frontend/widgets/button_icon.dart';
 import 'package:frontend/widgets/divider.dart';
 import 'package:frontend/widgets/header.dart';
-import 'package:frontend/widgets/switch_button.dart';
 import 'package:frontend/widgets/text.dart';
 
 class DraggableList {
@@ -122,17 +120,18 @@ class _DragNDropList extends State<DragNDropList> {
           ),
           Image.asset(
             'assets/icons/i16/dots-vertical.png',
-            width: 30,
-            height: 30,
+            width: 24,
+            height: 24,
             color: MyColors.grey['c900'],
           ),
         ]),
         leftIcon: isSelecting
-            ? MyIconButton(
+            ? IconButton(
                 icon: Image.asset(
                   'assets/icons/i16/close.png',
-                  width: 20,
-                  height: 20,
+                  width: 24,
+                  height: 24,
+                  color: MyColors.grey['c900']!,
                 ),
                 onPressed: () {
                   widget.showBottomBar?.call(true);
@@ -160,7 +159,7 @@ class _DragNDropList extends State<DragNDropList> {
       Expanded(
           child: Stack(children: [
         Padding(
-            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
             child: Column(
               children: [
                 Row(
@@ -203,30 +202,30 @@ class _DragNDropList extends State<DragNDropList> {
                             ],
                           )
                         : const SizedBox(),
-                    isSelecting
-                        ? const SizedBox()
-                        : Row(
-                            children: [
-                              MyText(
-                                  text: 'Phân loại',
-                                  fontWeight: FontWeight.w500,
-                                  color: MyColors.grey['c700']!,
-                                  fontSize: FontSize.z16),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              MySwitch(
-                                  value: classify,
-                                  onChange: (value) {
-                                    setState(() {
-                                      classify = value;
-                                    });
-                                  }),
-                              const SizedBox(
-                                width: 5,
-                              )
-                            ],
-                          )
+                    // isSelecting
+                    //     ? const SizedBox()
+                    //     : Row(
+                    //         children: [
+                    //           MyText(
+                    //               text: 'Phân loại',
+                    //               fontWeight: FontWeight.w500,
+                    //               color: MyColors.grey['c700']!,
+                    //               fontSize: FontSize.z16),
+                    //           const SizedBox(
+                    //             width: 5,
+                    //           ),
+                    //           MySwitch(
+                    //               value: classify,
+                    //               onChange: (value) {
+                    //                 setState(() {
+                    //                   classify = value;
+                    //                 });
+                    //               }),
+                    //           const SizedBox(
+                    //             width: 5,
+                    //           )
+                    //         ],
+                    //       )
                   ],
                 ),
                 Expanded(child: _buildList()),
@@ -270,89 +269,145 @@ class _DragNDropList extends State<DragNDropList> {
         : ReorderableListView(
             children: allItems != null
                 ? allItems!
-                    .map((item) => Column(
+                    .map((item) => Dismissible(
                           key: ValueKey(item.category.value),
-                          children: [
-                            Container(
-                              color: MyColors.grey['c50']!,
-                              child: Row(
-                                children: [
-                                  isSelecting
-                                      ? Checkbox(
-                                          activeColor: MyColors.primary[
-                                              'CulturalYellow']!['c600']!,
-                                          value: item.isSelected,
-                                          onChanged: (bool? value) {
-                                            print(selectedListItems.length);
-                                            setState(() {
-                                              item.isSelected = value!;
-                                              if (item.isSelected) {
-                                                selectedListItems.add(item);
-                                              } else {
-                                                selectedListItems.remove(item);
-                                              }
-                                            });
-                                          },
-                                        )
-                                      : Container(),
-                                  Expanded(
-                                    child: ListTile(
-                                      leading: Image.asset(
-                                        item.category.icon,
-                                        width: 40,
-                                        height: 40,
-                                        color: item.isDeleted
-                                            ? MyColors.grey['c700']!
-                                                .withOpacity(0.4)
-                                            : null,
-                                        fit: BoxFit.cover,
+                          secondaryBackground: Container(
+                              height: 40,
+                              color: const Color.fromARGB(255, 200, 72, 63),
+                              alignment: Alignment.centerRight,
+                              child: Padding(
+                                  padding: const EdgeInsets.only(right: 30),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      MyText(
+                                          text: 'Xóa',
+                                          fontSize: FontSize.z14,
+                                          fontWeight: FontWeight.w600,
+                                          color: MyColors.white['c900']!),
+                                      const SizedBox(
+                                        width: 10,
                                       ),
-                                      title: Text(
-                                        item.category.label,
-                                        style: item.isDeleted
-                                            ? const TextStyle(
-                                                // color: MyColors.grey['c500']!,
-                                                decoration:
-                                                    TextDecoration.lineThrough,
-                                                fontSize: FontSize.z14)
-                                            : const TextStyle(
-                                                fontSize: FontSize.z14,
-                                              ),
+                                      Image.asset(
+                                        'assets/icons/i16/delete.png',
+                                        width: 26,
+                                        height: 26,
+                                        color: MyColors.white['c900'],
                                       ),
-                                      onTap: () {
-                                        handleTapItem(item);
-                                      },
-                                      onLongPress: () {
-                                        setState(() {
-                                          isSelecting = true;
-                                          if (classify) {
-                                            classify = false;
-                                          }
-                                          item.isSelected = !item.isSelected;
-                                          if (item.isSelected) {
-                                            selectedListItems.add(item);
-                                          } else {
-                                            selectedListItems.remove(item);
-                                          }
-                                        });
-                                        widget.showBottomBar?.call(false);
-                                      },
+                                    ],
+                                  ))),
+                          background: Container(
+                              height: 40,
+                              color:
+                                  MyColors.primary['CulturalYellow']!['c600']!,
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 30),
+                                child: Row(
+                                  children: [
+                                    Image.asset(
+                                      'assets/icons/i16/save.png',
+                                      width: 26,
+                                      height: 26,
+                                      color: MyColors.grey['c900'],
                                     ),
-                                  ),
-                                  !isSelecting && !item.isDeleted
-                                      ? Container(
-                                          padding:
-                                              const EdgeInsets.only(right: 10),
-                                          child: Icon(Icons.menu,
-                                              color: MyColors.primary[
-                                                  'CulturalYellow']!['c600']!),
-                                        )
-                                      : Container(),
-                                ],
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    MyText(
+                                        text: 'Bảo quản',
+                                        fontSize: FontSize.z14,
+                                        fontWeight: FontWeight.w600,
+                                        color: MyColors.grey['c900']!),
+                                  ],
+                                ),
+                              )),
+                          child: Column(
+                            children: [
+                              Container(
+                                color:
+                                    MyColors.primary['CulturalYellow']!['c50']!,
+                                child: Row(
+                                  children: [
+                                    isSelecting
+                                        ? Checkbox(
+                                            activeColor: MyColors.primary[
+                                                'CulturalYellow']!['c600']!,
+                                            value: item.isSelected,
+                                            onChanged: (bool? value) {
+                                              print(selectedListItems.length);
+                                              setState(() {
+                                                item.isSelected = value!;
+                                                if (item.isSelected) {
+                                                  selectedListItems.add(item);
+                                                } else {
+                                                  selectedListItems
+                                                      .remove(item);
+                                                }
+                                              });
+                                            },
+                                          )
+                                        : Container(),
+                                    Expanded(
+                                      child: ListTile(
+                                        leading: Image.asset(
+                                          item.category.icon,
+                                          width: 40,
+                                          height: 40,
+                                          color: item.isDeleted
+                                              ? MyColors.grey['c700']!
+                                                  .withOpacity(0.4)
+                                              : null,
+                                          fit: BoxFit.cover,
+                                        ),
+                                        title: Text(
+                                          item.category.label,
+                                          style: item.isDeleted
+                                              ? const TextStyle(
+                                                  // color: MyColors.grey['c500']!,
+                                                  decoration: TextDecoration
+                                                      .lineThrough,
+                                                  fontSize: FontSize.z14)
+                                              : const TextStyle(
+                                                  fontSize: FontSize.z14,
+                                                ),
+                                        ),
+                                        onTap: () {
+                                          handleTapItem(item);
+                                        },
+                                        onLongPress: () {
+                                          setState(() {
+                                            isSelecting = true;
+                                            if (classify) {
+                                              classify = false;
+                                            }
+                                            item.isSelected = !item.isSelected;
+                                            if (item.isSelected) {
+                                              selectedListItems.add(item);
+                                            } else {
+                                              selectedListItems.remove(item);
+                                            }
+                                          });
+                                          widget.showBottomBar?.call(false);
+                                        },
+                                      ),
+                                    ),
+                                    !isSelecting && !item.isDeleted
+                                        ? Container(
+                                            padding: const EdgeInsets.only(
+                                                right: 10),
+                                            child: Icon(Icons.menu,
+                                                color: MyColors.primary[
+                                                        'CulturalYellow']![
+                                                    'c600']!),
+                                          )
+                                        : Container(),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const MyDivider(type: Type.solid),
-                          ],
+                              const MyDivider(type: Type.solid),
+                            ],
+                          ),
                         ))
                     .toList()
                 : [

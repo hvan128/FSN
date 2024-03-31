@@ -66,8 +66,8 @@ class _HeaderState extends State<MyHeader> {
             decoration: BoxDecoration(
                 color: widget.bgColor,
                 borderRadius: const BorderRadius.only(
-                    bottomRight: Radius.circular(16),
-                    bottomLeft: Radius.circular(16))),
+                    bottomRight: Radius.circular(24),
+                    bottomLeft: Radius.circular(24))),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -81,12 +81,12 @@ class _HeaderState extends State<MyHeader> {
                                 : widget.onLeftPressed ??
                                     _defaultOnLeftPressed(context),
                             child: SizedBox(
-                              width: 16,
-                              height: 16,
+                              width: 24,
+                              height: 24,
                               child: Image.asset(
-                                'assets/icons/i16/back.png',
-                                width: 16,
-                                height: 16,
+                                'assets/icons/i24/arrow-left.png',
+                                width: 24,
+                                height: 24,
                               ),
                             ),
                           )
@@ -103,8 +103,8 @@ class _HeaderState extends State<MyHeader> {
                                 ))
                             : MyIconButton2(
                                 src: widget.srcLeftIcon,
-                                heightIcon: 16,
-                                widthIcon: 16,
+                                heightIcon: 24,
+                                widthIcon: 24,
                                 onPressed: widget.disableLeftButton
                                     ? null
                                     : widget.onLeftPressed ??
@@ -131,8 +131,8 @@ class _HeaderState extends State<MyHeader> {
                               ? null
                               : widget.onRightPressed,
                           child: SizedBox(
-                              width: 16,
-                              height: 16,
+                              width: 24,
+                              height: 24,
                               child: Image.asset(
                                 'assets/icons/i16/close.png',
                               )),
@@ -149,8 +149,8 @@ class _HeaderState extends State<MyHeader> {
                               ))
                           : MyIconButton2(
                               src: widget.srcRightIcon,
-                              heightIcon: 16,
-                              widthIcon: 16,
+                              heightIcon: 24,
+                              widthIcon: 24,
                               onPressed: widget.disableRightButton
                                   ? null
                                   : widget.onRightPressed,

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend/screen/account/account_screen.dart';
 import 'package:frontend/screen/community/community_screen.dart';
 import 'package:frontend/screen/my_fridge/my_fridge_screen.dart';
+import 'package:frontend/screen/my_fridge/test_screen.dart';
 import 'package:frontend/screen/report/report_screen.dart';
 import 'package:frontend/screen/to_do/to_do_screen.dart';
 import 'package:frontend/theme/color.dart';
@@ -72,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     tooltip: "Danh sách",
                     icon: _navigateItem(
                         _currentIndex == 2 ? true : false,
-                        'Account',
+                        'Danh sách',
                         Image.asset('assets/icons/i16/list.png',
                             width: 25,
                             height: 25,

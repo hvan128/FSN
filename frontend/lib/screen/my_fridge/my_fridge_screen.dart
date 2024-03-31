@@ -354,98 +354,198 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
     );
   }
 
+  // Widget _renderTab(List<Food> foods) {
+  //   return SingleChildScrollView(
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: foods.map((food) {
+  //         return Column(
+  //           children: [
+  //             Row(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Expanded(
+  //                   child: Column(
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     children: [
+  //                       Padding(
+  //                         padding: const EdgeInsets.symmetric(horizontal: 10),
+  //                         child: MyText(
+  //                           text: '${food.label} (${food.categories.length})',
+  //                           fontSize: FontSize.z16,
+  //                           fontWeight: FontWeight.w600,
+  //                           color: MyColors.grey['c900']!,
+  //                         ),
+  //                       ),
+  //                       const SizedBox(
+  //                         height: 5,
+  //                       ),
+  //                       Container(
+  //                         width: MediaQuery.of(context).size.width,
+  //                         padding: const EdgeInsets.symmetric(
+  //                             horizontal: 12, vertical: 10),
+  //                         decoration: BoxDecoration(
+  //                           color: MyColors.grey['c100']!,
+  //                           borderRadius: BorderRadius.circular(20),
+  //                         ),
+  //                         child: Wrap(
+  //                           spacing: 14,
+  //                           runSpacing: 5,
+  //                           children: food.categories
+  //                               .map((category) => GestureDetector(
+  //                                   onTap: () {
+  //                                     if (isSelecting) {
+  //                                       if (isSelected.contains(category)) {
+  //                                         setState(() {
+  //                                           isSelected.remove(category);
+  //                                         });
+  //                                       } else {
+  //                                         setState(() {
+  //                                           isSelected.add(category);
+  //                                         });
+  //                                       }
+  //                                     } else {
+  //                                       Navigator.push(
+  //                                           context,
+  //                                           MaterialPageRoute(
+  //                                             builder: (context) =>
+  //                                                 AddCategoryDetailScreen(
+  //                                                     category: category),
+  //                                           ));
+  //                                     }
+  //                                   },
+  //                                   onLongPress: () {
+  //                                     widget.showBottomBar!(false);
+  //                                     setState(() {
+  //                                       isSelected.add(category);
+  //                                       isSelecting = true;
+  //                                     });
+  //                                   },
+  //                                   child: ItemCategory(
+  //                                     category: category,
+  //                                     isSelected: isSelected.contains(category),
+  //                                   )))
+  //                               .toList(),
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //             const SizedBox(
+  //               height: 10,
+  //             ),
+  //             const MyDivider(),
+  //             const SizedBox(
+  //               height: 10,
+  //             )
+  //           ],
+  //         );
+  //       }).toList(),
+  //     ),
+  //   );
+  // }
+
   Widget _renderTab(List<Food> foods) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: foods.map((food) {
-          return Column(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: MyText(
-                            text: '${food.label} (${food.categories.length})',
-                            fontSize: FontSize.z16,
-                            fontWeight: FontWeight.w600,
-                            color: MyColors.grey['c900']!,
+  return CustomScrollView(
+    slivers: [
+      SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (BuildContext context, int index) {
+            final food = foods[index];
+            return Column(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: MyText(
+                              text: '${food.label} (${food.categories.length})',
+                              fontSize: FontSize.z16,
+                              fontWeight: FontWeight.w600,
+                              color: MyColors.grey['c900']!,
+                            ),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Container(
-                          width: MediaQuery.of(context).size.width,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: MyColors.grey['c100']!,
-                            borderRadius: BorderRadius.circular(20),
+                          const SizedBox(
+                            height: 5,
                           ),
-                          child: Wrap(
-                            spacing: 14,
-                            runSpacing: 5,
-                            children: food.categories
-                                .map((category) => GestureDetector(
-                                    onTap: () {
-                                      if (isSelecting) {
-                                        if (isSelected.contains(category)) {
-                                          setState(() {
-                                            isSelected.remove(category);
-                                          });
-                                        } else {
-                                          setState(() {
-                                            isSelected.add(category);
-                                          });
-                                        }
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: MyColors.grey['c100']!,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Wrap(
+                              spacing: 14,
+                              runSpacing: 5,
+                              children: food.categories
+                                  .map((category) => GestureDetector(
+                                  onTap: () {
+                                    if (isSelecting) {
+                                      if (isSelected.contains(category)) {
+                                        setState(() {
+                                          isSelected.remove(category);
+                                        });
                                       } else {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  AddCategoryDetailScreen(
-                                                      category: category),
-                                            ));
+                                        setState(() {
+                                          isSelected.add(category);
+                                        });
                                       }
-                                    },
-                                    onLongPress: () {
-                                      widget.showBottomBar!(false);
-                                      setState(() {
-                                        isSelected.add(category);
-                                        isSelecting = true;
-                                      });
-                                    },
-                                    child: ItemCategory(
-                                      category: category,
-                                      isSelected: isSelected.contains(category),
-                                    )))
-                                .toList(),
+                                    } else {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                AddCategoryDetailScreen(
+                                                  category: category,
+                                                ),
+                                          ));
+                                    }
+                                  },
+                                  onLongPress: () {
+                                    widget.showBottomBar!(false);
+                                    setState(() {
+                                      isSelected.add(category);
+                                      isSelecting = true;
+                                    });
+                                  },
+                                  child: ItemCategory(
+                                    category: category,
+                                    isSelected: isSelected.contains(category),
+                                  )))
+                                  .toList(),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              const MyDivider(),
-              const SizedBox(
-                height: 10,
-              )
-            ],
-          );
-        }).toList(),
+                  ],
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                const MyDivider(),
+                const SizedBox(
+                  height: 10,
+                )
+              ],
+            );
+          },
+          childCount: foods.length,
+        ),
       ),
-    );
-  }
+    ],
+  );
+}
+
 
   Widget _buildOptions() {
     return Container(

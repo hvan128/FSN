@@ -10,16 +10,16 @@ import 'package:frontend/utils/test_constants.dart';
 import 'package:frontend/widgets/divider.dart';
 import 'package:frontend/widgets/text.dart';
 
-class ReportScreen extends StatefulWidget {
+class TestScreen extends StatefulWidget {
   final Function(bool)? showBottomBar;
   final Function(int)? navigateBottomBar;
-  const ReportScreen({super.key, this.showBottomBar, this.navigateBottomBar});
+  const TestScreen({super.key, this.showBottomBar, this.navigateBottomBar});
 
   @override
-  State<ReportScreen> createState() => _ReportScreenState();
+  State<TestScreen> createState() => _TestScreenState();
 }
 
-class _ReportScreenState extends State<ReportScreen>
+class _TestScreenState extends State<TestScreen>
     with TickerProviderStateMixin {
   late final TabController _tabController;
   String selectedFilter = '';
