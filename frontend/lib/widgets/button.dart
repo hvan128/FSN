@@ -9,8 +9,8 @@ class MyButton extends StatelessWidget {
   final ButtonType buttonType;
   final double? width;
   final double? height;
-  final IconData? startIcon;
-  final IconData? endIcon;
+  final Widget? startIcon;
+  final Widget? endIcon;
   final double? sizeStartIcon;
   final double? sizeEndIcon;
   final double? fontSize;
@@ -85,10 +85,7 @@ class MyButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            startIcon == null ? const SizedBox() : Icon(
-              startIcon,
-              size: sizeStartIcon,
-            ),
+            startIcon == null ? const SizedBox() : startIcon!,
             startIcon == null ? const SizedBox() : const SizedBox(
               width: 4,
             ),
@@ -101,10 +98,7 @@ class MyButton extends StatelessWidget {
             endIcon == null ? const SizedBox() : const SizedBox(
               width: 4,
             ),
-            endIcon == null ? const SizedBox() : Icon(
-              endIcon,
-              size: sizeEndIcon,
-            ),
+            endIcon == null ? const SizedBox() : endIcon!,
           ],
         ),
       ),

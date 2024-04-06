@@ -14,7 +14,7 @@ import 'package:frontend/widgets/text.dart';
 import 'package:frontend/widgets/text_area.dart';
 
 class AddCategoryDetailScreen extends StatefulWidget {
-  final Category? category;
+  final ItemCategory? category;
 
   const AddCategoryDetailScreen({super.key, this.category});
 

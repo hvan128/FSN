@@ -11,8 +11,8 @@ class TodoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Food> listFoods = foods.map((food) {
-      return Food(
+    final List<ItemFood> listFoods = foods.map((food) {
+      return ItemFood(
         categories: food.categories.length > 3
             ? food.categories.sublist(0, 3)
             : food.categories,

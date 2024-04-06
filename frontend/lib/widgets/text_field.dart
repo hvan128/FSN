@@ -3,6 +3,10 @@ import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/widgets/text.dart';
 
+enum TextFieldType {
+  normal,
+  border 
+}
 class MyTextField extends StatefulWidget {
   final String? hintText;
   final bool obscureText;

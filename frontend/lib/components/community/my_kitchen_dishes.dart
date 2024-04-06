@@ -18,7 +18,7 @@ class MyKitchenDishes extends StatefulWidget {
 }
 
 class _MyKitchenDishesState extends State<MyKitchenDishes> {
-  List<Category> selectedCategories = [];
+  List<ItemCategory> selectedCategories = [];
   List<Dish>? dishes;
 
   @override

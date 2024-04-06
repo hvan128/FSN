@@ -5,8 +5,8 @@ import 'package:frontend/types/user.dart';
 import 'package:frontend/utils/constants.dart';
 
 //! Food
-List<Food> listFoodsTest = foods.map((food) {
-  return Food(
+List<ItemFood> listFoodsTest = foods.map((food) {
+  return ItemFood(
     categories: food.categories.length > 3
         ? food.categories.sublist(0, 2)
         : food.categories,
@@ -15,8 +15,8 @@ List<Food> listFoodsTest = foods.map((food) {
     icon: food.icon,
   );
 }).toList();
-List<Food> listFoodsTest2 = foods.map((food) {
-  return Food(
+List<ItemFood> listFoodsTest2 = foods.map((food) {
+  return ItemFood(
     categories: food.categories.length > 3
         ? food.categories.sublist(3, 5)
         : food.categories,
@@ -25,8 +25,8 @@ List<Food> listFoodsTest2 = foods.map((food) {
     icon: food.icon,
   );
 }).toList();
-List<Food> listFoodsTest3 = foods.map((food) {
-  return Food(
+List<ItemFood> listFoodsTest3 = foods.map((food) {
+  return ItemFood(
     categories: food.categories.length > 3
         ? food.categories.sublist(5, 7)
         : food.categories,
@@ -36,7 +36,7 @@ List<Food> listFoodsTest3 = foods.map((food) {
   );
 }).toList();
 
-List<Category> listCategoriesTest =
+List<ItemCategory> listCategoriesTest =
     listFoodsTest.expand((food) => food.categories).toSet().toList();
 
 //! User

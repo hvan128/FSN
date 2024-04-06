@@ -3,7 +3,7 @@ import 'package:frontend/components/item/item_category.dart';
 import 'package:frontend/types/food.dart';
 
 class CategoriesField extends StatelessWidget {
-  final List<Category> categories;
+  final List<ItemCategory> categories;
   const CategoriesField({super.key, required this.categories});
 
   @override
@@ -11,7 +11,7 @@ class CategoriesField extends StatelessWidget {
     return Wrap(
       spacing: 8,
       children: categories
-          .map((category) => ItemCategory(category: category))
+          .map((category) => CategoryItem(category: category))
           .toList(),
     );
   }

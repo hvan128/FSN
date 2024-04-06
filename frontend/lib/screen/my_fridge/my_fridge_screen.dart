@@ -27,7 +27,7 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
   String selectedFilter = '';
   int selectedTabIndex = 0;
   bool isSelecting = false;
-  List<Category> isSelected = [];
+  List<ItemCategory> isSelected = [];
   PageController pageController = PageController(initialPage: 0);
   final List<Item> listPositions = [
     Item(
@@ -447,7 +447,7 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
   //   );
   // }
 
-  Widget _renderTab(List<Food> foods) {
+  Widget _renderTab(List<ItemFood> foods) {
   return CustomScrollView(
     slivers: [
       SliverList(
@@ -517,7 +517,7 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
                                       isSelecting = true;
                                     });
                                   },
-                                  child: ItemCategory(
+                                  child: CategoryItem(
                                     category: category,
                                     isSelected: isSelected.contains(category),
                                   )))

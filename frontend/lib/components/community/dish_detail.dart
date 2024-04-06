@@ -263,7 +263,7 @@ class _DishDetailState extends State<DishDetail> {
                           .firstWhere(
                               (category) =>
                                   category.value == ingredient.category,
-                              orElse: () => Category(
+                              orElse: () => ItemCategory(
                                   label: '',
                                   value: '',
                                   icon: '',

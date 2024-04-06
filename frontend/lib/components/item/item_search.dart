@@ -7,7 +7,7 @@ import 'package:frontend/utils/constants.dart';
 import 'package:frontend/widgets/text.dart';
 
 class ItemSearch extends StatefulWidget {
-  final Category category;
+  final ItemCategory category;
   final SearchType type;
   const ItemSearch({
     super.key,

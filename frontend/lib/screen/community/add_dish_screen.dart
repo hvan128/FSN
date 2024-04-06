@@ -306,7 +306,7 @@ class _AddDishScreenState extends State<AddDishScreen> {
           onChange: (value) {},
         ),
         Expanded(
-            child: Autocomplete<Category>(
+            child: Autocomplete<ItemCategory>(
                 displayStringForOption: (option) => option.label,
                 fieldViewBuilder:
                     (context, controller, focusNode, onEditingComplete) {
@@ -366,7 +366,7 @@ class _AddDishScreenState extends State<AddDishScreen> {
                 },
                 optionsBuilder: (TextEditingValue textEditingValue) {
                   if (textEditingValue.text.isEmpty) {
-                    return const Iterable<Category>.empty();
+                    return const Iterable<ItemCategory>.empty();
                   }
                   return allCategories.where((element) =>
                       TiengViet.parse(element.label)

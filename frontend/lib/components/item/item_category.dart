@@ -4,10 +4,10 @@ import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/food.dart';
 import 'package:frontend/widgets/text.dart';
 
-class ItemCategory extends StatelessWidget {
-  final Category category;
+class CategoryItem extends StatelessWidget {
+  final ItemCategory category;
   final bool? isSelected;
-  const ItemCategory(
+  const CategoryItem(
       {super.key, required this.category, this.isSelected = false});
 
   @override

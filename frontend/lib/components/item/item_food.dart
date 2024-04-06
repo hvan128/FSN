@@ -3,21 +3,21 @@ import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/widgets/text.dart';
 
-class ItemFood extends StatefulWidget {
+class FoodItem extends StatefulWidget {
   final String label;
   final String icon;
   final bool isSelected;
-  const ItemFood(
+  const FoodItem(
       {super.key,
       required this.label,
       required this.icon,
       this.isSelected = false});
 
   @override
-  State<ItemFood> createState() => _ItemFoodState();
+  State<FoodItem> createState() => _FoodItemState();
 }
 
-class _ItemFoodState extends State<ItemFood> {
+class _FoodItemState extends State<FoodItem> {
   @override
   Widget build(BuildContext context) {
     return Padding(

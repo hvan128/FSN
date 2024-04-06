@@ -1,10 +1,10 @@
-class Food {
+class ItemFood {
   final String label;
   final String value;
   final String icon;
-  final List<Category> categories;
+  final List<ItemCategory> categories;
 
-  Food({
+  ItemFood({
     required this.categories,
     required this.value,
     required this.label,
@@ -13,14 +13,14 @@ class Food {
 
 }
 
-class Category {
+class ItemCategory {
   final String label;
   final String value;
   final String icon;
   final String type;
   final double defaultDuration;
 
-  Category(
+  ItemCategory(
       {required this.label,
       required this.value,
       required this.icon,

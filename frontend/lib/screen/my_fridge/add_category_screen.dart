@@ -7,7 +7,6 @@ import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/food.dart';
 import 'package:frontend/utils/constants.dart';
-import 'package:frontend/widgets/button_icon.dart';
 import 'package:frontend/widgets/divider.dart';
 import 'package:frontend/widgets/header.dart';
 import 'package:frontend/widgets/text.dart';
@@ -20,8 +19,8 @@ class AddCategoryScreen extends StatefulWidget {
 }
 
 class _AddCategoryScreenState extends State<AddCategoryScreen> {
-  Category? selectedCategory;
-  Food? selectedFood;
+  ItemCategory? selectedCategory;
+  ItemFood? selectedFood;
   @override
   void initState() {
     super.initState();
@@ -80,7 +79,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                                             selectedFood = e;
                                           });
                                         },
-                                        child: ItemFood(
+                                        child: FoodItem(
                                             label: e.label,
                                             icon: e.icon,
                                             isSelected: selectedFood == e),
@@ -106,7 +105,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                                                             category: e),
                                                   ));
                                             },
-                                            child: ItemFood(
+                                            child: FoodItem(
                                                 label: e.label, icon: e.icon)))
                                         .toList(),
                                     GestureDetector(

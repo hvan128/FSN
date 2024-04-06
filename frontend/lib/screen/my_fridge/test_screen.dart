@@ -25,7 +25,7 @@ class _TestScreenState extends State<TestScreen>
   String selectedFilter = '';
   int selectedTabIndex = 0;
   bool isSelecting = false;
-  List<Category> isSelected = [];
+  List<ItemCategory> isSelected = [];
   final List<Item> listPositions = [
     Item(
       label: "Tủ lạnh",
@@ -271,7 +271,7 @@ class _TestScreenState extends State<TestScreen>
     );
   }
 
-  Widget _renderTab(List<Food> foods) {
+  Widget _renderTab(List<ItemFood> foods) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,7 +338,7 @@ class _TestScreenState extends State<TestScreen>
                                         isSelecting = true;
                                       });
                                     },
-                                    child: ItemCategory(
+                                    child: CategoryItem(
                                       category: category,
                                       isSelected: isSelected.contains(category),
                                     )))

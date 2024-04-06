@@ -5,7 +5,7 @@ import 'package:frontend/types/food.dart';
 import 'package:frontend/widgets/text.dart';
 
 class ItemIngredient extends StatelessWidget {
-  final Category category;
+  final ItemCategory category;
   final bool? isSelected;
   const ItemIngredient(
       {super.key, required this.category, this.isSelected = false});

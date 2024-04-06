@@ -22,7 +22,7 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  List<Category>? listCategories;
+  List<ItemCategory>? listCategories;
   TextEditingController searchTextController = TextEditingController();
 
   @override

@@ -18,7 +18,7 @@ class DraggableList {
 }
 
 class DraggableListItem {
-  final Category category;
+  final ItemCategory category;
   bool isDeleted;
   bool isSelected;
 
@@ -30,7 +30,7 @@ class DraggableListItem {
 }
 
 class DragNDropList extends StatefulWidget {
-  final List<Food> listFoods;
+  final List<ItemFood> listFoods;
   final Function(bool)? showBottomBar;
   final Function(int)? navigateBottomBar;
 
@@ -70,7 +70,7 @@ class _DragNDropList extends State<DragNDropList> {
       );
     }).toList();
     lists = allLists!.map(buildList).toList();
-    List<Category> allCategories =
+    List<ItemCategory> allCategories =
         widget.listFoods.expand((food) => food.categories).toSet().toList();
     allItems = allCategories.isNotEmpty
         ? allCategories.map((e) {
