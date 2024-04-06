@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/item/item_food.dart';
-import 'package:frontend/screen/my_fridge/add_category_detail_screen.dart';
-import 'package:frontend/screen/my_fridge/add_food_screen.dart';
-import 'package:frontend/screen/search/search_screen.dart';
+import 'package:frontend/screens/my_fridge/add_category_detail_screen.dart';
+import 'package:frontend/screens/my_fridge/add_food_screen.dart';
+import 'package:frontend/screens/search/search_screen.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/food.dart';

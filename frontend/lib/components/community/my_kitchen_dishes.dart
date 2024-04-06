@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/card/food_card.dart';
 import 'package:frontend/components/item/item_ingredient.dart';
-import 'package:frontend/screen/community/dish_detail_screen.dart';
+import 'package:frontend/screens/community/dish_detail_screen.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/dish.dart';

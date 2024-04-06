@@ -2,9 +2,9 @@
 import 'package:frontend/components/item/item_category.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
 import 'package:frontend/components/modals/modal_select.dart';
-import 'package:frontend/screen/my_fridge/add_category_detail_screen.dart';
-import 'package:frontend/screen/my_fridge/add_category_screen.dart';
-import 'package:frontend/screen/search/search_screen.dart';
+import 'package:frontend/screens/my_fridge/add_category_detail_screen.dart';
+import 'package:frontend/screens/my_fridge/add_category_screen.dart';
+import 'package:frontend/screens/search/search_screen.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/food.dart';

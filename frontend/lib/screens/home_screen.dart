@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/screen/account/account_screen.dart';
-import 'package:frontend/screen/community/community_screen.dart';
-import 'package:frontend/screen/my_fridge/my_fridge_screen.dart';
-import 'package:frontend/screen/my_fridge/test_screen.dart';
-import 'package:frontend/screen/report/report_screen.dart';
-import 'package:frontend/screen/to_do/to_do_screen.dart';
+import 'package:frontend/screens/account/account_screen.dart';
+import 'package:frontend/screens/community/community_screen.dart';
+import 'package:frontend/screens/my_fridge/my_fridge_screen.dart';
+import 'package:frontend/screens/my_fridge/test_screen.dart';
+import 'package:frontend/screens/report/report_screen.dart';
+import 'package:frontend/screens/to_do/to_do_screen.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/widgets/text.dart';

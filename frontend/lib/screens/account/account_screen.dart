@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/account/my_food_field.dart';
-import 'package:frontend/screen/community/add_dish_screen.dart';
+import 'package:frontend/screens/community/add_dish_screen.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/widgets/button.dart';
