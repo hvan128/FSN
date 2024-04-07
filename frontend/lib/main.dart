@@ -53,6 +53,6 @@ class MainApp extends StatelessWidget {
               .colorScheme
               .copyWith(outline: MyColors.white['c900']),
         ),
-        home: const HomeScreen());
+        home: const LoginScreen());
   }
 }

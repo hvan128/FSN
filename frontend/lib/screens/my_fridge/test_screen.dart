@@ -19,8 +19,7 @@ class TestScreen extends StatefulWidget {
   State<TestScreen> createState() => _TestScreenState();
 }
 
-class _TestScreenState extends State<TestScreen>
-    with TickerProviderStateMixin {
+class _TestScreenState extends State<TestScreen> with TickerProviderStateMixin {
   late final TabController _tabController;
   String selectedFilter = '';
   int selectedTabIndex = 0;
@@ -60,34 +59,196 @@ class _TestScreenState extends State<TestScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 125,
-        flexibleSpace: _buildHeader(),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const <Widget>[
-            Tab(
-              text: 'Ngăn lạnh',
+      // appBar: AppBar(
+      //   toolbarHeight: 125,
+      //   flexibleSpace: _buildHeader(),
+      //   bottom: TabBar(
+      //     controller: _tabController,
+      //     tabs: const <Widget>[
+      //       Tab(
+      //         text: 'Ngăn lạnh',
+      //       ),
+      //       Tab(
+      //         text: 'Ngăn đông',
+      //       ),
+      //       Tab(
+      //         text: 'Nhà bếp',
+      //       ),
+      //     ],
+      //   ),
+      // ),
+      // body: Padding(
+      //   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
+      //   child: TabBarView(
+      //     controller: _tabController,
+      //     children: <Widget>[
+      //       _renderTab(listFoodsTest),
+      //       _renderTab(listFoodsTest2),
+      //       _renderTab(listFoodsTest3),
+      //     ],
+      //   ),
+      // ),
+
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) {
+          return [
+            SliverAppBar(
+              pinned: true,
+              expandedHeight: 150,
+              floating: true,
+              flexibleSpace: _buildHeader(),
+              title: _title(),
+              bottom: TabBar(
+                controller: _tabController,
+                tabs: [
+                  Tab(
+                    text: 'Ngăn lạnh',
+                  ),
+                  Tab(
+                    text: 'Ngăn đông',
+                  ),
+                  Tab(
+                    text: 'Nhà bếp',
+                  ),
+                ],
+              ),
             ),
-            Tab(
-              text: 'Ngăn đông',
-            ),
-            Tab(
-              text: 'Nhà bếp',
-            ),
-          ],
-        ),
+          ];
+        },
+        body: TabBarView(controller: _tabController, children: <Widget>[
+          _renderTab(listFoodsTest),
+          _renderTab(listFoodsTest2),
+          _renderTab(listFoodsTest3),
+        ]),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
-        child: TabBarView(
-          controller: _tabController,
-          children: <Widget>[
-            _renderTab(listFoodsTest),
-            _renderTab(listFoodsTest2),
-            _renderTab(listFoodsTest3),
+    );
+  }
+
+  Widget _title() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            isSelecting
+                ? GestureDetector(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: Image.asset(
+                          'assets/icons/i16/close.png',
+                          width: 16,
+                          height: 16,
+                          color: MyColors.grey['c900']!,
+                        ),
+                      ),
+                    ),
+                    onTap: () {
+                      widget.showBottomBar?.call(true);
+                      setState(() {
+                        isSelecting = !isSelecting;
+                      });
+                      isSelected.clear();
+                    })
+                : const SizedBox(),
+            MyText(
+              text: isSelecting
+                  ? 'Đã chọn ${isSelected.length}'
+                  : 'Chào Ngô Hải Văn',
+              fontSize: FontSize.z16,
+              fontWeight: FontWeight.w600,
+              color: MyColors.grey['c900']!,
+            ),
           ],
         ),
+        !isSelecting
+            ? Row(children: [
+                GestureDetector(
+                  onTap: () {
+                    widget.showBottomBar?.call(false);
+                    setState(() {
+                      isSelecting = true;
+                    });
+                  },
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: MyColors.grey['c600']!.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: MyText(
+                        text: 'Chọn',
+                        fontSize: FontSize.z15,
+                        fontWeight: FontWeight.w600,
+                        color: MyColors.white['c900']!),
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: MyColors.grey['c600']!.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Image.asset(
+                    'assets/icons/i16/dots-vertical.png',
+                    width: 30,
+                    height: 30,
+                    color: MyColors.white['c900'],
+                  ),
+                ),
+              ])
+            : const SizedBox(),
+      ],
+    );
+  }
+
+  Widget _searchBar() {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return const SearchScreen(type: SearchType.mine);
+        }));
+      },
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          color: MyColors.primary['CulturalYellow']!['c50']!,
+          border: Border.all(
+            color: MyColors.grey['c100']!,
+          ),
+          borderRadius: BorderRadius.circular(6),
+          boxShadow: [
+            BoxShadow(
+              color: MyColors.grey['c500']!.withOpacity(0.5),
+              spreadRadius: 5,
+              blurRadius: 7,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: Row(children: [
+          Image.asset(
+            'assets/icons/i16/search.png',
+            width: 18,
+            height: 18,
+            color: MyColors.grey['c500'],
+          ),
+          const SizedBox(
+            width: 12,
+          ),
+          MyText(
+            text: 'Bạn đang muốn tìm kiếm thứ gì?',
+            fontSize: FontSize.z16,
+            fontWeight: FontWeight.w400,
+            color: MyColors.grey['c500']!,
+          )
+        ]),
       ),
     );
   }
@@ -99,172 +260,31 @@ class _TestScreenState extends State<TestScreen>
         child: Container(
           color: MyColors.primary['CulturalYellow']!['c50']!,
           child: Stack(children: [
-            Column(
-              children: [
-                Container(
-                  height: 90,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          MyColors.primary['CulturalYellow']!['c600']!,
-                          MyColors.primary['CulturalYellow']!['c600']!
-                              .withOpacity(0.0),
-                        ],
-                        stops: const [
-                          0.1,
-                          1.0
-                        ]),
-                  ),
-                ),
-                const SizedBox(
-                  height: 25,
-                )
-              ],
+            Container(
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      MyColors.primary['CulturalYellow']!['c600']!,
+                      MyColors.primary['CulturalYellow']!['c600']!
+                          .withOpacity(0.0),
+                    ],
+                    stops: const [
+                      0.1,
+                      1.0
+                    ]),
+              ),
             ),
             Positioned.fill(
                 child: Align(
-              alignment: Alignment.topCenter,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        isSelecting
-                            ? GestureDetector(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: Image.asset(
-                                      'assets/icons/i16/close.png',
-                                      width: 16,
-                                      height: 16,
-                                      color: MyColors.grey['c900']!,
-                                    ),
-                                  ),
-                                ),
-                                onTap: () {
-                                  widget.showBottomBar?.call(true);
-                                  setState(() {
-                                    isSelecting = !isSelecting;
-                                  });
-                                  isSelected.clear();
-                                })
-                            : const SizedBox(),
-                        MyText(
-                          text: isSelecting
-                              ? 'Đã chọn ${isSelected.length}'
-                              : 'Chào Ngô Hải Văn',
-                          fontSize: FontSize.z16,
-                          fontWeight: FontWeight.w600,
-                          color: MyColors.grey['c900']!,
-                        ),
-                      ],
-                    ),
-                    !isSelecting
-                        ? Row(children: [
-                            GestureDetector(
-                              onTap: () {
-                                widget.showBottomBar?.call(false);
-                                setState(() {
-                                  isSelecting = true;
-                                });
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color:
-                                      MyColors.grey['c600']!.withOpacity(0.5),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: MyText(
-                                    text: 'Chọn',
-                                    fontSize: FontSize.z15,
-                                    fontWeight: FontWeight.w600,
-                                    color: MyColors.white['c900']!),
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: MyColors.grey['c600']!.withOpacity(0.5),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Image.asset(
-                                'assets/icons/i16/dots-vertical.png',
-                                width: 30,
-                                height: 30,
-                                color: MyColors.white['c900'],
-                              ),
-                            ),
-                          ])
-                        : const SizedBox(),
-                  ],
-                ),
-              ),
-            )),
-            Positioned.fill(
-                child: Align(
-              alignment: Alignment.center,
-              child: Padding(
-                  padding:
-                      const EdgeInsets.only(left: 20, bottom: 10, right: 20),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) {
-                        return const SearchScreen(type: SearchType.mine);
-                      }));
-                    },
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        color: MyColors.primary['CulturalYellow']!['c50']!,
-                        border: Border.all(
-                          color: MyColors.grey['c100']!,
-                        ),
-                        borderRadius: BorderRadius.circular(6),
-                        boxShadow: [
-                          BoxShadow(
-                            color: MyColors.grey['c500']!.withOpacity(0.5),
-                            spreadRadius: 5,
-                            blurRadius: 7,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
-                      child: Row(children: [
-                        Image.asset(
-                          'assets/icons/i16/search.png',
-                          width: 18,
-                          height: 18,
-                          color: MyColors.grey['c500'],
-                        ),
-                        const SizedBox(
-                          width: 12,
-                        ),
-                        MyText(
-                          text: 'Bạn đang muốn tìm kiếm thứ gì?',
-                          fontSize: FontSize.z16,
-                          fontWeight: FontWeight.w400,
-                          color: MyColors.grey['c500']!,
-                        )
-                      ]),
-                    ),
-                  )),
-            )),
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 20, bottom: 55, right: 20),
+                      child: _searchBar(),
+                    )))
           ]),
         ),
       ),

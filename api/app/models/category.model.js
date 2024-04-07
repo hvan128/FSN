@@ -1,13 +1,13 @@
 import db from '../common/connect.js'
 class Category {
-    constructor(id, label, icon, type, positionId, manufactureDate, expiryDate, subPosition) {
+    constructor(id, label, icon, type, positionId, manufactureDate, expiryDate, subPositionId) {
         this.id = id
         this.label = this.label
         this.value = label.toLowerCase().replace(' ', '-')
         this.icon = icon
         this.type = type
         this.positionId = positionId
-        this.subPosition = subPosition
+        this.subPositionId = subPosition
         this.manufactureDate = manufactureDate
         this.expiryDate = expiryDate
     }
