@@ -43,9 +43,9 @@ class DatabaseService {
       batch.insert('positions', {'label': 'Lạnh', 'value': 'lanh'});
       batch.insert('positions', {'label': 'Đông', 'value': 'dong'});
       batch.insert('positions', {'label': 'Bếp', 'value': 'bep'});
-      batch.insert('sub_positions', {'label': 'Không có', 'value': '0', 'position_id': 0});
       batch.insert('sub_positions', {'label': 'Không có', 'value': '0', 'position_id': 1});
       batch.insert('sub_positions', {'label': 'Không có', 'value': '0', 'position_id': 2});
+      batch.insert('sub_positions', {'label': 'Không có', 'value': '0', 'position_id': 3});
       await batch.commit();
     });
   }

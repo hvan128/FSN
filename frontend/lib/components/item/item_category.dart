@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/food.dart';
+import 'package:frontend/utils/icon.dart';
 import 'package:frontend/widgets/text.dart';
 
 class CategoryItem extends StatelessWidget {
@@ -12,6 +13,7 @@ class CategoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final icon = allIcons[category.value] ?? 'assets/icons/i16/logo.png';
     return Stack(children: [
       Padding(
         padding: const EdgeInsets.all(2.0),
@@ -33,7 +35,7 @@ class CategoryItem extends StatelessWidget {
                     ),
                     padding: const EdgeInsets.only(
                         top: 17, bottom: 8, left: 15, right: 15),
-                    child: Image.asset(category.icon, width: 40, height: 40)),
+                    child: Image.asset(icon, width: 40, height: 40)),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: SizedBox(

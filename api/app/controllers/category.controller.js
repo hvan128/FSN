@@ -1,8 +1,14 @@
 import Category from "../models/category.model.js"
 
-export const getAllCategory = (req, res) => {
+export const getAllCategory = (req, res, next) => {
     Category.getAllCategory((err, data) => {
-        res.send({result: data})
+        if (err) {
+            return next(err);
+        }
+        return res.status(200).send({
+            message: "Success",
+            data: data,
+          });
     })
 }
 

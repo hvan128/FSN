@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screens/home_screen.dart';
-import 'package:frontend/screens/login/login_screen.dart';
+import 'package:frontend/screens/auth/login_screen.dart';
+import 'package:frontend/services/auth/shared_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 
-void main() {
+Widget _defaultHome = const LoginScreen();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Get result of the login function.
+  bool result = await SharedService.isLoggedIn();
+  if (result) {
+    _defaultHome = const HomeScreen();
+  }
   runApp(const MainApp());
 }
 
@@ -53,6 +62,6 @@ class MainApp extends StatelessWidget {
               .colorScheme
               .copyWith(outline: MyColors.white['c900']),
         ),
-        home: const LoginScreen());
+        home: _defaultHome);
   }
 }

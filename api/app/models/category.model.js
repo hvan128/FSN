@@ -7,7 +7,7 @@ class Category {
         this.icon = icon
         this.type = type
         this.positionId = positionId
-        this.subPositionId = subPosition
+        this.subPositionId = subPositionId
         this.manufactureDate = manufactureDate
         this.expiryDate = expiryDate
     }

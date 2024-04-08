@@ -1,5 +1,5 @@
 import 'package:frontend/database/database_service.dart';
-import 'package:frontend/models/category.dart';
+import 'package:frontend/models/category/category.dart';
 import 'package:sqflite/sqflite.dart';
 
 class CategoryDb {
@@ -25,7 +25,7 @@ class CategoryDb {
   Future<int> addCategory({required Category category}) async {
     final db = await DatabaseService().database;
     return db.rawInsert(
-        '''INSERT INTO $tableName(label, value, icon, type, unit, quantity, position_id, sub_position_id, manufacture_date, expiry_date) VALUES(?, ?, ?, ?, ?, ?, ?, ?)''',
+        '''INSERT INTO $tableName(label, value, icon, type, unit, quantity, position_id, sub_position_id, manufacture_date, expiry_date) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
         [
           category.label,
           category.value,
@@ -35,8 +35,8 @@ class CategoryDb {
           category.quantity,
           category.positionId,
           category.subPositionId,
-          category.manufactureDate.millisecondsSinceEpoch,
-          category.expiryDate.millisecondsSinceEpoch
+          category.manufactureDate?.millisecondsSinceEpoch,
+          category.expiryDate?.millisecondsSinceEpoch
         ]);
   }
 
@@ -75,8 +75,8 @@ class CategoryDb {
           'quantity': category.quantity,
           'position_id': category.positionId,
           'sub_position_id': category.subPositionId,
-          'manufacture_date': category.manufactureDate.millisecondsSinceEpoch,
-          'expiry_date': category.expiryDate.millisecondsSinceEpoch
+          'manufacture_date': category.manufactureDate?.millisecondsSinceEpoch,
+          'expiry_date': category.expiryDate?.millisecondsSinceEpoch
         },
         where: 'id = ?',
         conflictAlgorithm: ConflictAlgorithm.rollback,

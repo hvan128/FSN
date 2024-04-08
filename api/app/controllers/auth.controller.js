@@ -31,11 +31,18 @@ export const login = (req, res) => {
           data[0]
         );
         res.send({
-          token: token,
+          message: "Login successfully!",
+          data: {
+            username: data[0].username,
+            email: data[0].email,
+            id: data[0].id,
+            token: token,
+          },
         });
       } else {
         res.send({
           message: "Wrong username or password",
+          data: null,
           code: 1001,
         });
       }
@@ -49,8 +56,12 @@ export const register = (req, res) => {
     if (err)
       res.status(500).send({
         message: err.message || "Some error occurred while creating the User.",
+        data: data,
         code: err.errno,
       });
-    else res.send(data);
+    else res.send({
+      message: "User was registered successfully!",
+      data: data,
+    });
   });
 };
