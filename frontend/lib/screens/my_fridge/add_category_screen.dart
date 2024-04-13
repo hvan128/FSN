@@ -140,7 +140,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                                                   ],
                                                 ),
                                                 child: Image.asset(
-                                                  'assets/icons/i16/plus.png',
+                                                  'assets/icons/i16/add.png',
                                                   width: 40,
                                                   height: 40,
                                                 ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/account/my_food_field.dart';
+import 'package:frontend/navigation/navigation.dart';
+import 'package:frontend/navigation/router/community.dart';
 import 'package:frontend/screens/community/add_dish_screen.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
@@ -197,9 +199,7 @@ class _AccountScreenState extends State<AccountScreen>
           width: 200,
           text: 'Viết món mới',
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return const AddDishScreen();
-            }));
+            Navigator.pushNamed(context, RouterCommunity.addDish);
           },
         )
       ]),

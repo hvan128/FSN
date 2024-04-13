@@ -6,29 +6,29 @@ import 'package:intl/intl.dart';
 
 class MyDatePicker extends StatefulWidget {
   final ValueChanged<DateTime> onDateSelected;
-  final String label;
+  final String? label;
   final DateTime? defaultValue; // Add defaultValue prop
 
   const MyDatePicker({
-    Key? key,
+    super.key,
     required this.onDateSelected,
-    required this.label,
+    this.label,
     this.defaultValue, // Initialize defaultValue in constructor
-  }) : super(key: key);
+  });
 
   @override
-  _MyDatePickerState createState() =>
-      _MyDatePickerState(defaultValue); // Pass defaultValue to state
+  State<MyDatePicker> createState() =>
+      _MyDatePickerState(); // Pass defaultValue to state
 }
 
 class _MyDatePickerState extends State<MyDatePicker> {
-  late DateTime selectedDate;
+  DateTime? selectedDate;
   final inputFormat = DateFormat('dd/MM/yyyy');
 
-
-  _MyDatePickerState(DateTime? defaultValue) {
-    selectedDate = defaultValue ??
-        DateTime.now(); // Set selectedDate to defaultValue if provided
+  @override
+  void initState() {
+    super.initState();
+    selectedDate = widget.defaultValue ?? DateTime.now();
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -69,41 +69,39 @@ class _MyDatePickerState extends State<MyDatePicker> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 25,
-      width: 110,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-          color: MyColors.primary['CulturalYellow']!['c100']!,
-          borderRadius: BorderRadius.circular(100),
-          boxShadow: [
-            BoxShadow(
-              color: MyColors.grey['c300']!,
-              blurRadius: 4,
-              offset: const Offset(1, 2),
-            )
-          ]),
-      child: Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          MyText(
-              text: inputFormat.format(selectedDate),
-              // text: '${selectedDate.toLocal()}'.split(' ')[0],
-              fontSize: FontSize.z12,
-              fontWeight: FontWeight.w500,
-              color: MyColors.grey['c900']!),
-          GestureDetector(
-            onTap: () => _selectDate(context),
-            child: Image.asset(
-              "assets/icons/i16/calendar.png",
-              width: 15,
-              height: 15,
-              color: MyColors.grey['c900']!,
-            ),
-          ),
-        ],
-      ),
+    return GestureDetector(
+      onTap: () => _selectDate(context),
+      child: Container(
+          height: 25,
+          width: 110,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(
+              color: MyColors.primary['CulturalYellow']!['c100']!,
+              borderRadius: BorderRadius.circular(100),
+              boxShadow: [
+                BoxShadow(
+                  color: MyColors.grey['c300']!,
+                  blurRadius: 4,
+                  offset: const Offset(1, 2),
+                )
+              ]),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              MyText(
+                  text: inputFormat.format(selectedDate!),
+                  fontSize: FontSize.z12,
+                  fontWeight: FontWeight.w500,
+                  color: MyColors.grey['c900']!),
+              Image.asset(
+                "assets/icons/i16/calendar.png",
+                width: 15,
+                height: 15,
+                color: MyColors.grey['c900']!,
+              )
+            ],
+          )),
     );
   }
 }

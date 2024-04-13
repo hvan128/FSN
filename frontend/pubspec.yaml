@@ -19,6 +19,7 @@ dependencies:
   tiengviet: ^1.0.0
   api_cache_manager: ^1.0.1
   snippet_coder_utils: ^1.0.15
+  google_sign_in: ^6.2.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

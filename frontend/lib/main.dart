@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/screens/home_screen.dart';
-import 'package:frontend/screens/auth/login_screen.dart';
+import 'package:frontend/config.dart';
+import 'package:frontend/navigation/router/auth.dart';
+import 'package:frontend/navigation/router/home.dart';
+import 'package:frontend/navigation/router/introduction.dart';
+import 'package:frontend/navigation/routes.dart';
 import 'package:frontend/services/auth/shared_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 
-Widget _defaultHome = const LoginScreen();
+String _defaultRoute = RouterIntroduction.introduction;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Get result of the login function.
-  bool result = await SharedService.isLoggedIn();
-  if (result) {
-    _defaultHome = const HomeScreen();
-  }
+  // bool result = await SharedService.isLoggedIn();
+  // if (result) {
+  //   _defaultRoute = RouterHome.home;
+  // }
   runApp(const MainApp());
 }
 
@@ -23,7 +26,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'DK Mobile Banking',
+        title: Config.APP_NAME,
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.amber,
@@ -46,7 +49,6 @@ class MainApp extends StatelessWidget {
               ),
               indicator: UnderlineTabIndicator(
                 // color for indicator (underline)
-
                 borderSide: BorderSide(
                     color: MyColors.primary['CulturalYellow']!['c700']!,
                     width: 2.0),
@@ -62,6 +64,9 @@ class MainApp extends StatelessWidget {
               .colorScheme
               .copyWith(outline: MyColors.white['c900']),
         ),
-        home: _defaultHome);
+        initialRoute: _defaultRoute,
+        routes: appRoutes,
+        onGenerateRoute: onAnimateRoute,
+        );
   }
 }

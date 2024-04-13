@@ -358,10 +358,7 @@ class _TestScreenState extends State<TestScreen> with TickerProviderStateMixin {
                                         isSelecting = true;
                                       });
                                     },
-                                    child: CategoryItem(
-                                      category: category,
-                                      isSelected: isSelected.contains(category),
-                                    )))
+                                    child: Text('abc')))
                                 .toList(),
                           ),
                         ),

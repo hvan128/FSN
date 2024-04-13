@@ -1,29 +1,5 @@
-class CategoryResponseModel {
-  String? message;
-  List<Category>? data;
-
-  CategoryResponseModel({this.message, this.data});
-
-  CategoryResponseModel.fromJson(Map<String, dynamic> json) {
-    message = json['message'];
-    if (json['data'] != null) {
-      data = <Category>[];
-      json['data'].forEach((v) {
-        data!.add(Category.fromJson(v));
-      });
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['message'] = message;
-    if (this.data != null) {
-      data['data'] = this.data!.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
-}
-
+List<Category> categoryFromJson(dynamic str) =>
+    List<Category>.from((str).map((x) => Category.fromJson(x)));
 class Category {
   int? id;
   String? icon;
@@ -60,8 +36,8 @@ class Category {
     subPositionId = json['subPositionId'];
     quantity = json['quantity'];
     unit = json['unit'];
-    manufactureDate = json['manufactureDate'];
-    expiryDate = json['expiryDate'];
+    manufactureDate = DateTime.parse(json['manufactureDate']);
+    expiryDate = DateTime.parse(json['expiryDate']);
   }
 
   Map<String, dynamic> toJson() {

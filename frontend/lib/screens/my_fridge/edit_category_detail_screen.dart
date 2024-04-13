@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
 import 'package:frontend/config.dart';
+import 'package:frontend/models/category/category.dart';
 import 'package:frontend/screens/home_screen.dart';
 import 'package:frontend/services/api_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
-import 'package:frontend/types/food.dart';
 import 'package:frontend/types/type.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:frontend/utils/functions_core.dart';
+import 'package:frontend/utils/icons.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/date_picker.dart';
 import 'package:frontend/widgets/drop-down.dart';
@@ -17,17 +18,15 @@ import 'package:frontend/widgets/input-form.dart';
 import 'package:frontend/widgets/text.dart';
 import 'package:frontend/widgets/text_area.dart';
 
-class AddCategoryDetailScreen extends StatefulWidget {
-  final ItemCategory? category;
-
-  const AddCategoryDetailScreen({super.key, this.category});
+class EditCategoryDetailScreen extends StatefulWidget {
+  const EditCategoryDetailScreen({super.key});
 
   @override
-  State<AddCategoryDetailScreen> createState() =>
-      _AddCategoryDetailScreenState();
+  State<EditCategoryDetailScreen> createState() =>
+      _EditCategoryDetailScreenState();
 }
 
-class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
+class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
   final TextEditingController _controller = TextEditingController();
   List<Item>? listUnits;
   final List<Item> listPositions = [
@@ -53,26 +52,50 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
       label: "Không có",
       value: '0',
     ),
+    Item(
+      label: "Không có",
+      value: '1',
+    ),
   ];
   String? position;
   String? unit;
+  String? type;
   String? subPosition;
-  DateTime? expDate;
+  DateTime? expiryDate;
   DateTime? manufactureDate;
   int quantity = 1;
+  Category? category;
+  String? icon;
   String note = '';
 
   @override
   void initState() {
     super.initState();
-    _controller.text = widget.category!.label;
-    listUnits = FunctionCore.getUnitList(widget.category!.type);
-    position = listPositions.first.value;
-    unit = listUnits!.first.value;
-    subPosition = listSubPositions.first.value;
-    manufactureDate = DateTime.now();
-    expDate =
-        DateTime.now().add(Duration(days: widget.category!.defaultDuration));
+    category = Category();
+
+    Future.delayed(Duration.zero, () {
+      if (ModalRoute.of(context)?.settings.arguments != null) {
+        final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
+        setState(() {
+          category = arguments['category'];
+          _controller.text = category!.label ?? '';
+          icon = allIcons[category!.icon] ?? 'assets/icons/i16/logo.png';
+          type = category!.type ?? '';
+          position = '${category!.positionId}';
+          unit = category!.unit;
+          subPosition = '${category!.subPositionId}';
+          manufactureDate = category!.manufactureDate;
+          expiryDate = category!.expiryDate;
+          quantity = category!.quantity ?? 1;
+        });
+      }
+      setState(() {
+        listUnits = FunctionCore.getUnitList(type ?? '');
+      });
+      print(listUnits);
+      print(category!.toJson());
+
+    });
   }
 
   @override
@@ -84,7 +107,8 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final type = foods
-        .firstWhere((element) => element.value == widget.category?.type)
+        .firstWhere((element) => element.value == category!.type,
+            orElse: () => foods.first)
         .label;
     return Scaffold(
         backgroundColor: MyColors.primary['CulturalYellow']!['c50']!,
@@ -98,6 +122,7 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
             ),
             Expanded(
                 child: SingleChildScrollView(
+                    // physics: const BouncingScrollPhysics(),
                     child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Column(children: [
@@ -138,7 +163,7 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
                                       height: 60,
                                       width: 60,
                                       child: Image.asset(
-                                        widget.category!.icon,
+                                        icon ?? 'assets/icons/i16/logo.png',
                                         width: 50,
                                         height: 50,
                                       ),
@@ -315,6 +340,7 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
           label: 'Đơn vị',
           content: MyDropDownButton(
             items: listUnits ?? [Item(value: 'piece', label: 'Cái')],
+            selectedValue: unit,
             onSelected: (value) => setState(() {
               unit = value;
             }),
@@ -326,6 +352,7 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
           label: 'Vị trí',
           content: MyDropDownButton(
             items: listPositions,
+            selectedValue: position,
             onSelected: (value) => setState(() {
               position = value;
             }),
@@ -337,6 +364,7 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
           label: 'Vị trí con',
           content: MyDropDownButton(
               items: listSubPositions,
+              selectedValue: subPosition,
               otherAction: Item(
                 value: 'add',
                 label: 'Tạo mới',
@@ -348,9 +376,10 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
       const SizedBox(
         height: 20,
       ),
-      InputForm(
+      manufactureDate == null ? Container() : InputForm(
         label: 'Ngày nhập',
         content: MyDatePicker(
+          defaultValue: manufactureDate,
           onDateSelected: (DateTime date) {
             setState(() {
               manufactureDate = date;
@@ -361,14 +390,14 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
       const SizedBox(
         height: 20,
       ),
-      InputForm(
+      expiryDate == null ? Container() : InputForm(
         label: 'Ngày hết hạn',
         content: MyDatePicker(
           label: 'Date of birth',
-          defaultValue: expDate,
+          defaultValue: expiryDate,
           onDateSelected: (DateTime date) {
             setState(() {
-              expDate = date;
+              expiryDate = date;
             });
           },
         ),
@@ -387,30 +416,32 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
   }
 
   void onPressAdd() async {
-    ApiService.post(Config.CATEGORIES_API, {
-      'label': widget.category!.label,
-      'value': widget.category!.value,
-      'icon': widget.category!.value,
-      'type': widget.category!.type,
-      'quantity': quantity,
-      'unit': unit,
-      'positionId': int.parse(position!),
-      'subPositionId': int.parse(subPosition!),
-      'manufactureDate': manufactureDate!.toIso8601String(),
-      'expiryDate': expDate!.toIso8601String(),
-    });
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
-    showDialog(
-        context: context,
-        builder: (context) {
-          return MyAlert(
-            alertType: AlertType.success,
-            position: AlertPosition.topCenter,
-            title: 'Thành công',
-            description:
-                'Thêm đồ ăn ${widget.category!.label} vào $position thành công!',
-          );
-        });
+    setState(() {});
+    // ApiService.post(Config.CATEGORIES_API, {
+    //   'label': category!.label,
+    //   'value': category!.value,
+    //   'icon': category!.value,
+    //   'type': category!.type,
+    //   'quantity': quantity,
+    //   'unit': unit,
+    //   'positionId': int.parse(position!),
+    //   'subPositionId': int.parse(subPosition!),
+    //   'manufactureDate': manufactureDate!.toIso8601String(),
+    //   'expiryDate': expDate!.toIso8601String(),
+    // });
+    // Navigator.push(
+    //     context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+    // showDialog(
+    //     context: context,
+    //     builder: (context) {
+    //       return MyAlert(
+    //         alertType: AlertType.success,
+    //         position: AlertPosition.topCenter,
+    //         title: 'Thành công',
+    //         description:
+    //             'Thêm đồ ăn ${category!.label} vào $position thành công!',
+    //       );
+    //     });
     // print({
     //   'label': widget.category!.label,
     //   'value': widget.category!.value,

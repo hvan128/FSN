@@ -134,7 +134,10 @@ class _HomeScreenState extends State<HomeScreen> {
             showBottomBar: (bool value) => handleShowBottomBar(value),
             navigateBottomBar: (int index) => handleNavigateBottomBar(index));
       case 3:
-        return const ReportScreen();
+        return ReportScreen(
+          showBottomBar: (bool value) => handleShowBottomBar(value),
+          navigateBottomBar: (int index) => handleNavigateBottomBar(index),
+        );
       case 4:
         return const AccountScreen();
       default:

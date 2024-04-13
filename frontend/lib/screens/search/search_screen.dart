@@ -39,13 +39,13 @@ class _SearchScreenState extends State<SearchScreen> {
       listCategories = [];
       if (widget.type == SearchType.mine) {
         for (var element in listCategoriesTest) {
-          if (TiengViet.parse(element.label).contains(searchText)) {
+          if (TiengViet.parse(element.label).toLowerCase().contains(TiengViet.parse(searchText).toLowerCase())) {
             listCategories!.add(element);
           }
         }
       } else {
         for (var element in allCategories) {
-          if (TiengViet.parse(element.label).contains(searchText)) {
+          if (TiengViet.parse(element.label.toLowerCase()).contains(TiengViet.parse(searchText).toLowerCase())) {
             listCategories!.add(element);
           }
         }

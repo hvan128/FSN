@@ -369,8 +369,8 @@ class _AddDishScreenState extends State<AddDishScreen> {
                     return const Iterable<ItemCategory>.empty();
                   }
                   return allCategories.where((element) =>
-                      TiengViet.parse(element.label)
-                          .contains(TiengViet.parse(textEditingValue.text)));
+                      TiengViet.parse(element.label).toLowerCase()
+                          .contains(TiengViet.parse(textEditingValue.text).toLowerCase()));
                 })),
         const SizedBox(width: 10),
         Icon(Icons.menu, color: MyColors.grey['c400']!)

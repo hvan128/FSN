@@ -1,15 +1,20 @@
- import 'package:flutter/material.dart';
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:frontend/components/item/item_category.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
 import 'package:frontend/components/modals/modal_select.dart';
+import 'package:frontend/config.dart';
+import 'package:frontend/models/category/category.dart';
+import 'package:frontend/navigation/router/my_fridge.dart';
 import 'package:frontend/screens/my_fridge/add_category_detail_screen.dart';
 import 'package:frontend/screens/my_fridge/add_category_screen.dart';
 import 'package:frontend/screens/search/search_screen.dart';
+import 'package:frontend/services/api_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
-import 'package:frontend/types/food.dart';
 import 'package:frontend/types/type.dart';
-import 'package:frontend/utils/test_constants.dart';
 import 'package:frontend/widgets/divider.dart';
 import 'package:frontend/widgets/tab_button.dart';
 import 'package:frontend/widgets/text.dart';
@@ -27,24 +32,24 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
   String selectedFilter = '';
   int selectedTabIndex = 0;
   bool isSelecting = false;
-  List<ItemCategory> isSelected = [];
+  List<int> isSelected = [];
   PageController pageController = PageController(initialPage: 0);
   final List<Item> listPositions = [
     Item(
       label: "Tủ lạnh",
-      value: 'cool',
+      value: '1',
     ),
     Item(
       label: "Tủ đông",
-      value: 'freeze',
+      value: '2',
     ),
     Item(
       label: "Bếp",
-      value: 'kitchen',
+      value: '3',
     ),
     Item(
       label: "Khác",
-      value: 'other',
+      value: '0',
     )
   ];
   @override
@@ -100,9 +105,9 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
                                         selectedTabIndex = value;
                                       }),
                                   children: [
-                                    _renderTab(listFoodsTest),
-                                    _renderTab(listFoodsTest2),
-                                    _renderTab(listFoodsTest3),
+                                    _renderTab(1),
+                                    _renderTab(2),
+                                    _renderTab(3),
                                   ]),
                             )
                           ],
@@ -192,12 +197,12 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: SizedBox(
-                              width: 16,
-                              height: 16,
+                              width: 24,
+                              height: 24,
                               child: Image.asset(
                                 'assets/icons/i16/close.png',
-                                width: 16,
-                                height: 16,
+                                width: 24,
+                                height: 24,
                                 color: MyColors.grey['c900']!,
                               ),
                             ),
@@ -331,21 +336,27 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
               title: 'Lạnh',
               isSelected: selectedTabIndex == 0,
               onTap: () {
-                pageController.animateToPage(0, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+                pageController.animateToPage(0,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeInOut);
               },
             ),
             MyTabButton(
               title: 'Đông',
               isSelected: selectedTabIndex == 1,
               onTap: () {
-                pageController.animateToPage(1, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+                pageController.animateToPage(1,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeInOut);
               },
             ),
             MyTabButton(
               title: 'Bếp',
               isSelected: selectedTabIndex == 2,
               onTap: () {
-                pageController.animateToPage(2, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+                pageController.animateToPage(2,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeInOut);
               },
             ),
           ],
@@ -354,202 +365,234 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
     );
   }
 
-  // Widget _renderTab(List<Food> foods) {
-  //   return SingleChildScrollView(
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: foods.map((food) {
-  //         return Column(
-  //           children: [
-  //             Row(
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               children: [
-  //                 Expanded(
-  //                   child: Column(
-  //                     crossAxisAlignment: CrossAxisAlignment.start,
-  //                     children: [
-  //                       Padding(
-  //                         padding: const EdgeInsets.symmetric(horizontal: 10),
-  //                         child: MyText(
-  //                           text: '${food.label} (${food.categories.length})',
-  //                           fontSize: FontSize.z16,
-  //                           fontWeight: FontWeight.w600,
-  //                           color: MyColors.grey['c900']!,
-  //                         ),
-  //                       ),
-  //                       const SizedBox(
-  //                         height: 5,
-  //                       ),
-  //                       Container(
-  //                         width: MediaQuery.of(context).size.width,
-  //                         padding: const EdgeInsets.symmetric(
-  //                             horizontal: 12, vertical: 10),
-  //                         decoration: BoxDecoration(
-  //                           color: MyColors.grey['c100']!,
-  //                           borderRadius: BorderRadius.circular(20),
-  //                         ),
-  //                         child: Wrap(
-  //                           spacing: 14,
-  //                           runSpacing: 5,
-  //                           children: food.categories
-  //                               .map((category) => GestureDetector(
-  //                                   onTap: () {
-  //                                     if (isSelecting) {
-  //                                       if (isSelected.contains(category)) {
-  //                                         setState(() {
-  //                                           isSelected.remove(category);
-  //                                         });
-  //                                       } else {
-  //                                         setState(() {
-  //                                           isSelected.add(category);
-  //                                         });
-  //                                       }
-  //                                     } else {
-  //                                       Navigator.push(
-  //                                           context,
-  //                                           MaterialPageRoute(
-  //                                             builder: (context) =>
-  //                                                 AddCategoryDetailScreen(
-  //                                                     category: category),
-  //                                           ));
-  //                                     }
-  //                                   },
-  //                                   onLongPress: () {
-  //                                     widget.showBottomBar!(false);
-  //                                     setState(() {
-  //                                       isSelected.add(category);
-  //                                       isSelecting = true;
-  //                                     });
-  //                                   },
-  //                                   child: ItemCategory(
-  //                                     category: category,
-  //                                     isSelected: isSelected.contains(category),
-  //                                   )))
-  //                               .toList(),
-  //                         ),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //             const SizedBox(
-  //               height: 10,
-  //             ),
-  //             const MyDivider(),
-  //             const SizedBox(
-  //               height: 10,
-  //             )
-  //           ],
-  //         );
-  //       }).toList(),
-  //     ),
-  //   );
-  // }
+  Future? futureCategory;
 
-  Widget _renderTab(List<ItemFood> foods) {
-  return CustomScrollView(
-    slivers: [
-      SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (BuildContext context, int index) {
-            final food = foods[index];
-            return Column(
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+  void fetchCategoryByPosition(int positionId) async {
+    setState(() {
+      // futureCategory = categoryDB.getCategories();
+      futureCategory =
+          ApiService.get('${Config.CATEGORIES_API}/position/$positionId');
+    });
+  }
+
+  Widget _renderTab(int positionId) {
+    return FutureBuilder(
+      future: ApiService.get('${Config.CATEGORIES_API}/position/$positionId'),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final data = jsonDecode(snapshot.data.toString());
+          final listCategories = categoryFromJson(data['data']);
+          Map<String, List<Category>> groupedCategories = {};
+
+          for (var category in listCategories) {
+            if (!groupedCategories.containsKey(category.type)) {
+              groupedCategories[category.type!] = [];
+            }
+            groupedCategories[category.type]?.add(category);
+          }
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: groupedCategories.entries.map((food) {
+                return Column(
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: MyText(
-                              text: '${food.label} (${food.categories.length})',
-                              fontSize: FontSize.z16,
-                              fontWeight: FontWeight.w600,
-                              color: MyColors.grey['c900']!,
-                            ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                child: MyText(
+                                  text: '${food.key} (${food.value.length})',
+                                  fontSize: FontSize.z16,
+                                  fontWeight: FontWeight.w600,
+                                  color: MyColors.grey['c900']!,
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: MyColors.grey['c100']!,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Wrap(
+                                  spacing: 14,
+                                  runSpacing: 5,
+                                  children: food.value
+                                      .map((category) => GestureDetector(
+                                          onTap: () {
+                                            if (isSelecting) {
+                                              if (isSelected
+                                                  .contains(category.id)) {
+                                                setState(() {
+                                                  isSelected
+                                                      .remove(category.id);
+                                                });
+                                              } else {
+                                                setState(() {
+                                                  isSelected.add(category.id!);
+                                                });
+                                              }
+                                            } else {
+                                              print(category.toJson());
+                                              Navigator.pushNamed(
+                                                  context,
+                                                  RouterMyFridge
+                                                      .editCategoryDetail,
+                                                  arguments: {
+                                                    'category': category
+                                                  });
+                                            }
+                                          },
+                                          onLongPress: () {
+                                            widget.showBottomBar!(false);
+                                            setState(() {
+                                              isSelected.add(category.id!);
+                                              isSelecting = true;
+                                            });
+                                          },
+                                          child: CategoryItem(
+                                            category: category,
+                                            isSelected: isSelected
+                                                .contains(category.id!),
+                                          )))
+                                      .toList(),
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Container(
-                            width: MediaQuery.of(context).size.width,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: MyColors.grey['c100']!,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Wrap(
-                              spacing: 14,
-                              runSpacing: 5,
-                              children: food.categories
-                                  .map((category) => GestureDetector(
-                                  onTap: () {
-                                    if (isSelecting) {
-                                      if (isSelected.contains(category)) {
-                                        setState(() {
-                                          isSelected.remove(category);
-                                        });
-                                      } else {
-                                        setState(() {
-                                          isSelected.add(category);
-                                        });
-                                      }
-                                    } else {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                AddCategoryDetailScreen(
-                                                  category: category,
-                                                ),
-                                          ));
-                                    }
-                                  },
-                                  onLongPress: () {
-                                    widget.showBottomBar!(false);
-                                    setState(() {
-                                      isSelected.add(category);
-                                      isSelecting = true;
-                                    });
-                                  },
-                                  child: CategoryItem(
-                                    category: category,
-                                    isSelected: isSelected.contains(category),
-                                  )))
-                                  .toList(),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    const MyDivider(),
+                    const SizedBox(
+                      height: 10,
+                    )
                   ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                const MyDivider(),
-                const SizedBox(
-                  height: 10,
-                )
-              ],
-            );
-          },
-          childCount: foods.length,
-        ),
-      ),
-    ],
-  );
-}
+                );
+              }).toList(),
+            ),
+          );
+        } else if (snapshot.hasError) {
+          return Text('${snapshot.error}');
+        } else {
+          return const Center(child: CircularProgressIndicator());
+        }
+      },
+    );
+  }
 
+//   Widget _renderTab(List<ItemFood> foods) {
+//   return CustomScrollView(
+//     slivers: [
+//       SliverList(
+//         delegate: SliverChildBuilderDelegate(
+//           (BuildContext context, int index) {
+//             final food = foods[index];
+//             return Column(
+//               children: [
+//                 Row(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     Expanded(
+//                       child: Column(
+//                         crossAxisAlignment: CrossAxisAlignment.start,
+//                         children: [
+//                           Padding(
+//                             padding: const EdgeInsets.symmetric(horizontal: 10),
+//                             child: MyText(
+//                               text: '${food.label} (${food.categories.length})',
+//                               fontSize: FontSize.z16,
+//                               fontWeight: FontWeight.w600,
+//                               color: MyColors.grey['c900']!,
+//                             ),
+//                           ),
+//                           const SizedBox(
+//                             height: 5,
+//                           ),
+//                           Container(
+//                             width: MediaQuery.of(context).size.width,
+//                             padding: const EdgeInsets.symmetric(
+//                                 horizontal: 12, vertical: 10),
+//                             decoration: BoxDecoration(
+//                               color: MyColors.grey['c100']!,
+//                               borderRadius: BorderRadius.circular(20),
+//                             ),
+//                             child: Wrap(
+//                               spacing: 14,
+//                               runSpacing: 5,
+//                               children: food.categories
+//                                   .map((category) => GestureDetector(
+//                                   onTap: () {
+//                                     if (isSelecting) {
+//                                       if (isSelected.contains(category)) {
+//                                         setState(() {
+//                                           isSelected.remove(category);
+//                                         });
+//                                       } else {
+//                                         setState(() {
+//                                           isSelected.add(category);
+//                                         });
+//                                       }
+//                                     } else {
+//                                       Navigator.push(
+//                                           context,
+//                                           MaterialPageRoute(
+//                                             builder: (context) =>
+//                                                 AddCategoryDetailScreen(
+//                                                   category: category,
+//                                                 ),
+//                                           ));
+//                                     }
+//                                   },
+//                                   onLongPress: () {
+//                                     widget.showBottomBar!(false);
+//                                     setState(() {
+//                                       isSelected.add(category);
+//                                       isSelecting = true;
+//                                     });
+//                                   },
+//                                   child: Text('abc')))
+//                                   .toList(),
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//                 const SizedBox(
+//                   height: 10,
+//                 ),
+//                 const MyDivider(),
+//                 const SizedBox(
+//                   height: 10,
+//                 )
+//               ],
+//             );
+//           },
+//           childCount: foods.length,
+//         ),
+//       ),
+//     ],
+//   );
+// }
 
   Widget _buildOptions() {
     return Container(
-      height: 50,
+      height: 60,
       padding: const EdgeInsets.symmetric(vertical: 4),
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
@@ -557,34 +600,18 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
       ),
       child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             GestureDetector(
                 onTap: () {
-                  showModalBottomSheet(
-                      context: context,
-                      builder: (context) {
-                        return ModalSelect(
-                            title: 'Di chuyển tới',
-                            options: listPositions,
-                            onSelectItem: (value) {
-                              Navigator.of(context).pop();
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return MyAlert(
-                                      alertType: AlertType.success,
-                                      position: AlertPosition.topCenter,
-                                      title: 'Thành công',
-                                      description:
-                                          'Đã di chuyển ${isSelected.length} đồ ăn tới ${value.label}!',
-                                    );
-                                  });
-                            });
-                      });
+                  onTapMove();
                 },
                 child: _option('assets/icons/i16/save.png', 'Di chuyển')),
-            _option('assets/icons/i16/delete.png', 'Xóa'),
+            GestureDetector(
+                onTap: () {
+                  onTapDelete();
+                },
+                child: _option('assets/icons/i16/delete.png', 'Xóa')),
           ]),
     );
   }
@@ -600,5 +627,61 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
             color: MyColors.grey['c900']!),
       ],
     );
+  }
+
+  void onTapMove() {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return ModalSelect(
+              title: 'Di chuyển tới',
+              options: listPositions,
+              onSelectItem: (value) {
+                for (var element in isSelected) {
+                  ApiService.put('${Config.CATEGORIES_API}/position',
+                      {'id': element, 'positionId': value.value});
+                }
+                fetchCategoryByPosition(1);
+                setState(() {
+                  isSelecting = false;
+                  isSelected.clear();
+                });
+                widget.showBottomBar!(true);
+                Navigator.of(context).pop();
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return MyAlert(
+                        alertType: AlertType.success,
+                        position: AlertPosition.topCenter,
+                        title: 'Thành công',
+                        description:
+                            'Đã di chuyển ${isSelected.length} đồ ăn tới ${value.label}!',
+                      );
+                    });
+              });
+        });
+  }
+
+  void onTapDelete() {
+    for (var element in isSelected) {
+      ApiService.delete('${Config.CATEGORIES_API}/$element').then((value) {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return MyAlert(
+                alertType: AlertType.success,
+                position: AlertPosition.topCenter,
+                title: 'Thành công',
+                description: 'Xóa ${isSelected.length} đồ ăn khỏi tủ lạnh!',
+              );
+            });
+      });
+    }
+    setState(() {
+      isSelecting = false;
+    });
+    widget.showBottomBar!(true);
+    fetchCategoryByPosition(1);
   }
 }

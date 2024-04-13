@@ -5,18 +5,31 @@ import 'package:frontend/types/dish.dart';
 import 'package:frontend/widgets/button_icon.dart';
 
 class DishDetailScreen extends StatefulWidget {
-  final Dish dish;
-  const DishDetailScreen({super.key, required this.dish});
+  const DishDetailScreen({super.key});
 
   @override
   State<DishDetailScreen> createState() => _DishDetailScreenState();
 }
 
 class _DishDetailScreenState extends State<DishDetailScreen> {
+  Dish? dish;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final arguments = ModalRoute.of(context)?.settings.arguments as Map;
+      setState(() {
+        dish = arguments['dish'];
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
               expandedHeight: 300,
@@ -51,17 +64,16 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
                       ],
                     ),
                   ]),
-              
               automaticallyImplyLeading: false,
               backgroundColor: MyColors.white['c900']!,
               flexibleSpace: FlexibleSpaceBar(
                 background: Image.asset(
-                  widget.dish.image,
+                  dish!.image,
                   fit: BoxFit.cover,
                 ),
               )),
           SliverToBoxAdapter(
-            child: DishDetail(dish: widget.dish),
+            child: DishDetail(dish: dish!),
           )
         ],
       ),

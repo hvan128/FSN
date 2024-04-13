@@ -18,7 +18,7 @@ class ApiService {
     return response.body;
   }
 
-  static Future<dynamic> post(String apiUrl, Map<String, dynamic> body) async {
+  static Future<dynamic> post(String apiUrl, Map<String, dynamic> model) async {
     var loginDetails = await SharedService.loginDetails();
     Map<String, String> requestHeaders = {
       'Content-Type': 'application/json',
@@ -28,9 +28,41 @@ class ApiService {
     var response = await client.post(
       url,
       headers: requestHeaders,
-      body: jsonEncode(body),
+      body: jsonEncode(model),
     );
-    print('response: ${response.body}');
     return response.body;
+  }
+
+  static Future<dynamic> put(String apiUrl, Map<String, dynamic> model) async {
+    var loginDetails = await SharedService.loginDetails();
+    Map<String, String> requestHeaders = {
+      'Content-Type': 'application/json',
+      'Authorization': loginDetails!.data!.token
+    };
+    var url = Uri.http(Config.API_URL, apiUrl);
+    var response = await client.put(
+      url,
+      headers: requestHeaders,
+      body: jsonEncode(model),
+    );
+    return response.body;
+  }
+
+  static Future<bool> delete(String apiUrl) async {
+    var loginDetails = await SharedService.loginDetails();
+    Map<String, String> requestHeaders = {
+      'Content-Type': 'application/json',
+      'Authorization': loginDetails!.data!.token
+    };
+    var url = Uri.http(Config.API_URL, apiUrl);
+    var response = await client.delete(
+      url,
+      headers: requestHeaders,
+    );
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
