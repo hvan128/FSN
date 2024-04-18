@@ -16,6 +16,7 @@ class MyTextField extends StatefulWidget {
   final double? width;
   final double? fontSize;
   final String? label;
+  final Icon? prefixIcon;
   final double? borderRadius;
   final String? value;
   final FontWeight? hintFontWeight;
@@ -34,6 +35,7 @@ class MyTextField extends StatefulWidget {
     required this.hasError,
     this.errorText,
     this.label,
+    this.prefixIcon,
     this.borderRadius = 16,
     this.value = '',
     this.onChange,
@@ -90,6 +92,7 @@ class _MyTextFieldState extends State<MyTextField> {
               },
               obscureText: widget.obscureText,
               decoration: InputDecoration(
+                prefixIcon: widget.prefixIcon,
                 contentPadding:
                     const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                 hintMaxLines: widget.hintMaxLines,

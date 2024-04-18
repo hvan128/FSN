@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/components/modals/alert_modal.dart';
-import 'package:frontend/config.dart';
 import 'package:frontend/models/category/category.dart';
-import 'package:frontend/screens/home_screen.dart';
-import 'package:frontend/services/api_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/type.dart';

@@ -1,22 +1,32 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:frontend/config.dart';
-import 'package:frontend/navigation/router/auth.dart';
 import 'package:frontend/navigation/router/home.dart';
 import 'package:frontend/navigation/router/introduction.dart';
 import 'package:frontend/navigation/routes.dart';
+import 'package:frontend/provider/google_sign_in.dart';
 import 'package:frontend/services/auth/shared_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+import 'firebase_options.dart';
 
 String _defaultRoute = RouterIntroduction.introduction;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Get result of the login function.
-  // bool result = await SharedService.isLoggedIn();
-  // if (result) {
-  //   _defaultRoute = RouterHome.home;
-  // }
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  bool result = await SharedService.isLoggedIn();
+  if (result) {
+    Timer.periodic(const Duration(seconds: 10), (timer) {
+      print('2 minute passed');
+      GoogleSignInProvider().refreshToken();
+    });
+    _defaultRoute = RouterHome.home;
+  }
   runApp(const MainApp());
 }
 
@@ -25,7 +35,9 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return ChangeNotifierProvider(
+      create: (context) => GoogleSignInProvider(),
+      child: MaterialApp(
         title: Config.APP_NAME,
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
@@ -67,6 +79,7 @@ class MainApp extends StatelessWidget {
         initialRoute: _defaultRoute,
         routes: appRoutes,
         onGenerateRoute: onAnimateRoute,
-        );
+      ),
+    );
   }
 }

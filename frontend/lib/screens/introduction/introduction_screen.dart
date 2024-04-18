@@ -1,10 +1,18 @@
+// ignore_for_file: use_build_context_synchronously, avoid_print
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/config.dart';
-import 'package:frontend/services/auth/google__signin_api.dart';
+import 'package:frontend/models/user/user.dart';
+import 'package:frontend/navigation/router/auth.dart';
+import 'package:frontend/provider/google_sign_in.dart';
+import 'package:frontend/screens/home_screen.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/text.dart';
+import 'package:provider/provider.dart';
 
 class IntroductionScreen extends StatelessWidget {
   const IntroductionScreen({super.key});
@@ -144,16 +152,39 @@ class IntroductionScreen extends StatelessWidget {
                               fontWeight: FontWeight.w400,
                               color: MyColors.grey['c700']!),
                           const SizedBox(height: 20),
-                          MyButton(
-                              text: 'Đăng nhập bằng Google',
-                              buttonType: ButtonType.primary,
-                              onPressed: () {
-                                GoogleSignInApi.login();
-                              },
-                              startIcon: Image.asset(
-                                  'assets/icons/i16/google.png',
-                                  width: 24,
-                                  height: 24)),
+                          StreamBuilder(
+                              stream: FirebaseAuth.instance.authStateChanges(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const CircularProgressIndicator();
+                                } else if (snapshot.hasError) {
+                                  return Text(snapshot.error.toString());
+                                } else if (snapshot.hasData) {
+                                  print(snapshot.data);
+                                  return MyButton(
+                                      text: 'Đăng nhập bằng Google',
+                                      buttonType: ButtonType.primary,
+                                      onPressed: () {
+                                        onPressLoginGoogle(context);
+                                      },
+                                      startIcon: Image.asset(
+                                          'assets/icons/i16/google.png',
+                                          width: 24,
+                                          height: 24));
+                                } else {
+                                  return MyButton(
+                                      text: 'Đăng nhập bằng Google',
+                                      buttonType: ButtonType.primary,
+                                      onPressed: () {
+                                        onPressLoginGoogle(context);
+                                      },
+                                      startIcon: Image.asset(
+                                          'assets/icons/i16/google.png',
+                                          width: 24,
+                                          height: 24));
+                                }
+                              }),
                         ],
                       ),
                     ),
@@ -164,5 +195,33 @@ class IntroductionScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future onPressLoginGoogle(BuildContext context) async {
+    final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+    try {
+      Map<String, dynamic> response = await provider.googleLogin();
+      UserCredential user = response['user'];
+      String token = response['token'];
+      print('user: ');
+      print(response['token']);
+      Navigator.pushReplacementNamed(
+        context,
+        RouterAuth.createId,
+        arguments: {
+          'user': UserModel(
+            displayName: user.additionalUserInfo!.profile!['name'],
+            email: user.additionalUserInfo!.profile!['email'],
+            imageUrl: user.additionalUserInfo!.profile!['picture'],
+            isNewUser: user.additionalUserInfo!.isNewUser,
+            token: token,
+            role: 'user',
+          )
+        },
+      );
+    } catch (e) {
+      print('onPressLoginGoogle lỗi');
+      print(e);
+    }
   }
 }

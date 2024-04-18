@@ -22,7 +22,13 @@ export const getCategoryById = (req, res) => {
 export const getCategoryByPositionId = (req, res) => {
     var positionId = req.params.positionId
     Category.findByPositionId(positionId, (err, result) => {
-        res.send(result)
+        if (err) {
+            return next(err);
+        }
+        return res.status(200).send({
+            message: "Success",
+            data: result,
+          });
     })
 }
 
@@ -40,8 +46,15 @@ export const updateCategory = (req, res) => {
     })
 }
 
+export const updatePosition = (req, res) => {
+    var data = req.body
+    Category.updatePosition(data, (result) => {
+        res.send(result)
+    })
+}
+
 export const deleteCategory = (req, res) => {
-    var id = req.body.id
+    var id = req.params.id
     Category.delete(id, (result) => {
         res.send(result)
     })

@@ -52,7 +52,7 @@ Category.findById = (id, result) => {
 }
 
 Category.findByPositionId = (positionId, result) => {
-    db.query(`SELECT * FROM categories WHERE positionId = ${positionId}`, (err, res) => {
+    db.query(`SELECT * FROM categories WHERE positionId = ${positionId} ORDER BY manufactureDate ASC`, (err, res) => {
         if (err) {
             console.log(err);
             result(err, null);
@@ -73,6 +73,18 @@ Category.update = (data, result) => {
         }
     })
 }
+
+Category.updatePosition = (data, result) => {
+    db.query('UPDATE categories SET positionId = ? WHERE id = ?', [data.positionId, data.id], (err, res) => {
+        if (err) {
+            console.log(err);
+            result(err, null);
+        } else {
+            result(null, { id: data.id, ...data });
+        }
+    })
+}
+
 
 /!* Delete Category */
 Category.delete = (id, result) => {

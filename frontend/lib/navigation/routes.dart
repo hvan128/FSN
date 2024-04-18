@@ -6,6 +6,7 @@ import 'package:frontend/navigation/router/home.dart';
 import 'package:frontend/navigation/router/introduction.dart';
 import 'package:frontend/navigation/router/my_fridge.dart';
 import 'package:frontend/screens/account/account_screen.dart';
+import 'package:frontend/screens/auth/create_id_screen.dart';
 import 'package:frontend/screens/auth/login_screen.dart';
 import 'package:frontend/screens/auth/register_screen.dart';
 import 'package:frontend/screens/community/add_dish_screen.dart';
@@ -25,6 +26,7 @@ Map<String, WidgetBuilder> appRoutes = {
   //* AUTH ROUTES */
   RouterAuth.login: (context) => const LoginScreen(),
   RouterAuth.register: (context) => const RegisterScreen(),
+  RouterAuth.createId: (context) => const CreateIdScreen(),
   //** COMMUNITY ROUTES */
   RouterCommunity.addDish: (context) => const AddDishScreen(),
   RouterCommunity.dishDetail: (context) => const DishDetailScreen(),
