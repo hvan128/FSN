@@ -28,6 +28,22 @@ export const findById = (req, res) => {
     });
 }
 
+export const findByEmail = (req, res) => {
+    User.findByEmail(req.body.email, (err, data) => {
+        if (err) {
+            if (err.kind === "not_found") {
+                res.status(404).send({
+                    message: `Not found User with email ${req.body.email}.`
+                });
+            } else {
+                res.status(500).send({
+                    message: "Error retrieving User with email " + req.body.email
+                });
+            }
+        } else res.send(data);
+    });
+}
+
 export const update = (req, res) => {
     if (req.body.password) {
         User.update(req.body, (err, data) => {

@@ -7,7 +7,7 @@ class User {
         this.email = email;
     }
 }
-
+//* Create a new User */
 User.create = (data, result) => {
     db.query('INSERT INTO users SET ?', data, (err, res) => {
         if (err) {
@@ -20,6 +20,7 @@ User.create = (data, result) => {
     })
 }
 
+///* Get Users */
 User.getAllUser = (result) => {
     db.query('SELECT * FROM users', (err, res) => {
         if (err) {
@@ -43,6 +44,18 @@ User.findById = (id, result) => {
     })
 }
 
+User.findByEmail = (email, result) => {
+    db.query(`SELECT * FROM users WHERE email = '${email}'`, (err, res) => {
+        if (err) {
+            console.log(err);
+            result(err, null);
+        } else {
+            result(null, res);
+        }
+    })
+}
+
+///* Update User */
 User.update = (data, result) => {
     db.query('UPDATE users SET ? WHERE id = ?', [data, data.id], (err, res) => {
         if (err) {

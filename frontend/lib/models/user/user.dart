@@ -13,7 +13,7 @@ class UserModel {
   String? phone;
   String? birthday;
   String? gender;
-  bool? isNewUser;
+  int? fridgeId;
   String? role;
 
   UserModel(
@@ -26,8 +26,8 @@ class UserModel {
       this.role,
       this.id,
       this.username,
+      this.fridgeId,
       this.email,
-      this.isNewUser,
       this.token,
       this.displayName});
 
@@ -38,10 +38,10 @@ class UserModel {
     token = json['token'];
     displayName = json['displayName'];
     imageUrl = json['imageUrl'];
-    isNewUser = json['isNewUser'];
     description = json['description'];
     address = json['address'];
     phone = json['phone'];
+    fridgeId = json['fridgeId'];
     birthday = json['birthday'];
     gender = json['gender'];
     role = json['role'];
@@ -55,7 +55,7 @@ class UserModel {
     data['token'] = token;
     data['displayName'] = displayName;
     data['description'] = description;
-    data['isNewUser'] = isNewUser;
+    data['fridgeId'] = fridgeId;
     data['imageUrl'] = imageUrl;
     data['address'] = address;
     data['phone'] = phone;

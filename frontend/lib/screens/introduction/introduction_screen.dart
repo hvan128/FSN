@@ -1,18 +1,22 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print
 
+import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/config.dart';
+import 'package:frontend/models/auth/login_response_model.dart';
 import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/router/auth.dart';
+import 'package:frontend/navigation/router/introduction.dart';
 import 'package:frontend/provider/google_sign_in.dart';
-import 'package:frontend/screens/home_screen.dart';
+import 'package:frontend/provider/user.dart';
+import 'package:frontend/services/auth/shared_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/text.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 class IntroductionScreen extends StatelessWidget {
   const IntroductionScreen({super.key});
@@ -203,22 +207,48 @@ class IntroductionScreen extends StatelessWidget {
       Map<String, dynamic> response = await provider.googleLogin();
       UserCredential user = response['user'];
       String token = response['token'];
-      print('user: ');
-      print(response['token']);
-      Navigator.pushReplacementNamed(
-        context,
-        RouterAuth.createId,
-        arguments: {
-          'user': UserModel(
-            displayName: user.additionalUserInfo!.profile!['name'],
-            email: user.additionalUserInfo!.profile!['email'],
-            imageUrl: user.additionalUserInfo!.profile!['picture'],
-            isNewUser: user.additionalUserInfo!.isNewUser,
-            token: token,
-            role: 'user',
-          )
-        },
-      );
+      if (user.additionalUserInfo!.isNewUser) {
+        Navigator.pushReplacementNamed(
+          context,
+          RouterAuth.createId,
+          arguments: {
+            'user': UserModel(
+              displayName: user.additionalUserInfo!.profile!['name'],
+              email: user.additionalUserInfo!.profile!['email'],
+              imageUrl: user.additionalUserInfo!.profile!['picture'],
+              token: token,
+              role: 'user',
+            )
+          },
+        );
+      } else {
+        var client = http.Client();
+        Map<String, String> requestHeaders = {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        };
+        Map<String, dynamic> body = {
+          'email': user.additionalUserInfo!.profile!['email']
+        };
+        var url = Uri.http(Config.API_URL,
+            '${Config.USER_API}/email');
+        var response = await client.post(url, headers: requestHeaders, body: jsonEncode(body));
+        print('response: ${jsonDecode(response.body)[0]}');
+        UserModel currentUser = UserModel.fromJson(jsonDecode(response.body)[0]);
+        context.read<UserProvider>().setUser(user: currentUser);
+        Map<String, dynamic> loginResponse = {
+          'message': 'Login successfully',
+          'data': {
+            'token': token,
+            'username': currentUser.displayName,
+            'email': currentUser.email,
+            'id': currentUser.id,
+          }
+        };
+        await SharedService.setLoginDetails(
+            loginResponseJson(jsonEncode(loginResponse)));
+        Navigator.pushReplacementNamed(context, RouterIntroduction.afterLogin);
+      }
     } catch (e) {
       print('onPressLoginGoogle lỗi');
       print(e);

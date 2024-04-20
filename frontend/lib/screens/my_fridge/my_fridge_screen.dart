@@ -7,7 +7,9 @@ import 'package:frontend/components/modals/alert_modal.dart';
 import 'package:frontend/components/modals/modal_select.dart';
 import 'package:frontend/config.dart';
 import 'package:frontend/models/category/category.dart';
+import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/router/my_fridge.dart';
+import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/my_fridge/add_category_detail_screen.dart';
 import 'package:frontend/screens/my_fridge/add_category_screen.dart';
 import 'package:frontend/screens/search/search_screen.dart';
@@ -18,6 +20,7 @@ import 'package:frontend/types/type.dart';
 import 'package:frontend/widgets/divider.dart';
 import 'package:frontend/widgets/tab_button.dart';
 import 'package:frontend/widgets/text.dart';
+import 'package:provider/provider.dart';
 
 class MyFridgeScreen extends StatefulWidget {
   final Function(bool)? showBottomBar;
@@ -33,6 +36,7 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
   int selectedTabIndex = 0;
   bool isSelecting = false;
   List<int> isSelected = [];
+  UserModel? user;
   PageController pageController = PageController(initialPage: 0);
   final List<Item> listPositions = [
     Item(
@@ -52,6 +56,12 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
       value: '0',
     )
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    user = Provider.of<UserProvider>(context, listen: false).user;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -218,7 +228,7 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
                   MyText(
                     text: isSelecting
                         ? 'Đã chọn ${isSelected.length}'
-                        : 'Chào Ngô Hải Văn',
+                        : user != null && user!.displayName != null ? 'Chào ${user!.displayName}' : '',
                     fontSize: FontSize.z16,
                     fontWeight: FontWeight.w600,
                     color: MyColors.grey['c900']!,

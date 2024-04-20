@@ -1,13 +1,9 @@
 import 'dart:convert';
-import 'dart:math';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/config.dart';
 import 'package:frontend/models/auth/login_response_model.dart';
 import 'package:frontend/services/auth/shared_service.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:http/http.dart' as http;
 
 class GoogleSignInProvider extends ChangeNotifier {
   final googleSignIn = GoogleSignIn();
@@ -31,38 +27,38 @@ class GoogleSignInProvider extends ChangeNotifier {
   }
 
   Future refreshToken() async {
-    var loginDetails = await SharedService.loginDetails();
-    String token = loginDetails!.data!.token;
-    print('token');
-    for (int i = 0; i < token.length; i += 500) {
-      print(token.substring(i, min(i + 500, token.length)));
-    }
-    final url = Uri.parse(
-        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key=${Config.API_KEY}');
-    const provider = 'google.com';
+    // var loginDetails = await SharedService.loginDetails();
+    // String token = loginDetails!.data!.token;
+    // print('token');
+    // for (int i = 0; i < token.length; i += 500) {
+    //   print(token.substring(i, min(i + 500, token.length)));
+    // }
+    // final url = Uri.parse(
+    //     'https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key=${Config.API_KEY}');
+    // const provider = 'google.com';
 
-    final response = await http.post(url,
-        headers: {'Content-type': 'application/json'},
-        body: jsonEncode({
-          'postBody': 'id_token=$token&providerId=$provider',
-          'requestUri': 'http://localhost',
-          'returnIdpCredential': true,
-          'returnSecureToken': true
-        }));
-    print('response');
-    print(response.body);
-    if (response.statusCode != 200) {
-      throw 'Refresh token request failed: ${response.statusCode}';
-    }
+    // final response = await http.post(url,
+    //     headers: {'Content-type': 'application/json'},
+    //     body: jsonEncode({
+    //       'postBody': 'id_token=$token&providerId=$provider',
+    //       'requestUri': 'http://localhost',
+    //       'returnIdpCredential': true,
+    //       'returnSecureToken': true
+    //     }));
+    // print('response');
+    // print(response.body);
+    // if (response.statusCode != 200) {
+    //   throw 'Refresh token request failed: ${response.statusCode}';
+    // }
 
-    final data = Map<String, dynamic>.of(jsonDecode(response.body));
-    if (data.containsKey('refreshToken')) {
-      final String refreshToken = data['refreshToken'];
-      print('refreshToken');
-      for (int i = 0; i < refreshToken.length; i += 500) {
-        print(refreshToken.substring(
-            i, min(i + 500, refreshToken.length)));
-      }
+    // final data = Map<String, dynamic>.of(jsonDecode(response.body));
+    // if (data.containsKey('refreshToken')) {
+    //   final String refreshToken = data['refreshToken'];
+    //   print('refreshToken');
+    //   for (int i = 0; i < refreshToken.length; i += 500) {
+    //     print(refreshToken.substring(
+    //         i, min(i + 500, refreshToken.length)));
+    //   }
       // Map<String, dynamic> loginResponse = {
       //   'message': 'Login successfully',
       //   'data': {
@@ -74,26 +70,27 @@ class GoogleSignInProvider extends ChangeNotifier {
       // };
       // await SharedService.setLoginDetails(
       //     loginResponseJson(jsonEncode(loginResponse)));
-    } else {
-      throw 'No refresh token in response';
-    }
-    notifyListeners();
-    // final user = await googleSignIn.signInSilently();
-    // if (user == null) return;
-    // _user = user;
-    // final googleAuth = await user.authentication;
-    // String token = googleAuth.idToken!;
-    // final currentUser = await SharedService.loginDetails();
-    // Map<String, dynamic>  loginResponse = {
-    //       'message': 'Login successfully',
-    //       'data': {
-    //         'token': token,
-    //         'username': currentUser!.data!.username,
-    //         'email': currentUser.data!.email,
-    //         'id': currentUser.data!.id,
-    //       }
-    //     };
-    //     await SharedService.setLoginDetails(loginResponseJson(jsonEncode(loginResponse)));
+    // } else {
+    //   throw 'No refresh token in response';
+    // }
+    final user = await googleSignIn.signInSilently();
+    if (user == null) return;
+    _user = user;
+    final googleAuth = await user.authentication;
+    String token = googleAuth.idToken!;
+    print('token: $token');
+    final currentUser = await SharedService.loginDetails();
+    Map<String, dynamic>  loginResponse = {
+          'message': 'Login successfully',
+          'data': {
+            'token': token,
+            'username': currentUser!.data!.username,
+            'email': currentUser.data!.email,
+            'id': currentUser.data!.id,
+          }
+        };
+        await SharedService.setLoginDetails(loginResponseJson(jsonEncode(loginResponse)));
+        notifyListeners();
   }
 
   Future logout() async {

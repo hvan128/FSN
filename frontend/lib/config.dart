@@ -10,4 +10,6 @@ class Config {
   static const String LOGIN_API = "/api/v1/auth/login";
   static const String REGISTER_API = "/api/v1/auth/register";
   static const String CATEGORIES_API = "/api/v1/category";
+  static const String USER_API = "/api/v1/user";
+  static const String FRIDGE_API = "/api/v1/fridge";
 }

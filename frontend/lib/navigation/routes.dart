@@ -35,6 +35,8 @@ Map<String, WidgetBuilder> appRoutes = {
   RouterMyFridge.addCategoryDetail: (context) => const AddCategoryDetailScreen(),
   RouterMyFridge.editCategoryDetail: (context) => const EditCategoryDetailScreen(),
   RouterMyFridge.addFood: (context) => const AddFoodScreen(),
+
+  ...introductionRoutes
   
 };
 

@@ -8,6 +8,7 @@ import 'package:frontend/models/auth/login_response_model.dart';
 import 'package:frontend/models/auth/register_request_model.dart';
 import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/router/home.dart';
+import 'package:frontend/navigation/router/introduction.dart';
 import 'package:frontend/services/auth/auth_service.dart';
 import 'package:frontend/services/auth/shared_service.dart';
 import 'package:frontend/theme/color.dart';
@@ -153,7 +154,7 @@ class _CreateIdScreenState extends State<CreateIdScreen> {
         };
         await SharedService.setLoginDetails(loginResponseJson(jsonEncode(loginResponse)));
         Navigator.pushNamedAndRemoveUntil(
-            context, RouterHome.home, (route) => false);
+            context, RouterIntroduction.afterLogin, (route) => false);
       } else {
         print(value.message);
       }

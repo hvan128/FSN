@@ -2,6 +2,8 @@ import express from 'express'
 import morgan from 'morgan'
 import homeRouter from './app/routes/home.router.js'
 import authRouter from './app/routes/auth.router.js'
+import userRouter from './app/routes/user.router.js'
+import fridgeRouter from './app/routes/fridge.router.js'
 import * as middleware from './app/middleware/auth.js'
 import bodyParser from 'body-parser'
 import errorHandler from './app/middleware/errors.js'
@@ -15,8 +17,10 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 authRouter(app);
-app.use(middleware.isAuthenticated); // middleware
+app.use(middleware.isAuthenticated);
 homeRouter(app);
+userRouter(app);
+fridgeRouter(app);
 app.use(errorHandler);
 
 app.listen(port, () => {
