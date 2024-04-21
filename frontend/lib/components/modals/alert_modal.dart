@@ -57,7 +57,7 @@ class MyAlert extends StatelessWidget {
         break;
     }
 
-    const duration = Duration(seconds: 1);
+    const duration = Duration(seconds: 2);
 
     Future.delayed(duration, () {
       Navigator.of(context).pop();

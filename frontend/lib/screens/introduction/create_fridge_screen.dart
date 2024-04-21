@@ -3,6 +3,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:frontend/components/introduction/qr_code_invite.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
 import 'package:frontend/config.dart';
 import 'package:frontend/models/user/user.dart';
@@ -39,7 +41,7 @@ class _CreateFridgeScreenState extends State<CreateFridgeScreen> {
               fontSize: FontSize.z20),
           actions: [
             IconButton(
-              onPressed: () {},
+              onPressed: onPressQRCode,
               icon: const Icon(
                 Icons.qr_code,
                 color: Colors.black,
@@ -146,41 +148,77 @@ class _CreateFridgeScreenState extends State<CreateFridgeScreen> {
                             fontWeight: FontWeight.w900,
                             color: MyColors.grey['c700']!),
                         const SizedBox(height: 20),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: MyColors.grey['c100']!,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color:
-                                      MyColors.grey['c500']!.withOpacity(0.5),
-                                  spreadRadius: 2,
-                                  blurRadius: 7,
-                                  offset: const Offset(0, 5),
-                                )
-                              ]),
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              MyText(
-                                  text:
-                                      'Khi chạm vào biểu tượng QR ở phía trên màn hình, mã QR lời mời sẽ được hiển thị. Hãy gửi nó cho chủ tủ lạnh và yêu cầu một lời mời.',
-                                  fontSize: FontSize.z15,
-                                  fontWeight: FontWeight.w700,
-                                  color: MyColors.grey['c700']!),
-                              const SizedBox(height: 20),
-                              MyButton(
-                                text: 'Làm mới',
-                                buttonType: ButtonType.disable,
-                                onPressed: () {},
-                                startIcon: const Icon(
-                                  Icons.refresh,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
+                        FutureBuilder(
+                            future: ApiService.get(
+                                '${Config.INVITATION_API}/${user.id}'),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                print(snapshot.data);
+                                final sendersId = jsonDecode(snapshot.data.toString())['data'];
+                                return Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                        color: MyColors.grey['c100']!,
+                                        borderRadius: BorderRadius.circular(16),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: MyColors.grey['c500']!
+                                                .withOpacity(0.5),
+                                            spreadRadius: 2,
+                                            blurRadius: 7,
+                                            offset: const Offset(0, 5),
+                                          )
+                                        ]),
+                                    child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          ...sendersId.map((senderId) =>
+                                          Text('Lời mời từ $senderId'),),
+                                          const SizedBox(height: 20),
+                                          MyButton(text: 'Tham gia', onPressed: () {}, buttonType: ButtonType.secondary),
+                                        ]));
+                              } else if (snapshot.hasError) {
+                                return Text('${snapshot.error}');
+                              } else {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                      color: MyColors.grey['c100']!,
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: MyColors.grey['c500']!
+                                              .withOpacity(0.5),
+                                          spreadRadius: 2,
+                                          blurRadius: 7,
+                                          offset: const Offset(0, 5),
+                                        )
+                                      ]),
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      MyText(
+                                          text:
+                                              'Khi chạm vào biểu tượng QR ở phía trên màn hình, mã QR lời mời sẽ được hiển thị. Hãy gửi nó cho chủ tủ lạnh và yêu cầu một lời mời.',
+                                          fontSize: FontSize.z15,
+                                          fontWeight: FontWeight.w700,
+                                          color: MyColors.grey['c700']!),
+                                      const SizedBox(height: 20),
+                                      MyButton(
+                                        text: 'Làm mới',
+                                        buttonType: ButtonType.disable,
+                                        onPressed: () {},
+                                        startIcon: const Icon(
+                                          Icons.refresh,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                );
+                              }
+                            }),
                         const SizedBox(height: 40),
                       ]),
                 )),
@@ -193,11 +231,11 @@ class _CreateFridgeScreenState extends State<CreateFridgeScreen> {
       "ownerId": context.read<UserProvider>().user!.id,
       "usersId": '${context.read<UserProvider>().user!.id}'
     };
-    await ApiService.post(Config.FRIDGE_API, data)
-        .then((value) {
-          final fridgeId = jsonDecode(value.toString())['id'];
-          Provider.of<UserProvider>(context, listen: false).setFridge(fridgeId: fridgeId);
-        });
+    await ApiService.post(Config.FRIDGE_API, data).then((value) {
+      final fridgeId = jsonDecode(value.toString())['id'];
+      Provider.of<UserProvider>(context, listen: false)
+          .setFridge(fridgeId: fridgeId);
+    });
     Navigator.pushNamedAndRemoveUntil(context, RouterHome.home, (_) => false);
     showDialog(
         context: context,
@@ -210,5 +248,9 @@ class _CreateFridgeScreenState extends State<CreateFridgeScreen> {
                 'Tạo tủ lạnh thành công! Hãy thêm đồ ăn vào tủ lạnh để quản lý nhé!',
           );
         });
+  }
+
+  void onPressQRCode() {
+    showDialog(context: context, builder: (context) => const QRCodeInvite());
   }
 }

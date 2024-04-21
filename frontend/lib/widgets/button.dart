@@ -41,7 +41,7 @@ class MyButton extends StatelessWidget {
         break;
       case ButtonType.secondary:
         bgColor = MyColors.primary['CulturalYellow']!['c100']!;
-        textColor = MyColors.primary['CulturalYellow']!['c700']!;
+        textColor = MyColors.grey['c900']!;
         break;
 
       case ButtonType.yellow:

@@ -4,6 +4,7 @@ import 'package:frontend/config.dart';
 import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/introduction.dart';
+import 'package:frontend/navigation/router/settings.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/services/api_service.dart';
 import 'package:frontend/services/category/category_service.dart';
@@ -37,11 +38,18 @@ class _FridgeFamilySettingScreenState extends State<FridgeFamilySettingScreen> {
         title: const Text('Tủ lạnh gia đình'),
         actions: [
           IconButton(
-              onPressed: () {},
+              onPressed: scanQr,
               icon: Icon(
                 Icons.qr_code,
                 color: MyColors.grey['c900']!,
               )),
+          IconButton(
+              onPressed: () {},
+              icon: Icon(
+                Icons.help_outline,
+                color: MyColors.grey['c900']!,
+              )
+          ),
           SubmenuButton(
             menuChildren: <Widget>[
               MenuItemButton(
@@ -101,5 +109,9 @@ class _FridgeFamilySettingScreenState extends State<FridgeFamilySettingScreen> {
                 )
               ]
             ));
+  }
+
+  void scanQr() {
+    Navigate.pushNamed(RouterSetting.qrScanner);
   }
 }
