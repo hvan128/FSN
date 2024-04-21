@@ -88,9 +88,6 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
       setState(() {
         listUnits = FunctionCore.getUnitList(type ?? '');
       });
-      print(listUnits);
-      print(category!.toJson());
-
     });
   }
 

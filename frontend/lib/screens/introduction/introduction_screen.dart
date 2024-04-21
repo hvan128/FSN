@@ -167,10 +167,10 @@ class IntroductionScreen extends StatelessWidget {
                                 } else if (snapshot.hasData) {
                                   print(snapshot.data);
                                   return MyButton(
-                                      text: 'Đăng nhập bằng Google',
+                                      text: 'Thử lại',
                                       buttonType: ButtonType.primary,
                                       onPressed: () {
-                                        onPressLoginGoogle(context);
+                                        onPressTry(context);
                                       },
                                       startIcon: Image.asset(
                                           'assets/icons/i16/google.png',
@@ -233,7 +233,6 @@ class IntroductionScreen extends StatelessWidget {
         var url = Uri.http(Config.API_URL,
             '${Config.USER_API}/email');
         var response = await client.post(url, headers: requestHeaders, body: jsonEncode(body));
-        print('response: ${jsonDecode(response.body)[0]}');
         UserModel currentUser = UserModel.fromJson(jsonDecode(response.body)[0]);
         context.read<UserProvider>().setUser(user: currentUser);
         Map<String, dynamic> loginResponse = {
@@ -253,5 +252,11 @@ class IntroductionScreen extends StatelessWidget {
       print('onPressLoginGoogle lỗi');
       print(e);
     }
+  }
+  
+  void onPressTry(BuildContext context) {
+    final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+    provider.logout();
+    SharedService.logout();
   }
 }

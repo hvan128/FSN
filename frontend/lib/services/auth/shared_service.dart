@@ -6,6 +6,7 @@ import 'package:api_cache_manager/api_cache_manager.dart';
 import 'package:api_cache_manager/models/cache_db_model.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/models/auth/login_response_model.dart';
+import 'package:frontend/navigation/navigation.dart';
 
 class SharedService {
   static Future<bool> isLoggedIn() async {
@@ -38,12 +39,8 @@ class SharedService {
     await APICacheManager().addCacheData(cacheModel);
   }
 
-  static Future<void> logout(BuildContext context) async {
+  static Future<void> logout() async {
     await APICacheManager().deleteCache("login_details");
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/login',
-      (route) => false,
-    );
+    await APICacheManager().emptyCache();
   }
 }

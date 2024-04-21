@@ -1,6 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:api_cache_manager/api_cache_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
 import 'package:frontend/config.dart';
+import 'package:frontend/models/user/user.dart';
+import 'package:frontend/navigation/navigation.dart';
+import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/home_screen.dart';
 import 'package:frontend/services/api_service.dart';
 import 'package:frontend/theme/color.dart';
@@ -16,6 +22,7 @@ import 'package:frontend/widgets/header.dart';
 import 'package:frontend/widgets/input-form.dart';
 import 'package:frontend/widgets/text.dart';
 import 'package:frontend/widgets/text_area.dart';
+import 'package:provider/provider.dart';
 
 class AddCategoryDetailScreen extends StatefulWidget {
   final ItemCategory? category;
@@ -387,7 +394,11 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
   }
 
   void onPressAdd() async {
-    ApiService.post(Config.CATEGORIES_API, {
+    final fridgeId = Provider.of<UserProvider>(
+          Navigate().navigationKey.currentContext!,
+          listen: false)
+      .user!.fridgeId;
+    await ApiService.post(Config.CATEGORIES_API, {
       'label': widget.category!.label,
       'value': widget.category!.value,
       'icon': widget.category!.value,
@@ -398,7 +409,9 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
       'subPositionId': int.parse(subPosition!),
       'manufactureDate': manufactureDate!.toIso8601String(),
       'expiryDate': expDate!.toIso8601String(),
+      'fridgeId': fridgeId
     });
+    await APICacheManager().deleteCache('categories_${int.parse(position!)}');
     Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
     showDialog(
         context: context,

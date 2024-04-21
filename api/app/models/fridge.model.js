@@ -31,4 +31,26 @@ Fridge.create = (data, result) => {
   });
 };
 
+Fridge.getFridgeById = (id, result) => {
+  db.query(`SELECT * FROM fridges WHERE id = ${id}`, (err, res) => {
+    if (err) {
+      console.log(err);
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
+};
+
+Fridge.delete = (id, result) => {
+  db.query(`DELETE FROM fridges WHERE id = ${id}`, (err, res) => {
+    if (err) {
+      console.log(err);
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
+};
+
 export default Fridge;

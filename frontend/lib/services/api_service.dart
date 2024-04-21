@@ -50,9 +50,10 @@ class ApiService {
 
   static Future<bool> delete(String apiUrl) async {
     var loginDetails = await SharedService.loginDetails();
+    print('token: ${loginDetails!.data!.token}');
     Map<String, String> requestHeaders = {
       'Content-Type': 'application/json',
-      'Authorization': loginDetails!.data!.token
+      'Authorization': loginDetails.data!.token
     };
     var url = Uri.http(Config.API_URL, apiUrl);
     var response = await client.delete(

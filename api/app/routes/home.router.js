@@ -6,13 +6,13 @@ import * as subPositionController from "../controllers/subPosition.controller.js
 export default (router) => { 
     //! GET home page
     /* GET category */
-    router.get('/api/v1/category', function(req, res, next) {
+    router.get('/api/v1/category/:fridgeId', function(req, res, next) {
         categoryController.getAllCategory(req, res);
     })
-    router.get('/api/v1/category/:id', function(req, res, next) {
+    router.get('/api/v1/category/:id/:fridgeId', function(req, res, next) {
         categoryController.getCategoryById(req, res);
     })
-    router.get('/api/v1/category/position/:positionId', function(req, res, next) {
+    router.get('/api/v1/category/position/:positionId/:fridgeId', function(req, res, next) {
         categoryController.getCategoryByPositionId(req, res);
     })
 
@@ -42,7 +42,7 @@ export default (router) => {
 
     //! PUT home page
     router.put('/api/v1/category', function(req, res, next) {
-        categoryController.updateCategory(req, res);
+        categoryController.updateCategory(req, res); 
     })
     router.put('/api/v1/category/position', function(req, res, next) {
         categoryController.updatePosition(req, res);

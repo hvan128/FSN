@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/models/auth/login_response_model.dart';
@@ -78,7 +79,10 @@ class GoogleSignInProvider extends ChangeNotifier {
     _user = user;
     final googleAuth = await user.authentication;
     String token = googleAuth.idToken!;
-    print('token: $token');
+    print('token: ');
+    for (int i = 0; i < token.length; i += 500) {
+      print(token.substring(i, min(i + 500, token.length)));
+    }
     final currentUser = await SharedService.loginDetails();
     Map<String, dynamic>  loginResponse = {
           'message': 'Login successfully',

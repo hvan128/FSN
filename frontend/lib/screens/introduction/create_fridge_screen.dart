@@ -1,3 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
 import 'package:frontend/config.dart';
@@ -25,8 +29,6 @@ class _CreateFridgeScreenState extends State<CreateFridgeScreen> {
     UserModel user = context.watch<UserProvider>().user != null
         ? context.watch<UserProvider>().user!
         : UserModel();
-    print('user:');
-    print(user.toJson());
     return Scaffold(
         backgroundColor: MyColors.primary['CulturalYellow']!['c50']!,
         appBar: AppBar(
@@ -186,13 +188,16 @@ class _CreateFridgeScreenState extends State<CreateFridgeScreen> {
         ));
   }
 
-  void onPressCreateFridge(BuildContext context) {
+  void onPressCreateFridge(BuildContext context) async {
     Map<String, dynamic> data = {
       "ownerId": context.read<UserProvider>().user!.id,
       "usersId": '${context.read<UserProvider>().user!.id}'
     };
-    var response = ApiService.post(Config.FRIDGE_API, data);
-    print('response: $response');
+    await ApiService.post(Config.FRIDGE_API, data)
+        .then((value) {
+          final fridgeId = jsonDecode(value.toString())['id'];
+          Provider.of<UserProvider>(context, listen: false).setFridge(fridgeId: fridgeId);
+        });
     Navigator.pushNamedAndRemoveUntil(context, RouterHome.home, (_) => false);
     showDialog(
         context: context,

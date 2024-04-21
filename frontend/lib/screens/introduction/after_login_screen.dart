@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:frontend/config.dart';
 import 'package:frontend/models/user/user.dart';
-import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/home_screen.dart';
 import 'package:frontend/screens/introduction/create_fridge_screen.dart';

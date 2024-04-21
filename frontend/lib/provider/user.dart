@@ -9,4 +9,17 @@ class UserProvider extends ChangeNotifier {
     this.user = user;
     notifyListeners();
   }
+
+  void setFridge({required int fridgeId}) async {
+    if (user != null) {
+      user!.fridgeId = fridgeId;
+      notifyListeners();
+    }
+  }
+  void deleteFridge() async {
+    if (user != null) {
+    user!.fridgeId = null; 
+    notifyListeners(); 
+  }
+  }
 }

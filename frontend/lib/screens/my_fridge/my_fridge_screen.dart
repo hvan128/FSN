@@ -8,12 +8,15 @@ import 'package:frontend/components/modals/modal_select.dart';
 import 'package:frontend/config.dart';
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/models/user/user.dart';
+import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/my_fridge.dart';
+import 'package:frontend/navigation/router/settings.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/my_fridge/add_category_detail_screen.dart';
 import 'package:frontend/screens/my_fridge/add_category_screen.dart';
 import 'package:frontend/screens/search/search_screen.dart';
 import 'package:frontend/services/api_service.dart';
+import 'package:frontend/services/category/category_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/type.dart';
@@ -62,6 +65,7 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
     super.initState();
     user = Provider.of<UserProvider>(context, listen: false).user;
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -228,7 +232,9 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
                   MyText(
                     text: isSelecting
                         ? 'Đã chọn ${isSelected.length}'
-                        : user != null && user!.displayName != null ? 'Chào ${user!.displayName}' : '',
+                        : user != null && user!.displayName != null
+                            ? 'Chào ${user!.displayName}'
+                            : '',
                     fontSize: FontSize.z16,
                     fontWeight: FontWeight.w600,
                     color: MyColors.grey['c900']!,
@@ -261,16 +267,21 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
                       const SizedBox(
                         width: 10,
                       ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: MyColors.grey['c600']!.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Image.asset(
-                          'assets/icons/i16/dots-vertical.png',
-                          width: 30,
-                          height: 30,
-                          color: MyColors.white['c900'],
+                      GestureDetector(
+                        onTap: () {
+                          onTapSetting();
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: MyColors.grey['c600']!.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Image.asset(
+                            'assets/icons/i16/dots-vertical.png',
+                            width: 30,
+                            height: 30,
+                            color: MyColors.white['c900'],
+                          ),
                         ),
                       ),
                     ])
@@ -377,23 +388,17 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
 
   Future? futureCategory;
 
-  void fetchCategoryByPosition(int positionId) async {
-    setState(() {
-      // futureCategory = categoryDB.getCategories();
-      futureCategory =
-          ApiService.get('${Config.CATEGORIES_API}/position/$positionId');
-    });
+  void clearCache() async {
+    CategoryService().deleteCache();
   }
 
   Widget _renderTab(int positionId) {
     return FutureBuilder(
-      future: ApiService.get('${Config.CATEGORIES_API}/position/$positionId'),
+      future: CategoryService().getCategoriesByPosition(positionId: positionId),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          final data = jsonDecode(snapshot.data.toString());
-          final listCategories = categoryFromJson(data['data']);
+          final listCategories = snapshot.data as List<Category>;
           Map<String, List<Category>> groupedCategories = {};
-
           for (var category in listCategories) {
             if (!groupedCategories.containsKey(category.type)) {
               groupedCategories[category.type!] = [];
@@ -651,7 +656,7 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
                   ApiService.put('${Config.CATEGORIES_API}/position',
                       {'id': element, 'positionId': value.value});
                 }
-                fetchCategoryByPosition(1);
+                clearCache();
                 setState(() {
                   isSelecting = false;
                   isSelected.clear();
@@ -692,6 +697,14 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
       isSelecting = false;
     });
     widget.showBottomBar!(true);
-    fetchCategoryByPosition(1);
+    clearCache();
+  }
+  
+  void onTapSignOut() {
+
+  }
+  
+  void onTapSetting() {
+    Navigate.pushNamed(RouterSetting.setting);
   }
 }

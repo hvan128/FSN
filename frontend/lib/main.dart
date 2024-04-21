@@ -1,14 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:frontend/config.dart';
-import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/introduction.dart';
 import 'package:frontend/navigation/routes.dart';
 import 'package:frontend/provider/google_sign_in.dart';
 import 'package:frontend/provider/user.dart';
-import 'package:frontend/services/api_service.dart';
 import 'package:frontend/services/auth/shared_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
