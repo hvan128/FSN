@@ -11,6 +11,7 @@ class MyText extends StatelessWidget {
   final String fontFamily;
   final TextAlign? textAlign;
   final double? lineHeight;
+  final Shadow? shadow;
 
   const MyText(
       {super.key,
@@ -22,6 +23,7 @@ class MyText extends StatelessWidget {
       this.letterSpacing = 0.01,
       this.fontFamily = "Urbanist",
       this.lineHeight,
+      this.shadow,
       this.decorationColor,
       this.textAlign});
 
@@ -38,6 +40,7 @@ class MyText extends StatelessWidget {
           decorationColor: decorationColor,
           letterSpacing: letterSpacing,
           height: lineHeight,
+          shadows: shadow == null ? null : [shadow!],
         ));
   }
 }

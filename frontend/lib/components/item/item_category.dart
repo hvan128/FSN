@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/models/category/category.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
-import 'package:frontend/types/food.dart';
+import 'package:frontend/utils/icons.dart';
 import 'package:frontend/widgets/text.dart';
 
 class CategoryItem extends StatelessWidget {
-  final ItemCategory category;
+  final Category category;
   final bool? isSelected;
   const CategoryItem(
-      {super.key, required this.category, this.isSelected = false});
+      {super.key, required this.category, this.isSelected = true});
 
   @override
   Widget build(BuildContext context) {
+    final duration = category.expiryDate!.difference(DateTime.now()).inDays;
+    final icon = allIcons[category.icon] ?? 'assets/icons/i16/logo.png';
     return Stack(children: [
       Padding(
         padding: const EdgeInsets.all(2.0),
@@ -33,13 +36,13 @@ class CategoryItem extends StatelessWidget {
                     ),
                     padding: const EdgeInsets.only(
                         top: 17, bottom: 8, left: 15, right: 15),
-                    child: Image.asset(category.icon, width: 40, height: 40)),
+                    child: Image.asset(icon, width: 40, height: 40)),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: SizedBox(
                     width: 70,
                     child: MyText(
-                      text: category.label,
+                      text: category.label ?? '',
                       fontSize: FontSize.z12,
                       fontWeight: FontWeight.w600,
                       color: MyColors.grey['c700']!,
@@ -58,16 +61,16 @@ class CategoryItem extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 4),
               decoration: BoxDecoration(
-                  color: MyColors.grey['c100']!,
+                  color: getDurationColor(duration),
                   borderRadius: BorderRadius.circular(100),
                   border: Border.all(
                     color: MyColors.grey['c300']!,
                   )),
               child: MyText(
-                  text: 'D - ${category.defaultDuration.toInt()}',
+                  text: 'D - $duration',
                   fontSize: FontSize.z10,
                   fontWeight: FontWeight.w600,
-                  color: MyColors.grey['c700']!),
+                  color: getDurationTextColor(duration)),
             ),
           ),
         ),
@@ -95,4 +98,24 @@ class CategoryItem extends StatelessWidget {
           : const SizedBox(),
     ]);
   }
+  
+  getDurationColor(int duration) {
+    if (duration < 0) {
+      return MyColors.support['Error']!['c800']!;
+    }
+    else if(duration == 0 ) {
+      return MyColors.secondary['DawnOrange']!['c800']!;
+    } else {
+      return MyColors.grey['c100']!;
+    }
+  }
+  
+  getDurationTextColor(int duration) {
+    if (duration > 0) {
+      return MyColors.grey['c800']!;
+    }
+    else {
+      return MyColors.white['c900']!;
+    }
+  } 
 }

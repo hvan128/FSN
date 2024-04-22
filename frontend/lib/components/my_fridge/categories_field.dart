@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/item/item_category.dart';
-import 'package:frontend/types/food.dart';
+import 'package:frontend/models/category/category.dart';
 
 class CategoriesField extends StatelessWidget {
-  final List<ItemCategory> categories;
+  final List<Category> categories;
   const CategoriesField({super.key, required this.categories});
 
   @override

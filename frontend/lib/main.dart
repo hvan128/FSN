@@ -1,20 +1,48 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:frontend/screen/home_screen.dart';
-import 'package:frontend/screen/login/login_screen.dart';
+import 'package:frontend/config.dart';
+import 'package:frontend/navigation/navigation.dart';
+import 'package:frontend/navigation/router/introduction.dart';
+import 'package:frontend/navigation/routes.dart';
+import 'package:frontend/provider/google_sign_in.dart';
+import 'package:frontend/provider/user.dart';
+import 'package:frontend/services/auth/shared_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+import 'firebase_options.dart';
 
-void main() {
+String _defaultRoute = RouterIntroduction.introduction;
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  bool result = await SharedService.isLoggedIn();
+  if (result) {
+    await GoogleSignInProvider().refreshToken();
+    Timer.periodic(const Duration(seconds: 3601), (timer) {
+      GoogleSignInProvider().refreshToken();
+    });
+    _defaultRoute = RouterIntroduction.afterLogin;
+  }
   runApp(const MainApp());
 }
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
+  static final navigate = Navigate();
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'DK Mobile Banking',
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => UserProvider()),
+        ChangeNotifierProvider(create: (context) => GoogleSignInProvider()),
+      ],
+      child: MaterialApp(
+        title: Config.APP_NAME,
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.amber,
@@ -37,7 +65,6 @@ class MainApp extends StatelessWidget {
               ),
               indicator: UnderlineTabIndicator(
                 // color for indicator (underline)
-
                 borderSide: BorderSide(
                     color: MyColors.primary['CulturalYellow']!['c700']!,
                     width: 2.0),
@@ -53,6 +80,11 @@ class MainApp extends StatelessWidget {
               .colorScheme
               .copyWith(outline: MyColors.white['c900']),
         ),
-        home: const HomeScreen());
+        navigatorKey: navigate.navigationKey,
+        initialRoute: _defaultRoute,
+        routes: appRoutes,
+        onGenerateRoute: onAnimateRoute,
+      ),
+    );
   }
 }

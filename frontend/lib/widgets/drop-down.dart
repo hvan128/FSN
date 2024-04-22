@@ -96,6 +96,7 @@ class _MyDropDownButtonState extends State<MyDropDownButton> {
           }
           setState(() {
             selectedValue = value;
+            widget.onSelected!(value);
           });
         },
         buttonStyleData: ButtonStyleData(

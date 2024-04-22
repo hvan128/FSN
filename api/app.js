@@ -2,8 +2,12 @@ import express from 'express'
 import morgan from 'morgan'
 import homeRouter from './app/routes/home.router.js'
 import authRouter from './app/routes/auth.router.js'
-import * as authController from './app/controllers/auth.controller.js'
+import userRouter from './app/routes/user.router.js'
+import fridgeRouter from './app/routes/fridge.router.js'
+import invitationRouter from './app/routes/invitation.router.js'
+import * as middleware from './app/middleware/auth.js'
 import bodyParser from 'body-parser'
+import errorHandler from './app/middleware/errors.js'
 
 const app = express()
 const port = 3000
@@ -14,9 +18,12 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 authRouter(app);
-app.use(authController.isAuthenticated); // middleware
+app.use(middleware.isAuthenticated);
 homeRouter(app);
-
+userRouter(app);
+fridgeRouter(app);
+invitationRouter(app);
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)

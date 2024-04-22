@@ -1,4 +1,9 @@
+import 'package:flutter/material.dart';
+import 'package:frontend/navigation/navigation.dart';
+import 'package:frontend/types/food.dart';
 import 'package:frontend/types/type.dart';
+import 'package:frontend/utils/constants.dart';
+import 'package:frontend/widgets/loading.dart';
 
 class FunctionCore {
   static List<Item> getUnitList(String type) {
@@ -244,7 +249,39 @@ class FunctionCore {
         ];
 
       default:
-        return [];
+        return [
+          Item(
+            value: 'piece',
+            label: 'cái',
+          ),
+          Item(
+            value: 'kg',
+            label: 'kg',
+          ),
+          Item(
+            value: 'lit',
+            label: 'lít',
+          )
+        ];
     }
+  }
+
+  static String getCategoryType(String type) {
+    return foods.firstWhere((element) => false, orElse: () => ItemFood(categories: [], value: '', label: 'Khác', icon: '')).label;
+  }
+
+
+}
+  class Loading {
+  static void showLoading() {
+    showDialog(
+        context: Navigate().navigationKey.currentContext!,
+        builder: (BuildContext context) {
+          return const MyLoading();
+        });
+  }
+
+  static void hideLoading() {
+    Navigate.pop();
   }
 }

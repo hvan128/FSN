@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/card/food_card.dart';
 import 'package:frontend/components/item/item_ingredient.dart';
-import 'package:frontend/screen/community/dish_detail_screen.dart';
+import 'package:frontend/navigation/navigation.dart';
+import 'package:frontend/navigation/router/community.dart';
+import 'package:frontend/screens/community/dish_detail_screen.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/dish.dart';
@@ -95,10 +97,10 @@ class _MyKitchenDishesState extends State<MyKitchenDishes> {
                             children: [
                               GestureDetector(
                                 onTap: () {
-                                  Navigator.push(context,
-                                      MaterialPageRoute(builder: (context) {
-                                    return DishDetailScreen(dish: e);
-                                  }));
+                                  print('a');
+                                  Navigator.pushNamed(context, RouterCommunity.dishDetail, arguments: {
+                                    'dish': e
+                                  });
                                 },
                                 child: FoodCard(
                                     dish: e,

@@ -18,7 +18,7 @@ class ItemCategory {
   final String value;
   final String icon;
   final String type;
-  final double defaultDuration;
+  final int defaultDuration;
 
   ItemCategory(
       {required this.label,
