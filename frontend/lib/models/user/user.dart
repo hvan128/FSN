@@ -64,4 +64,20 @@ class UserModel {
     data['role'] = role;
     return data;
   }
+
+  UserModel deleteFridge() {
+    return UserModel(
+        id: id,
+        username: username,
+        email: email,
+        token: token,
+        displayName: displayName,
+        description: description,
+        address: address,
+        phone: phone,
+        birthday: birthday,
+        gender: gender,
+        role: role,
+        fridgeId: null);
+  }
 }

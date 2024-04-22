@@ -42,26 +42,43 @@ export const findByEmail = (req, res) => {
   });
 };
 
+export const findByFridgeId = (req, res) => {
+  User.findByFridgeId(req.params.fridgeId, (err, data) => {
+    if (err) {
+      if (err.kind === "not_found") {
+        res.status(404).send({
+          message: `Not found User with fridgeId ${req.params.fridgeId}.`,
+        });
+      } else {
+        res.status(500).send({
+          message: "Error retrieving User with fridgeId " + req.params.fridgeId,
+        });
+      }
+    } else if (data == null || data.length == 0) {
+      res.status(200).send("No data");
+    } else {
+      res.status(200).send({
+        message: "Success",
+        data: data,
+      });
+    }
+  });
+};
+
 export const update = (req, res) => {
-  if (req.body.password) {
-    User.update(req.body, (err, data) => {
-      if (err) {
-        if (err.kind === "not_found") {
-          res.status(404).send({
-            message: `Not found User with id ${req.body.id}.`,
-          });
-        } else {
-          res.status(500).send({
-            message: "Error updating User with id " + req.body.id,
-          });
-        }
-      } else res.send(data);
-    });
-  } else {
-    res.status(500).send({
-      message: "Error updating User with id " + req.body.id,
-    });
-  }
+  User.update(req.body, (err, data) => {
+    if (err) {
+      if (err.kind === "not_found") {
+        res.status(404).send({
+          message: `Not found User with id ${req.body.id}.`,
+        });
+      } else {
+        res.status(500).send({
+          message: "Error updating User with id " + req.body.id,
+        });
+      }
+    } else res.send(data);
+  });
 };
 
 export const deleteFridge = (req, res, next) => {

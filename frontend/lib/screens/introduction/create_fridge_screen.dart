@@ -3,16 +3,17 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:frontend/components/introduction/qr_code_invite.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
 import 'package:frontend/config.dart';
+import 'package:frontend/models/invitation/invitation.dart';
 import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/router/home.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/services/api_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
+import 'package:frontend/utils/functions_core.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/gradient_text.dart';
 import 'package:frontend/widgets/text.dart';
@@ -26,11 +27,43 @@ class CreateFridgeScreen extends StatefulWidget {
 }
 
 class _CreateFridgeScreenState extends State<CreateFridgeScreen> {
+  Future<List<Invitation>> getInvitations(int receiverId) async {
+    List<Invitation> invitations = [];
+    await ApiService.get('${Config.INVITATION_API}/$receiverId').then((value) {
+      print('value: $value');
+      if (value != null && value != 'No data') {
+        final data = jsonDecode(value.toString())['data'];
+        print('data: $data');
+        invitations = invitationFromJson(data);
+      }
+    });
+    return invitations;
+  }
+
   @override
   Widget build(BuildContext context) {
     UserModel user = context.watch<UserProvider>().user != null
         ? context.watch<UserProvider>().user!
         : UserModel();
+    var futureBuilder = FutureBuilder(
+      future: getInvitations(user.id!),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+            return const Center(child: CircularProgressIndicator());
+          default:
+            print('snapshot.data: ${snapshot.data}');
+            if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else if (snapshot.hasData && snapshot.data.length > 0) {
+              return createListView(context, snapshot);
+            } else {
+              return createReloadButton();
+            }
+        }
+      },
+    );
     return Scaffold(
         backgroundColor: MyColors.primary['CulturalYellow']!['c50']!,
         appBar: AppBar(
@@ -65,34 +98,34 @@ class _CreateFridgeScreenState extends State<CreateFridgeScreen> {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 10),
                         MyText(
                             text: 'Xin chào, ',
                             fontSize: FontSize.z20,
                             fontWeight: FontWeight.w900,
                             color: MyColors.grey['c900']!),
-                        const SizedBox(height: 10),
                         user.displayName != null
                             ? GradientText(
                                 user.displayName!,
-                                style: const TextStyle(fontSize: 40),
+                                style: const TextStyle(
+                                    fontSize: 30, fontWeight: FontWeight.bold),
                                 gradient: LinearGradient(colors: [
                                   Colors.blue.shade400,
                                   Colors.blue.shade900,
                                 ]),
                               )
                             : Container(),
-                        const SizedBox(height: 20),
-                        SizedBox(
-                          width: double.infinity,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Image.asset('assets/icons/i16/logo.png',
-                                  width: 200, height: 200),
-                            ],
-                          ),
-                        ),
+                        // const SizedBox(height: 20),
+                        // SizedBox(
+                        //   width: double.infinity,
+                        //   child: Column(
+                        //     crossAxisAlignment: CrossAxisAlignment.center,
+                        //     children: [
+                        //       Image.asset('assets/icons/i16/logo.png',
+                        //           width: 150, height: 150),
+                        //     ],
+                        //   ),
+                        // ),
                         const SizedBox(height: 20),
                         MyText(
                             text: 'Bắt đầu làm chủ sở hữu',
@@ -148,77 +181,7 @@ class _CreateFridgeScreenState extends State<CreateFridgeScreen> {
                             fontWeight: FontWeight.w900,
                             color: MyColors.grey['c700']!),
                         const SizedBox(height: 20),
-                        FutureBuilder(
-                            future: ApiService.get(
-                                '${Config.INVITATION_API}/${user.id}'),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                print(snapshot.data);
-                                final sendersId = jsonDecode(snapshot.data.toString())['data'];
-                                return Container(
-                                    padding: const EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                        color: MyColors.grey['c100']!,
-                                        borderRadius: BorderRadius.circular(16),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: MyColors.grey['c500']!
-                                                .withOpacity(0.5),
-                                            spreadRadius: 2,
-                                            blurRadius: 7,
-                                            offset: const Offset(0, 5),
-                                          )
-                                        ]),
-                                    child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          ...sendersId.map((senderId) =>
-                                          Text('Lời mời từ $senderId'),),
-                                          const SizedBox(height: 20),
-                                          MyButton(text: 'Tham gia', onPressed: () {}, buttonType: ButtonType.secondary),
-                                        ]));
-                              } else if (snapshot.hasError) {
-                                return Text('${snapshot.error}');
-                              } else {
-                                return Container(
-                                  decoration: BoxDecoration(
-                                      color: MyColors.grey['c100']!,
-                                      borderRadius: BorderRadius.circular(16),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: MyColors.grey['c500']!
-                                              .withOpacity(0.5),
-                                          spreadRadius: 2,
-                                          blurRadius: 7,
-                                          offset: const Offset(0, 5),
-                                        )
-                                      ]),
-                                  padding: const EdgeInsets.all(16),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      MyText(
-                                          text:
-                                              'Khi chạm vào biểu tượng QR ở phía trên màn hình, mã QR lời mời sẽ được hiển thị. Hãy gửi nó cho chủ tủ lạnh và yêu cầu một lời mời.',
-                                          fontSize: FontSize.z15,
-                                          fontWeight: FontWeight.w700,
-                                          color: MyColors.grey['c700']!),
-                                      const SizedBox(height: 20),
-                                      MyButton(
-                                        text: 'Làm mới',
-                                        buttonType: ButtonType.disable,
-                                        onPressed: () {},
-                                        startIcon: const Icon(
-                                          Icons.refresh,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                );
-                              }
-                            }),
+                        futureBuilder,
                         const SizedBox(height: 40),
                       ]),
                 )),
@@ -252,5 +215,111 @@ class _CreateFridgeScreenState extends State<CreateFridgeScreen> {
 
   void onPressQRCode() {
     showDialog(context: context, builder: (context) => const QRCodeInvite());
+  }
+
+  Widget createListView(BuildContext context, AsyncSnapshot snapshot) {
+    final data = snapshot.data;
+    return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+            color: MyColors.grey['c100']!,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: MyColors.grey['c500']!.withOpacity(0.5),
+                spreadRadius: 2,
+                blurRadius: 7,
+                offset: const Offset(0, 5),
+              )
+            ]),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          ...data.map(
+            (data) => FutureBuilder(
+                future: getSenderName(data.senderId),
+                builder: (context, snapshot) {
+                  return Column(
+                    children: [
+                      Row(children: [
+                        Icon(Icons.mail, color: MyColors.grey['c700']!),
+                        const SizedBox(width: 10),
+                        MyText(
+                          text: 'Lời mời từ ${snapshot.data.toString()}',
+                          fontSize: FontSize.z15,
+                          fontWeight: FontWeight.w700,
+                          color: MyColors.grey['c700']!,
+                        )
+                      ]),
+                      const SizedBox(height: 20),
+                      MyButton(
+                          text: 'Tham gia',
+                          onPressed: () {
+                            onPressJoinFridge(data);
+                          },
+                          buttonType: ButtonType.secondary),
+                      const SizedBox(height: 20),
+                    ],
+                  );
+                }),
+          ),
+        ]));
+  }
+
+  Widget createReloadButton() {
+    return Container(
+      decoration: BoxDecoration(
+          color: MyColors.grey['c100']!,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: MyColors.grey['c500']!.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 7,
+              offset: const Offset(0, 5),
+            )
+          ]),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MyText(
+              text:
+                  'Khi chạm vào biểu tượng QR ở phía trên màn hình, mã QR lời mời sẽ được hiển thị. Hãy gửi nó cho chủ tủ lạnh và yêu cầu một lời mời.',
+              fontSize: FontSize.z15,
+              fontWeight: FontWeight.w700,
+              color: MyColors.grey['c700']!),
+          const SizedBox(height: 20),
+          MyButton(
+            text: 'Làm mới',
+            buttonType: ButtonType.disable,
+            onPressed: () {
+              setState(() {});
+            },
+            startIcon: const Icon(
+              Icons.refresh,
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Future<String> getSenderName(int senderId) async {
+    String senderName = '';
+    await ApiService.get('${Config.USER_API}/$senderId').then((value) {
+      if (value != null) {
+        senderName = jsonDecode(value.toString())[0]['displayName'];
+      }
+    });
+    return senderName;
+  }
+
+  void onPressJoinFridge(Invitation invitation) async {
+    final acceptInvitation = invitation.acceptInvitation();
+    Loading.showLoading();
+    await ApiService.put(Config.INVITATION_API, acceptInvitation.toJson());
+    Provider.of<UserProvider>(context, listen: false)
+        .setFridge(fridgeId: invitation.fridgeId!);
+    Loading.hideLoading();
+    Navigator.pushNamedAndRemoveUntil(context, RouterHome.home, (_) => false);
   }
 }

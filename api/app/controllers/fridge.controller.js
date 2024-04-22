@@ -25,7 +25,7 @@ export const create = (req, res, next) => {
 
 export const getFridgeById = (req, res) => {
   var id = req.params.id;
-  Fridge.findById(id, (err, result) => {
+  Fridge.getFridgeById(id, (err, result) => {
     res.send(result);
   });
 };

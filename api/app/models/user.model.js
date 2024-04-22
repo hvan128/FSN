@@ -55,6 +55,17 @@ User.findByEmail = (email, result) => {
   });
 };
 
+User.findByFridgeId = (fridgeId, result) => {
+  db.query(`SELECT * FROM users WHERE fridgeId = ${fridgeId}`, (err, res) => {
+    if (err) {
+      console.log(err);
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
+}
+
 ///* Update User */
 User.update = (data, result) => {
   db.query("UPDATE users SET ? WHERE id = ?", [data, data.id], (err, res) => {

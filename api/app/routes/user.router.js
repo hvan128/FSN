@@ -9,6 +9,10 @@ export default (router) => {
         UserController.findById(req, res);
     })
 
+    router.get('/api/v1/user/fridge/:fridgeId', function(req, res, next) {
+        UserController.findByFridgeId(req, res);
+    })
+
     router.post('/api/v1/user/email', function(req, res, next) {
         UserController.findByEmail(req, res);
     })
@@ -17,7 +21,7 @@ export default (router) => {
         UserController.create(req, res);
     })
 
-    router.put('/api/v1/user/:id', function(req, res, next) {
+    router.put('/api/v1/user/', function(req, res, next) {
         UserController.update(req, res);
     })
 }

@@ -56,6 +56,7 @@ export const updatePosition = (req, res) => {
   });
 };
 
+
 export const deleteCategory = (req, res) => {
   var id = req.params.id;
   Category.delete(id, (result) => {

@@ -47,6 +47,7 @@ export default (router) => {
     router.put('/api/v1/category/position', function(req, res, next) {
         categoryController.updatePosition(req, res);
     })
+    
 
     //! DELETE home page
     router.delete('/api/v1/category/:id', function(req, res, next) {
