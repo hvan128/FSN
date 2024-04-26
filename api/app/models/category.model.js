@@ -27,8 +27,8 @@ Category.create = (data, result) => {
 }
 
 /!* Get all Categories */
-Category.getAllCategory = (result) => {
-    db.query('SELECT * FROM categories', (err, res) => {
+Category.getAllCategoryInFridge = (fridgeId, result) => {
+    db.query('SELECT * FROM categories WHERE fridgeId = ?', [fridgeId], (err, res) => {
         if (err) {
             console.log(err);
             result(err, null);

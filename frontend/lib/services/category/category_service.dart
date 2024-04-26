@@ -46,9 +46,59 @@ class CategoryService {
       return categories;
     }
   }
-  Future deleteCache () async {
+
+  Future deleteCache() async {
     await APICacheManager().deleteCache('categories_1');
     await APICacheManager().deleteCache('categories_2');
     await APICacheManager().deleteCache('categories_3');
+    await APICacheManager().deleteCache('categories');
+  }
+
+  Future<List<Category>> getAllCategories() async {
+    List<dynamic> categories = [];
+    var isCacheExist = await APICacheManager().isAPICacheKeyExist('categories');
+    if (isCacheExist) {
+      print('cache exist');
+      var cacheData = await APICacheManager().getCacheData('categories');
+      final data = jsonDecode(cacheData.syncData);
+      return categoryFromJson(data);
+    } else {
+      var cache1Exist =
+          await APICacheManager().isAPICacheKeyExist('categories_1');
+      var cache2Exist =
+          await APICacheManager().isAPICacheKeyExist('categories_2');
+      var cache3Exist =
+          await APICacheManager().isAPICacheKeyExist('categories_3');
+      if (cache1Exist || cache2Exist || cache3Exist) {
+        print('cache exist 1');
+        var cache1Data = await APICacheManager().getCacheData('categories_1');
+        var cache2Data = await APICacheManager().getCacheData('categories_2');
+        var cache3Data = await APICacheManager().getCacheData('categories_3');
+        final data1 = jsonDecode(cache1Data.syncData)['data'];
+        final data2 = jsonDecode(cache2Data.syncData)['data'];
+        final data3 = jsonDecode(cache3Data.syncData)['data'];
+        categories = data1 + data2 + data3;
+            print(categories.length);
+        APICacheDBModel cacheDBModel = APICacheDBModel(
+          key: 'categories',
+          syncData: jsonEncode(categories),
+        );
+        APICacheManager().addCacheData(cacheDBModel);
+      } else {
+        await ApiService.get('${Config.CATEGORIES_API}/${user.fridgeId}')
+            .then((value) {
+          if (value != null) {
+            final data = jsonDecode(value.toString())['data'];
+            categories = data;
+          }
+        });
+        APICacheDBModel cacheDBModel = APICacheDBModel(
+          key: 'categories',
+          syncData: jsonEncode(categories),
+        );
+        APICacheManager().addCacheData(cacheDBModel);
+      }
+      return categoryFromJson(categories);
+    }
   }
 }

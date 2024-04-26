@@ -412,6 +412,7 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
       'fridgeId': fridgeId
     });
     await APICacheManager().deleteCache('categories_${int.parse(position!)}');
+    await APICacheManager().deleteCache('categories');
     Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
     showDialog(
         context: context,
