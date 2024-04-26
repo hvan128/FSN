@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/models/category/category.dart';
 import 'package:frontend/screens/search/search_screen.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
-import 'package:frontend/types/food.dart';
 import 'package:frontend/utils/constants.dart';
+import 'package:frontend/utils/icons.dart';
 import 'package:frontend/widgets/text.dart';
 
 class ItemSearch extends StatefulWidget {
-  final ItemCategory category;
+  final Category category;
   final SearchType type;
   const ItemSearch({
     super.key,
@@ -22,6 +23,7 @@ class ItemSearch extends StatefulWidget {
 class _ItemSearchState extends State<ItemSearch> {
   @override
   Widget build(BuildContext context) {
+    final icon = allIcons[widget.category.value] ?? 'assets/icons/i16/logo.png';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       width: MediaQuery.of(context).size.width * 0.5,
@@ -34,14 +36,14 @@ class _ItemSearchState extends State<ItemSearch> {
             width: 40,
             height: 40,
             child: Image.asset(
-              widget.category.icon,
+              icon,
             ),
           ),
           const SizedBox(
             width: 10,
           ),
           MyText(
-            text: widget.category.label,
+            text: widget.category.label!,
             fontSize: FontSize.z14,
             fontWeight: FontWeight.w600,
             color: MyColors.grey['c700']!,

@@ -12,6 +12,8 @@ class Category {
   String? unit;
   DateTime? manufactureDate;
   DateTime? expiryDate;
+  int? defaultDuration;
+
 
   Category(
       {this.id,
@@ -24,7 +26,9 @@ class Category {
       this.quantity,
       this.unit,
       this.manufactureDate,
-      this.expiryDate});
+      this.expiryDate,
+      this.defaultDuration
+      });
 
   Category.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -38,6 +42,7 @@ class Category {
     unit = json['unit'];
     manufactureDate = DateTime.parse(json['manufactureDate']);
     expiryDate = DateTime.parse(json['expiryDate']);
+    defaultDuration = json['defaultDuration'];
   }
 
   Map<String, dynamic> toJson() {
@@ -53,6 +58,7 @@ class Category {
     data['unit'] = unit;
     data['manufactureDate'] = manufactureDate;
     data['expiryDate'] = expiryDate;
+    data['defaultDuration'] = defaultDuration;
     return data;
   }
 }

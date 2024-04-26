@@ -7,7 +7,7 @@ export default (router) => {
     //! GET home page
     /* GET category */
     router.get('/api/v1/category/:fridgeId', function(req, res, next) {
-        categoryController.getAllCategory(req, res);
+        categoryController.getAllCategoryInFridge(req, res);
     })
     router.get('/api/v1/category/:id/:fridgeId', function(req, res, next) {
         categoryController.getCategoryById(req, res);

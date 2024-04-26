@@ -1,7 +1,8 @@
 import Category from "../models/category.model.js";
 
-export const getAllCategory = (req, res, next) => {
-  Category.getAllCategory((err, data) => {
+export const getAllCategoryInFridge = (req, res, next) => {
+  var fridgeId = req.params.fridgeId;
+  Category.getAllCategoryInFridge(fridgeId, (err, data) => {
     if (err) {
       return next(err);
     } else {
