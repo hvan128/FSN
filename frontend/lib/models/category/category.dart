@@ -1,5 +1,6 @@
 List<Category> categoryFromJson(dynamic str) =>
     List<Category>.from((str).map((x) => Category.fromJson(x)));
+
 class Category {
   int? id;
   String? icon;
@@ -12,8 +13,10 @@ class Category {
   String? unit;
   DateTime? manufactureDate;
   DateTime? expiryDate;
+  int? fridgeId;
   int? defaultDuration;
-
+  int? completed;
+  int? no;
 
   Category(
       {this.id,
@@ -25,10 +28,12 @@ class Category {
       this.subPositionId,
       this.quantity,
       this.unit,
+      this.fridgeId,
       this.manufactureDate,
       this.expiryDate,
-      this.defaultDuration
-      });
+      this.defaultDuration,
+      this.completed,
+      this.no});
 
   Category.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -40,9 +45,15 @@ class Category {
     subPositionId = json['subPositionId'];
     quantity = json['quantity'];
     unit = json['unit'];
-    manufactureDate = DateTime.parse(json['manufactureDate']);
-    expiryDate = DateTime.parse(json['expiryDate']);
+    manufactureDate = json['manufactureDate'] == null
+        ? null
+        : DateTime.parse(json['manufactureDate']);
+    expiryDate =
+        json['expiryDate'] == null ? null : DateTime.parse(json['expiryDate']);
     defaultDuration = json['defaultDuration'];
+    fridgeId = json['fridgeId'];
+    completed = json['completed'];
+    no = json['no'];
   }
 
   Map<String, dynamic> toJson() {
@@ -59,6 +70,9 @@ class Category {
     data['manufactureDate'] = manufactureDate;
     data['expiryDate'] = expiryDate;
     data['defaultDuration'] = defaultDuration;
+    data['completed'] = completed;
+    data['fridgeId'] = fridgeId;
+    data['no'] = no;
     return data;
   }
 }

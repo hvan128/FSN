@@ -4,14 +4,13 @@ import 'package:api_cache_manager/api_cache_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
 import 'package:frontend/config.dart';
-import 'package:frontend/models/user/user.dart';
+import 'package:frontend/models/category/category.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/home_screen.dart';
 import 'package:frontend/services/api_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
-import 'package:frontend/types/food.dart';
 import 'package:frontend/types/type.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:frontend/utils/functions_core.dart';
@@ -25,7 +24,7 @@ import 'package:frontend/widgets/text_area.dart';
 import 'package:provider/provider.dart';
 
 class AddCategoryDetailScreen extends StatefulWidget {
-  final ItemCategory? category;
+  final Category? category;
 
   const AddCategoryDetailScreen({super.key, this.category});
 
@@ -72,14 +71,14 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
   @override
   void initState() {
     super.initState();
-    _controller.text = widget.category!.label;
-    listUnits = FunctionCore.getUnitList(widget.category!.type);
+    _controller.text = widget.category!.label!;
+    listUnits = FunctionCore.getUnitList(widget.category!.type!);
     position = listPositions.first.value;
     unit = listUnits!.first.value;
     subPosition = listSubPositions.first.value;
     manufactureDate = DateTime.now();
     expDate =
-        DateTime.now().add(Duration(days: widget.category!.defaultDuration));
+        DateTime.now().add(Duration(days: widget.category!.defaultDuration!));
   }
 
   @override
@@ -100,7 +99,7 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
           child: SafeArea(
               child: Column(children: [
             MyHeader(
-              title: "Add Category",
+              title: "Thêm đồ ăn",
               bgColor: MyColors.white['c900']!,
             ),
             Expanded(
@@ -145,7 +144,7 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
                                       height: 60,
                                       width: 60,
                                       child: Image.asset(
-                                        widget.category!.icon,
+                                        widget.category!.icon!,
                                         width: 50,
                                         height: 50,
                                       ),
@@ -425,18 +424,5 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
                 'Thêm đồ ăn ${widget.category!.label} vào $position thành công!',
           );
         });
-    // print({
-    //   'label': widget.category!.label,
-    //   'value': widget.category!.value,
-    //   'icon': widget.category!.icon,
-    //   'type': widget.category!.type,
-    //   'quantity': quantity,
-    //   'unit': unit,
-    //   'position': position,
-    //   'subPosition': subPosition,
-    //   'manufactureDate': manufactureDate,
-    //   'expDate': expDate,
-    //   'note': note
-    // });
   }
 }

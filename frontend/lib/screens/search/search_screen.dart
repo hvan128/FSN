@@ -1,24 +1,18 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:frontend/components/item/item_search.dart';
-import 'package:frontend/config.dart';
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/my_fridge.dart';
-import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/my_fridge/add_category_detail_screen.dart';
-import 'package:frontend/screens/my_fridge/edit_category_detail_screen.dart';
-import 'package:frontend/services/api_service.dart';
 import 'package:frontend/services/category/category_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/utils/constants.dart';
-import 'package:provider/provider.dart';
 import 'package:tiengviet/tiengviet.dart';
 
 enum SearchType {
   mine,
+  shoppingList,
   all,
 }
 
@@ -41,20 +35,35 @@ class _SearchScreenState extends State<SearchScreen> {
     setListCategories('');
   }
 
-
   Future<void> setListCategories(String searchText) async {
     if (searchText == '') {
-      categories = await CategoryService().getAllCategories();
-      setState(() {
-        listCategories = categories;
-      });
+      if (widget.type == SearchType.mine) {
+        categories = await CategoryService().getAllCategories();
+        setState(() {
+          listCategories = categories;
+        });
+      } else {
+        setState(() {
+          listCategories = allCategories;
+        });
+      }
     } else {
       listCategories = [];
-      for (var element in categories!) {
-        if (TiengViet.parse(element.label!)
-            .toLowerCase()
-            .contains(TiengViet.parse(searchText).toLowerCase())) {
-          listCategories!.add(element);
+      if (widget.type == SearchType.mine) {
+        for (var element in categories!) {
+          if (TiengViet.parse(element.label!)
+              .toLowerCase()
+              .contains(TiengViet.parse(searchText).toLowerCase())) {
+            listCategories!.add(element);
+          }
+        }
+      } else {
+        for (var element in allCategories) {
+          if (TiengViet.parse(element.label!)
+              .toLowerCase()
+              .contains(TiengViet.parse(searchText).toLowerCase())) {
+            listCategories!.add(element);
+          }
         }
       }
     }
@@ -140,10 +149,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 ...listCategories!.map((category) {
                   return GestureDetector(
                       onTap: () {
-                        Navigate.pushNamed(RouterMyFridge.editCategoryDetail,
-                            arguments: {
-                              'category': category
-                            });
+                        onTapItem(category);
                       },
                       child: ItemSearch(
                           category: category,
@@ -155,5 +161,18 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       ),
     );
+  }
+
+  void onTapItem(Category category) {
+    if (widget.type == SearchType.mine) {
+      Navigate.pushNamed(RouterMyFridge.editCategoryDetail,
+          arguments: {'category': category});
+    } else if (widget.type == SearchType.all) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return AddCategoryDetailScreen(category: category);
+      }));
+    } else {
+      Navigator.pop(context, category);
+    }
   }
 }

@@ -3,6 +3,7 @@ import 'package:frontend/screens/account/account_screen.dart';
 import 'package:frontend/screens/community/community_screen.dart';
 import 'package:frontend/screens/my_fridge/my_fridge_screen.dart';
 import 'package:frontend/screens/report/report_screen.dart';
+import 'package:frontend/screens/to_do/shopping_list_screen.dart';
 import 'package:frontend/screens/to_do/to_do_screen.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
@@ -130,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         return const CommunityScreen();
       case 2:
-        return TodoScreen(
+        return ShoppingListScreen(
             showBottomBar: (bool value) => handleShowBottomBar(value),
             navigateBottomBar: (int index) => handleNavigateBottomBar(index));
       case 3:

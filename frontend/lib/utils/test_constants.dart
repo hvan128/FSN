@@ -1,3 +1,4 @@
+import 'package:frontend/models/category/category.dart';
 import 'package:frontend/types/dish.dart';
 import 'package:frontend/types/food.dart';
 import 'package:frontend/types/type.dart';
@@ -36,7 +37,7 @@ List<ItemFood> listFoodsTest3 = foods.map((food) {
   );
 }).toList();
 
-List<ItemCategory> listCategoriesTest =
+List<Category> listCategoriesTest =
     listFoodsTest.expand((food) => food.categories).toSet().toList();
 
 //! User

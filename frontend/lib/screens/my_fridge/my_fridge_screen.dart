@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:frontend/components/item/item_category.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
 import 'package:frontend/components/modals/modal_select.dart';
@@ -12,7 +9,6 @@ import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/my_fridge.dart';
 import 'package:frontend/navigation/router/settings.dart';
 import 'package:frontend/provider/user.dart';
-import 'package:frontend/screens/my_fridge/add_category_detail_screen.dart';
 import 'package:frontend/screens/my_fridge/add_category_screen.dart';
 import 'package:frontend/screens/search/search_screen.dart';
 import 'package:frontend/services/api_service.dart';
@@ -69,6 +65,18 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: isSelecting
+          ? null
+          : FloatingActionButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return const AddCategoryScreen();
+                }));
+              },
+              backgroundColor: MyColors.primary['CulturalYellow']!['c500']!,
+              shape: const CircleBorder(),
+              child: const Icon(Icons.add),
+            ),
       body: Stack(children: [
         ConstrainedBox(
           constraints: const BoxConstraints.expand(),
@@ -132,30 +140,6 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
                 ],
               ),
             )),
-          ),
-        ),
-        AnimatedPositioned(
-          duration: const Duration(milliseconds: 500),
-          bottom: isSelecting && isSelected.isNotEmpty ? 70 : 20,
-          right: 20,
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return const AddCategoryScreen();
-              }));
-            },
-            child: Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: MyColors.primary['CulturalYellow']!['c700']!,
-                borderRadius: BorderRadius.circular(100),
-              ),
-              child: Image.asset(
-                'assets/icons/i16/add.png',
-                color: MyColors.white['c900']!,
-              ),
-            ),
           ),
         ),
         isSelected.isNotEmpty
@@ -509,102 +493,6 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
     );
   }
 
-//   Widget _renderTab(List<ItemFood> foods) {
-//   return CustomScrollView(
-//     slivers: [
-//       SliverList(
-//         delegate: SliverChildBuilderDelegate(
-//           (BuildContext context, int index) {
-//             final food = foods[index];
-//             return Column(
-//               children: [
-//                 Row(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     Expanded(
-//                       child: Column(
-//                         crossAxisAlignment: CrossAxisAlignment.start,
-//                         children: [
-//                           Padding(
-//                             padding: const EdgeInsets.symmetric(horizontal: 10),
-//                             child: MyText(
-//                               text: '${food.label} (${food.categories.length})',
-//                               fontSize: FontSize.z16,
-//                               fontWeight: FontWeight.w600,
-//                               color: MyColors.grey['c900']!,
-//                             ),
-//                           ),
-//                           const SizedBox(
-//                             height: 5,
-//                           ),
-//                           Container(
-//                             width: MediaQuery.of(context).size.width,
-//                             padding: const EdgeInsets.symmetric(
-//                                 horizontal: 12, vertical: 10),
-//                             decoration: BoxDecoration(
-//                               color: MyColors.grey['c100']!,
-//                               borderRadius: BorderRadius.circular(20),
-//                             ),
-//                             child: Wrap(
-//                               spacing: 14,
-//                               runSpacing: 5,
-//                               children: food.categories
-//                                   .map((category) => GestureDetector(
-//                                   onTap: () {
-//                                     if (isSelecting) {
-//                                       if (isSelected.contains(category)) {
-//                                         setState(() {
-//                                           isSelected.remove(category);
-//                                         });
-//                                       } else {
-//                                         setState(() {
-//                                           isSelected.add(category);
-//                                         });
-//                                       }
-//                                     } else {
-//                                       Navigator.push(
-//                                           context,
-//                                           MaterialPageRoute(
-//                                             builder: (context) =>
-//                                                 AddCategoryDetailScreen(
-//                                                   category: category,
-//                                                 ),
-//                                           ));
-//                                     }
-//                                   },
-//                                   onLongPress: () {
-//                                     widget.showBottomBar!(false);
-//                                     setState(() {
-//                                       isSelected.add(category);
-//                                       isSelecting = true;
-//                                     });
-//                                   },
-//                                   child: Text('abc')))
-//                                   .toList(),
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//                 const SizedBox(
-//                   height: 10,
-//                 ),
-//                 const MyDivider(),
-//                 const SizedBox(
-//                   height: 10,
-//                 )
-//               ],
-//             );
-//           },
-//           childCount: foods.length,
-//         ),
-//       ),
-//     ],
-//   );
-// }
-
   Widget _buildOptions() {
     return Container(
       height: 60,
@@ -699,11 +587,9 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
     widget.showBottomBar!(true);
     clearCache();
   }
-  
-  void onTapSignOut() {
 
-  }
-  
+  void onTapSignOut() {}
+
   void onTapSetting() {
     Navigate.pushNamed(RouterSetting.setting);
   }

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/card/food_card.dart';
 import 'package:frontend/components/item/item_reaction.dart';
+import 'package:frontend/models/category/category.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/dish.dart';
@@ -263,13 +264,13 @@ class _DishDetailState extends State<DishDetail> {
                           .firstWhere(
                               (category) =>
                                   category.value == ingredient.category,
-                              orElse: () => ItemCategory(
+                              orElse: () => Category(
                                   label: '',
                                   value: '',
                                   icon: '',
                                   type: '',
                                   defaultDuration: 0))
-                          .label,
+                          .label!,
                       fontSize: FontSize.z17,
                       fontWeight: FontWeight.w400,
                       color: MyColors.grey['c800']!,

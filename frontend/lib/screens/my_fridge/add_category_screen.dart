@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/item/item_food.dart';
+import 'package:frontend/models/category/category.dart';
 import 'package:frontend/screens/my_fridge/add_category_detail_screen.dart';
 import 'package:frontend/screens/my_fridge/add_food_screen.dart';
 import 'package:frontend/screens/search/search_screen.dart';
@@ -19,7 +20,7 @@ class AddCategoryScreen extends StatefulWidget {
 }
 
 class _AddCategoryScreenState extends State<AddCategoryScreen> {
-  ItemCategory? selectedCategory;
+  Category? selectedCategory;
   ItemFood? selectedFood;
   @override
   void initState() {
@@ -106,7 +107,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                                                   ));
                                             },
                                             child: FoodItem(
-                                                label: e.label, icon: e.icon)))
+                                                label: e.label!, icon: e.icon!)))
                                         .toList(),
                                     GestureDetector(
                                       onTap: () {

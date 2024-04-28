@@ -1,8 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:frontend/components/community/image_picker.dart';
+import 'package:frontend/models/category/category.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
-import 'package:frontend/types/food.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_icon.dart';
@@ -18,11 +20,14 @@ class AddDishScreen extends StatefulWidget {
 }
 
 class _AddDishScreenState extends State<AddDishScreen> {
-  List<String> listCategory = allCategories.map((e) => e.label).toList();
+  List<String> listCategory = allCategories.map((e) => e.label!).toList();
   int numberOfIngredients = 2;
   List<Widget> ingredientsList = [];
   int numberOfSteps = 2;
   List<String> stepsList = [];
+  String? selectedImagePath;
+  List<String> listIngredients = [];
+  List<String> listSteps = [];
 
   @override
   void initState() {
@@ -88,7 +93,6 @@ class _AddDishScreenState extends State<AddDishScreen> {
             color: MyColors.primary['CulturalYellow']!['c50']!,
             child: SingleChildScrollView(
               child: Column(children: [
-                const SizedBox(height: 20),
                 _uploadImage(),
                 const SizedBox(height: 20),
                 _buildFormInfo(),
@@ -106,28 +110,34 @@ class _AddDishScreenState extends State<AddDishScreen> {
   }
 
   Widget _uploadImage() {
-    return SizedBox(
-      width: double.infinity,
-      child: Column(children: [
-        Image.asset('assets/images/new-food.png',
-            width: 150, color: MyColors.grey['c900']!),
-        const SizedBox(height: 10),
-        MyText(
-          text: 'Đăng tải hình đại diện món ăn',
-          fontSize: FontSize.z20,
-          fontWeight: FontWeight.w600,
-          color: MyColors.grey['c700']!,
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 5),
-        MyText(
-          text: 'Hãy truyền cảm hứng nấu món này tới mọi người',
-          fontSize: FontSize.z15,
-          fontWeight: FontWeight.w400,
-          color: MyColors.grey['c600']!,
-        ),
-      ]),
-    );
+    return selectedImagePath != null
+        ? imagePreview()
+        : GestureDetector(
+            onTap: pickerImage,
+            child: SizedBox(
+              width: double.infinity,
+              child: Column(children: [
+                const SizedBox(height: 20),
+                Image.asset('assets/images/new-food.png',
+                    width: 150, color: MyColors.grey['c900']!),
+                const SizedBox(height: 10),
+                MyText(
+                  text: 'Đăng tải hình đại diện món ăn',
+                  fontSize: FontSize.z20,
+                  fontWeight: FontWeight.w600,
+                  color: MyColors.grey['c700']!,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 5),
+                MyText(
+                  text: 'Hãy truyền cảm hứng nấu món này tới mọi người',
+                  fontSize: FontSize.z15,
+                  fontWeight: FontWeight.w400,
+                  color: MyColors.grey['c600']!,
+                ),
+              ]),
+            ),
+          );
   }
 
   Widget _buildFormInfo() {
@@ -306,8 +316,8 @@ class _AddDishScreenState extends State<AddDishScreen> {
           onChange: (value) {},
         ),
         Expanded(
-            child: Autocomplete<ItemCategory>(
-                displayStringForOption: (option) => option.label,
+            child: Autocomplete<Category>(
+                displayStringForOption: (option) => option.label!,
                 fieldViewBuilder:
                     (context, controller, focusNode, onEditingComplete) {
                   return TextField(
@@ -353,9 +363,9 @@ class _AddDishScreenState extends State<AddDishScreen> {
                                     return GestureDetector(
                                       onTap: () => onSelected(option),
                                       child: ListTile(
-                                        title: Text(option.label),
+                                        title: Text(option.label!),
                                         leading: Image.asset(
-                                          option.icon,
+                                          option.icon!,
                                           width: 40,
                                           height: 40,
                                           fit: BoxFit.cover,
@@ -366,11 +376,12 @@ class _AddDishScreenState extends State<AddDishScreen> {
                 },
                 optionsBuilder: (TextEditingValue textEditingValue) {
                   if (textEditingValue.text.isEmpty) {
-                    return const Iterable<ItemCategory>.empty();
+                    return const Iterable<Category>.empty();
                   }
                   return allCategories.where((element) =>
-                      TiengViet.parse(element.label).toLowerCase()
-                          .contains(TiengViet.parse(textEditingValue.text).toLowerCase()));
+                      TiengViet.parse(element.label!).toLowerCase().contains(
+                          TiengViet.parse(textEditingValue.text)
+                              .toLowerCase()));
                 })),
         const SizedBox(width: 10),
         Icon(Icons.menu, color: MyColors.grey['c400']!)
@@ -506,6 +517,24 @@ class _AddDishScreenState extends State<AddDishScreen> {
             const SizedBox(width: 10),
             Icon(Icons.menu, color: MyColors.grey['c400']!)
           ]),
+    );
+  }
+
+  void pickerImage() {
+    showDialog(
+        context: context,
+        builder: (context) => MyImagePicker(
+            onImageSelected: (path) => setState(() {
+                  selectedImagePath = path;
+                })));
+  }
+
+  imagePreview() {
+    return Image.file(
+      File(selectedImagePath!),
+      width: double.infinity,
+      height: MediaQuery.of(context).size.width,
+      fit: BoxFit.cover,
     );
   }
 }

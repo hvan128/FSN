@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/card/food_card.dart';
 import 'package:frontend/components/item/item_ingredient.dart';
-import 'package:frontend/navigation/navigation.dart';
+import 'package:frontend/models/category/category.dart';
 import 'package:frontend/navigation/router/community.dart';
-import 'package:frontend/screens/community/dish_detail_screen.dart';
+import 'package:frontend/services/category/category_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/dish.dart';
-import 'package:frontend/types/food.dart';
-import 'package:frontend/utils/constants.dart';
 import 'package:frontend/utils/test_constants.dart';
 import 'package:frontend/widgets/text.dart';
 
@@ -20,13 +18,22 @@ class MyKitchenDishes extends StatefulWidget {
 }
 
 class _MyKitchenDishesState extends State<MyKitchenDishes> {
-  List<ItemCategory> selectedCategories = [];
+  List<Category> selectedCategories = [];
+  List<Category> allCategories = [];
   List<Dish>? dishes;
 
   @override
   void initState() {
     super.initState();
     dishes = listDishes;
+    getAllCategories();
+  }
+
+  void getAllCategories() async {
+    List<Category> categories = await CategoryService().getAllCategories();
+    setState(() {
+      allCategories = categories;
+    });
   }
 
   @override
@@ -63,9 +70,9 @@ class _MyKitchenDishesState extends State<MyKitchenDishes> {
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: SizedBox(
-            width: MediaQuery.of(context).size.width * meats.length / 6,
+            width: 110 * allCategories.length / 2,
             child: Wrap(spacing: 8, runSpacing: 8, children: [
-              ...meats
+              ...allCategories
                   .map((e) => GestureDetector(
                       onTap: () {
                         if (selectedCategories.contains(e)) {

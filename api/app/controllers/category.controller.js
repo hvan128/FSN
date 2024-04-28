@@ -21,7 +21,7 @@ export const getCategoryById = (req, res) => {
   });
 };
 
-export const getCategoryByPositionId = (req, res) => {
+export const getCategoryByPositionId = (req, res, next) => {
   var positionId = req.params.positionId;
   var fridgeId = req.params.fridgeId;
   Category.findByPositionId({ positionId, fridgeId }, (err, result) => {
@@ -56,6 +56,28 @@ export const updatePosition = (req, res) => {
     res.send(result);
   });
 };
+
+export const completed = (req, res, next) => {
+  var data = req.body;
+  Category.completed(data, (err, result) => {
+    if (err) {
+      return next(err);
+    } else {
+      res.send(result);
+    }
+  });
+}
+
+export const reOrderCategory = (req, res, next) => {
+  var data = req.body;
+  Category.reOrderCategory(data, (err, result) => {
+    if (err) {
+      return next(err);
+    } else {
+      res.send(result);
+    }
+  });
+}
 
 
 export const deleteCategory = (req, res) => {

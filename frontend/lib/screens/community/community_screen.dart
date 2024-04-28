@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:frontend/components/community/my_kitchen_dishes.dart';
 import 'package:frontend/components/community/recent_recipes.dart';
 import 'package:frontend/screens/account/account_screen.dart';
