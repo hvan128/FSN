@@ -27,7 +27,7 @@ const fileFilter = (req, file, callback) => {
 let upload = multer({
   storage: storage,
   fileFilter: fileFilter,
-  fileSize: 1048576, // 10 Mb
+  fileSize: 5048576, // 10 Mb
 });
 
 export default upload;

@@ -17,14 +17,15 @@ const port = 3000
 app.use(morgan('combined'))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
-app.use(express.static('public'))
+app.use("/uploads", express.static("./public/uploads"));
+
 
 authRouter(app);
 app.use(middleware.isAuthenticated);
 homeRouter(app);
-userRouter(app);
-fridgeRouter(app);
-invitationRouter(app);
+userRouter(app); 
+fridgeRouter(app);  
+invitationRouter(app);  
 communityRouter(app);
 app.use(errorHandler);
 

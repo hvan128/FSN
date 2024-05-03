@@ -1,12 +1,19 @@
+import 'dart:convert';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:frontend/components/item/item_reaction.dart';
+import 'package:frontend/config.dart';
+import 'package:frontend/models/community/dish.dart';
+import 'package:frontend/models/user/user.dart';
+import 'package:frontend/navigation/router/community.dart';
+import 'package:frontend/services/api_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
-import 'package:frontend/types/dish.dart';
 import 'package:frontend/types/type.dart';
-import 'package:frontend/types/user.dart';
 import 'package:frontend/utils/constants.dart';
-import 'package:frontend/utils/test_constants.dart';
+import 'package:frontend/utils/functions_core.dart';
 import 'package:frontend/widgets/reaction_button.dart';
 import 'package:frontend/widgets/text.dart';
 
@@ -29,36 +36,42 @@ class FoodCard extends StatefulWidget {
 }
 
 class _FoodCardState extends State<FoodCard> {
+  UserModel? owner;
+  @override
+  void initState() {
+    super.initState();
+    fetchUser();
+  }
+
+  void fetchUser() async {
+    await ApiService.get('${Config.USER_API}/${widget.dish.ownerId}')
+        .then((value) {
+      if (value != null) {
+        setState(() {
+          owner = UserModel.fromJson(jsonDecode(value)[0]);
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final User owner =
-        users.firstWhere((owner) => owner.id == widget.dish.ownerId,
-            orElse: () => User(
-                  id: '0',
-                  username: 'john_doe',
-                  email: 'john.doe@example.com',
-                  image:
-                      'https://www.facebook.com/photo?fbid=3516518468585687&set=a.1525178521053035',
-                  description: 'Hello, I am John Doe!',
-                  address: '123 Main Street, City, Country',
-                  phone: '+1234567890',
-                  birthday: '1990-01-01',
-                  gender: 'Male',
-                  role: 'User',
-                ));
-    List<Reaction> listReactions = widget.dish.reactions ??
-        [Reaction(type: 'love', quantity: '0', isSelected: false)];
+    List<Reaction> listReactions = [
+      Reaction(type: 'love', quantity: '0', isSelected: false)
+    ];
     final Image noImage = Image.asset(
       "assets/icons/i16/logo.png",
       width: 30,
       height: 30,
     );
-    final imageUrl = owner.image;
+    final imageUrl = owner?.imageUrl;
 
     final Image image = (imageUrl != null)
         ? Image.network(
             imageUrl,
+            width: 30,
+            height: 30,
+            fit: BoxFit.cover,
             loadingBuilder: (context, child, loadingProgress) =>
                 (loadingProgress == null)
                     ? child
@@ -77,24 +90,35 @@ class _FoodCardState extends State<FoodCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Stack(children: [
-            Container(
-              width: widget.type == CardType.small
-                  ? MediaQuery.of(context).size.width * 0.5 - 22
-                  : 300,
-              height: widget.type == CardType.small
-                  ? MediaQuery.of(context).size.width * 0.4
-                  : 200,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(8),
-                  topRight: Radius.circular(8),
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(
+                                      context, RouterCommunity.dishDetail,
+                                      arguments: {'dish': widget.dish, 'owner': owner});
+              },
+              child: Container(
+                width: widget.type == CardType.small
+                    ? MediaQuery.of(context).size.width * 0.5 - 22
+                    : 300,
+                height: widget.type == CardType.small
+                    ? MediaQuery.of(context).size.width * 0.4
+                    : 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: Image.asset(
-                  widget.dish.image,
-                  fit: BoxFit.cover,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(8),
+                    topRight: Radius.circular(8),
+                  ),
+                  child: widget.dish.image != null && widget.dish.image!.startsWith('assets') != true
+                      ? Image.network(
+                          FunctionCore.convertImageUrl(widget.dish.image!),
+                          fit: BoxFit.cover)
+                      : Image.asset(
+                          widget.dish.image!,
+                          fit: BoxFit.cover,
+                        ),
                 ),
               ),
             ),
@@ -111,26 +135,25 @@ class _FoodCardState extends State<FoodCard> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(children: [
-                                  Container(
-                                      decoration: BoxDecoration(
-                                        color: MyColors.primary[
-                                            'CulturalYellow']!['c700']!,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: image),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(100),
+                                    child: image
+                                  ),
                                   const SizedBox(width: 10),
-                                  MyText(
-                                    text: owner.username,
-                                    fontSize: FontSize.z12,
-                                    fontWeight: FontWeight.w600,
+                                  owner == null ? Container() : MyText(
+                                    text: owner!.username!,
+                                    fontSize: FontSize.z13,
+                                    fontWeight: FontWeight.w700,
                                     color: MyColors.white['c900']!,
                                   )
                                 ]),
-                                MyText(
-                                  text: widget.dish.label,
-                                  fontSize: FontSize.z22,
-                                  fontWeight: FontWeight.w600,
-                                  color: MyColors.white['c900']!,
+                                Flexible(
+                                  child: MyText(
+                                    text: widget.dish.label!,
+                                    fontSize: FontSize.z20,
+                                    fontWeight: FontWeight.w700,
+                                    color: MyColors.white['c900']!,
+                                  ),
                                 ),
                               ],
                             ))),
@@ -173,41 +196,45 @@ class _FoodCardState extends State<FoodCard> {
                     children: [
                       widget.type == CardType.normal
                           ? const SizedBox()
-                          : Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(children: [
-                                  Container(
-                                      decoration: BoxDecoration(
-                                        color: MyColors.primary[
-                                            'CulturalYellow']!['c700']!,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: image),
-                                  const SizedBox(width: 5),
-                                  MyText(
-                                    text: owner.username,
-                                    fontSize: FontSize.z12,
-                                    fontWeight: FontWeight.w400,
-                                    color: MyColors.grey['c700']!,
-                                  )
-                                ]),
-                                MyText(
-                                  text: widget.dish.label,
-                                  fontSize: FontSize.z14,
-                                  fontWeight: FontWeight.w600,
-                                  color: MyColors.grey['c900']!,
-                                ),
-                                const SizedBox(height: 20),
-                                MyText(
-                                    text: '21 giờ trước',
-                                    fontSize: FontSize.z12,
-                                    fontWeight: FontWeight.w400,
-                                    color: MyColors.grey['c700']!),
-                                const SizedBox(height: 10),
-                              ],
-                            ),
+                          : SizedBox(
+                              width: widget.type == CardType.small
+                                  ? MediaQuery.of(context).size.width * 0.5 - 42
+                                  : 300,
+                            child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(100),
+                                      child: image,
+                                    ),
+                                    const SizedBox(width: 5),
+                                    owner == null ? Container() : MyText(
+                                      text: owner!.username!,
+                                      fontSize: FontSize.z12,
+                                      fontWeight: FontWeight.w400,
+                                      color: MyColors.grey['c700']!,
+                                    )
+                                  ]),
+                                  Flexible(
+                                    child: MyText(
+                                      text: widget.dish.label!,
+                                      fontSize: FontSize.z14,
+                                      fontWeight: FontWeight.w600,
+                                      color: MyColors.grey['c900']!,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  widget.dish.createdAt == null ? Container() : MyText(
+                                      text: FunctionCore.calculateDuration(widget.dish.createdAt!),
+                                      fontSize: FontSize.z12,
+                                      fontWeight: FontWeight.w400,
+                                      color: MyColors.grey['c700']!),
+                                  const SizedBox(height: 10),
+                                ],
+                              ),
+                          ),
                       Row(children: [
                         ...listReactions.map((e) {
                           return Row(
@@ -255,6 +282,7 @@ class _FoodCardState extends State<FoodCard> {
       ),
     );
   }
+
   EReaction? getFakeInitialReaction(int index) {
     if (index % 5 == 0) {
       return EReaction.like;

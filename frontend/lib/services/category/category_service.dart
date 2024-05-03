@@ -22,7 +22,7 @@ class CategoryService {
         await APICacheManager().isAPICacheKeyExist('categories_$positionId');
     if (isCacheExist) {
       var cacheData =
-          await APICacheManager().getCacheData('categories_$positionId');
+          await APICacheManager().getCacheData('categories_$positionId');  
       final data = jsonDecode(cacheData.syncData)['data'];
       return categoryFromJson(data);
     } else {

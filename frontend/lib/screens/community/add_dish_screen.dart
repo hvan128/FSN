@@ -1,15 +1,25 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/components/community/image_picker.dart';
+import 'package:frontend/components/modals/alert_modal.dart';
 import 'package:frontend/models/category/category.dart';
+import 'package:frontend/models/community/dish.dart';
+import 'package:frontend/navigation/navigation.dart';
+import 'package:frontend/navigation/router/account.dart';
+import 'package:frontend/navigation/router/community.dart';
+import 'package:frontend/provider/user.dart';
+import 'package:frontend/services/community/dish_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/utils/constants.dart';
+import 'package:frontend/utils/functions_core.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_icon.dart';
 import 'package:frontend/widgets/text.dart';
 import 'package:frontend/widgets/text_field.dart';
+import 'package:provider/provider.dart';
 import 'package:tiengviet/tiengviet.dart';
 
 class AddDishScreen extends StatefulWidget {
@@ -20,35 +30,26 @@ class AddDishScreen extends StatefulWidget {
 }
 
 class _AddDishScreenState extends State<AddDishScreen> {
-  List<String> listCategory = allCategories.map((e) => e.label!).toList();
-  int numberOfIngredients = 2;
-  List<Widget> ingredientsList = [];
-  int numberOfSteps = 2;
-  List<String> stepsList = [];
+  List<Ingredient> ingredientsList = [];
+  List<StepModel> listStepsModel = [];
   String? selectedImagePath;
-  List<String> listIngredients = [];
-  List<String> listSteps = [];
+
+  final TextEditingController _labelController = TextEditingController();
+  final TextEditingController _rangeOfPeopleController =
+      TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _cookingTimeController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     ingredientsList.addAll([
-      _itemIngredient('100 ml', 'nước', onDelete: () {
-        setState(() {
-          numberOfIngredients--;
-          ingredientsList.removeAt(0); // Xóa phần tử tại vị trí index
-        });
-      }),
-      _itemIngredient('250 g', 'bột', onDelete: () {
-        setState(() {
-          numberOfIngredients--;
-          ingredientsList.removeAt(1); // Xóa phần tử tại vị trí index
-        });
-      }),
+      Ingredient(),
+      Ingredient(),
     ]);
-    stepsList.addAll([
-      'Trộn bột và nước đến khi đặc lại',
-      'Đậy kín hỗn hợp lại và để ở nhiệt độ thường'
+    listStepsModel.addAll([
+      StepModel(),
+      StepModel(),
     ]);
   }
 
@@ -66,7 +67,7 @@ class _AddDishScreenState extends State<AddDishScreen> {
         actions: [
           MyButton(
             text: 'Lưu',
-            onPressed: () {},
+            onPressed: onSaveDish,
             width: 70,
             height: 38,
             buttonType: ButtonType.disable,
@@ -74,7 +75,7 @@ class _AddDishScreenState extends State<AddDishScreen> {
           const SizedBox(width: 8),
           MyButton(
             text: 'Lên sóng',
-            onPressed: () {},
+            onPressed: onAddDish,
             width: 110,
             height: 38,
             buttonType: ButtonType.yellow,
@@ -113,7 +114,11 @@ class _AddDishScreenState extends State<AddDishScreen> {
     return selectedImagePath != null
         ? imagePreview()
         : GestureDetector(
-            onTap: pickerImage,
+            onTap: () {
+              pickerImage((path) => setState(() {
+                    selectedImagePath = path;
+                  }));
+            },
             child: SizedBox(
               width: double.infinity,
               child: Column(children: [
@@ -152,8 +157,10 @@ class _AddDishScreenState extends State<AddDishScreen> {
             hintText: 'Tên món: Món canh bí ngon nhất',
             fontSize: FontSize.z20,
             hintFontWeight: FontWeight.w600,
-            onChange: (value) {},
-            controller: null),
+            onChange: (value) {
+              _labelController.text = value;
+            },
+            controller: _labelController),
         const SizedBox(height: 10),
         MyTextField(
             obscureText: false,
@@ -162,8 +169,10 @@ class _AddDishScreenState extends State<AddDishScreen> {
             hintText:
                 'Hãy chia sẻ với mọi người về món này của bạn nhé. Ai hay điều gì đã truyền cảm hứng cho bạn nấu nó? Tại sao nó đặc biệt? Bạn thích thưởng thức nó theo cách nào?',
             fontSize: FontSize.z17,
-            onChange: (value) {},
-            controller: null),
+            onChange: (value) {
+              _descriptionController.text = value;
+            },
+            controller: _descriptionController),
         const SizedBox(height: 10),
         Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -180,9 +189,12 @@ class _AddDishScreenState extends State<AddDishScreen> {
                 width: 175,
                 obscureText: false,
                 hasError: false,
+                controller: _rangeOfPeopleController,
                 hintText: '2 người',
                 fontSize: FontSize.z17,
-                onChange: (value) {},
+                onChange: (value) {
+                  _rangeOfPeopleController.text = value;
+                },
               )
             ]),
         Row(
@@ -202,7 +214,10 @@ class _AddDishScreenState extends State<AddDishScreen> {
                 hasError: false,
                 hintText: '1 tiếng 30 phút',
                 fontSize: FontSize.z17,
-                onChange: (value) {},
+                controller: _cookingTimeController,
+                onChange: (value) {
+                  _cookingTimeController.text = value;
+                },
               )
             ])
       ]),
@@ -232,37 +247,23 @@ class _AddDishScreenState extends State<AddDishScreen> {
                 if (oldIndex < newIndex) {
                   newIndex -= 1;
                 }
-                final Widget item = ingredientsList.removeAt(oldIndex);
+                final Ingredient item = ingredientsList.removeAt(oldIndex);
                 ingredientsList.insert(newIndex, item);
               });
             },
             children: <Widget>[
-              for (var ingredient in ingredientsList)
-                Container(key: ValueKey(ingredient), child: ingredient),
+              ...ingredientsList.asMap().entries.map((entry) {
+                final int index = entry.key;
+                return Container(
+                    key: Key('$index'), child: _itemIngredient(index));
+              }).toList(),
             ],
           ),
           const SizedBox(height: 16),
           GestureDetector(
             onTap: () {
               setState(() {
-                numberOfIngredients++;
-                numberOfIngredients % 2 == 0
-                    ? ingredientsList
-                        .add(_itemIngredient('250 g', 'bột', onDelete: () {
-                        setState(() {
-                          numberOfIngredients--;
-                          ingredientsList.removeAt(
-                              numberOfIngredients); // Xóa phần tử tại vị trí index
-                        });
-                      }))
-                    : ingredientsList
-                        .add(_itemIngredient('100 ml', 'nước', onDelete: () {
-                        setState(() {
-                          numberOfIngredients--;
-                          ingredientsList.removeAt(
-                              numberOfIngredients); // Xóa phần tử tại vị trí index
-                        });
-                      }));
+                ingredientsList.add(Ingredient());
               });
             },
             child: Row(
@@ -289,8 +290,7 @@ class _AddDishScreenState extends State<AddDishScreen> {
     );
   }
 
-  Widget _itemIngredient(String hintText1, String hintText2,
-      {VoidCallback? onDelete}) {
+  Widget _itemIngredient(int index) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
@@ -302,7 +302,9 @@ class _AddDishScreenState extends State<AddDishScreen> {
             color: MyColors.grey['c300'],
           ),
           onPressed: () {
-            onDelete!();
+            setState(() {
+              ingredientsList.removeAt(index);
+            });
           },
         ),
         const SizedBox(width: 10),
@@ -312,14 +314,31 @@ class _AddDishScreenState extends State<AddDishScreen> {
           hasError: false,
           hintFontWeight: FontWeight.w600,
           labelColor: MyColors.grey['c700']!,
-          hintText: hintText1,
-          onChange: (value) {},
+          hintText: index % 2 == 0 ? '100g' : '200ml',
+          controller: TextEditingController(
+              text: ingredientsList[index].quantity != null &&
+                      ingredientsList[index].unit != null
+                  ? '${ingredientsList[index].quantity} ${ingredientsList[index].unit}'
+                  : null),
+          onChange: (value) {
+            var input = FunctionCore().parseInput(value);
+            ingredientsList[index].quantity =
+                input['quantity'] != null ? int.tryParse(input['quantity']) : 0;
+            ingredientsList[index].unit = input['unit'];
+          },
         ),
         Expanded(
             child: Autocomplete<Category>(
                 displayStringForOption: (option) => option.label!,
                 fieldViewBuilder:
                     (context, controller, focusNode, onEditingComplete) {
+                  final text = allCategories
+                      .firstWhere(
+                          (element) =>
+                              element.value == ingredientsList[index].category,
+                          orElse: () => Category())
+                      .label;
+                  controller.text = text ?? '';
                   return TextField(
                       minLines: 1,
                       maxLines: 10,
@@ -341,7 +360,7 @@ class _AddDishScreenState extends State<AddDishScreen> {
                         focusedBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: MyColors.grey['c200']!),
                         ),
-                        hintText: hintText2,
+                        hintText: index % 2 == 0 ? "bột" : "nước",
                         hintStyle: TextStyle(
                             color: MyColors.grey['c300']!,
                             fontSize: FontSize.z16,
@@ -358,10 +377,14 @@ class _AddDishScreenState extends State<AddDishScreen> {
                               height: 225,
                               child: ListView.builder(
                                   itemCount: options.length,
-                                  itemBuilder: (context, index) {
-                                    final option = options.elementAt(index);
+                                  itemBuilder: (context, i) {
+                                    final option = options.elementAt(i);
                                     return GestureDetector(
-                                      onTap: () => onSelected(option),
+                                      onTap: () {
+                                        onSelected(option);
+                                        ingredientsList[index].category =
+                                            option.value;
+                                      },
                                       child: ListTile(
                                         title: Text(option.label!),
                                         leading: Image.asset(
@@ -417,16 +440,14 @@ class _AddDishScreenState extends State<AddDishScreen> {
                 if (oldIndex < newIndex) {
                   newIndex -= 1;
                 }
-                final String item = stepsList.removeAt(oldIndex);
-                stepsList.insert(newIndex, item);
+                final StepModel item = listStepsModel.removeAt(oldIndex);
+                listStepsModel.insert(newIndex, item);
               });
             },
             children: <Widget>[
-              ...stepsList.asMap().entries.map((entry) {
+              ...listStepsModel.asMap().entries.map((entry) {
                 final int index = entry.key;
-                final String hintText = entry.value;
-                return Container(
-                    key: Key('$index'), child: _itemStep(hintText, index));
+                return Container(key: Key('$index'), child: _itemStep(index));
               }).toList(),
             ],
           ),
@@ -434,10 +455,7 @@ class _AddDishScreenState extends State<AddDishScreen> {
           GestureDetector(
             onTap: () {
               setState(() {
-                numberOfSteps++;
-                numberOfSteps % 2 != 0
-                    ? stepsList.add('Trộn bột và nước đến khi đặc lại')
-                    : stepsList.add('Đậy kín hỗn hợp và để ở nhiệt độ thường');
+                listStepsModel.add(StepModel());
               });
             },
             child: Row(
@@ -464,7 +482,7 @@ class _AddDishScreenState extends State<AddDishScreen> {
     );
   }
 
-  Widget _itemStep(String hintText, int index) {
+  Widget _itemStep(int index) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
@@ -495,23 +513,51 @@ class _AddDishScreenState extends State<AddDishScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 MyTextField(
-                  hintText: hintText,
+                  hintText: index % 2 == 0
+                      ? 'Trộn bột và nước đến khi đặc lại'
+                      : 'Đậy kín hỗn hợp lại và để ở nhiệt độ thường',
+                  controller: TextEditingController(
+                      text: listStepsModel[index].description),
+                  onChange: (p0) {
+                    listStepsModel[index].description = p0;
+                  },
+                  value: listStepsModel[index].description != null
+                      ? listStepsModel[index].description!
+                      : '',
                   obscureText: false,
                   hasError: false,
                   hintMaxLines: 1,
                   multipleLine: true,
                 ),
                 const SizedBox(height: 10),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 40, vertical: 25),
-                  decoration: BoxDecoration(
-                    color: MyColors.grey['c50']!,
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Image.asset('assets/icons/i16/camera.png',
-                      width: 24, height: 24, color: MyColors.grey['c400']!),
-                )
+                listStepsModel[index].image == null
+                    ? GestureDetector(
+                        onTap: () {
+                          pickerImage((imagePath) {
+                            setState(() {
+                              listStepsModel[index].image = imagePath;
+                            });
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 40, vertical: 25),
+                          decoration: BoxDecoration(
+                            color: MyColors.grey['c50']!,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Image.asset('assets/icons/i16/camera.png',
+                              width: 24,
+                              height: 24,
+                              color: MyColors.grey['c400']!),
+                        ),
+                      )
+                    : Image.file(
+                        File(listStepsModel[index].image!),
+                        width: 200,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      ),
               ],
             )),
             const SizedBox(width: 10),
@@ -520,13 +566,10 @@ class _AddDishScreenState extends State<AddDishScreen> {
     );
   }
 
-  void pickerImage() {
+  void pickerImage(Function(String) onImageSelected) {
     showDialog(
         context: context,
-        builder: (context) => MyImagePicker(
-            onImageSelected: (path) => setState(() {
-                  selectedImagePath = path;
-                })));
+        builder: (context) => MyImagePicker(onImageSelected: onImageSelected));
   }
 
   imagePreview() {
@@ -537,4 +580,39 @@ class _AddDishScreenState extends State<AddDishScreen> {
       fit: BoxFit.cover,
     );
   }
+
+  void onAddDish() async {
+    for (var i = 0; i < listStepsModel.length; i++) {
+      listStepsModel[i].no = i + 1;
+    }
+    final userId = Provider.of<UserProvider>(context, listen: false).user!.id;
+    final Dish dish = Dish(
+      label: _labelController.text,
+      description: _descriptionController.text,
+      image: selectedImagePath,
+      rangOfPeople: _rangeOfPeopleController.text,
+      steps: listStepsModel,
+      ingredients: ingredientsList,
+      cookingTime: _cookingTimeController.text,
+      ownerId: userId,
+    );
+
+    final response = await DishService.addDish(dish);
+    if (response) {
+      Navigate.pop();
+      Navigate.pop();
+      showDialog(
+          context: context,
+          builder: (context) => const MyAlert(
+                alertType: AlertType.success,
+                title: 'Thành công',
+                description:
+                    'Thêm món ăn thành công! Hãy chia sẽ chúng với bạn bè và người thân nhé.',
+              ));
+    } else {
+      print('add dish fail');
+    }
+  }
+
+  void onSaveDish() async {}
 }

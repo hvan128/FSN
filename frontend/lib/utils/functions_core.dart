@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/config.dart';
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/types/food.dart';
 import 'package:frontend/types/type.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:frontend/widgets/loading.dart';
+import 'package:intl/intl.dart';
 
 class FunctionCore {
   static List<Item> getUnitList(String type) {
@@ -417,8 +419,74 @@ class FunctionCore {
         icon: 'assets/icons/etc/etc.png',
       ),
     ];
-    print('foods: $foods');
     return foods;
+  }
+
+  Map<String, dynamic> parseInput(String input) {
+    String unit = '';
+    String quantity = '';
+    // Tạo mẫu để tìm kiếm số lượng và đơn vị
+    RegExp quantityRegExp = RegExp(
+        r'(\d+\.?\d*|nửa|bán|hai|ba|bốn|một|sáu|bảy|tám|chín)\s*'); // Mẫu cho số lượng
+
+    // Tìm kiếm số lượng và đơn vị trong chuỗi nhập vào
+    String rawQuantity = quantityRegExp.firstMatch(input)?.group(1) ?? '';
+    quantity = convertToNumeric(rawQuantity);
+    unit = input.replaceAll(rawQuantity, '').trim();
+    return {'unit': unit, 'quantity': quantity};
+  }
+
+  String convertToNumeric(String quantity) {
+    // Chuyển đổi các số lượng từ ngôn ngữ tự nhiên sang số
+    switch (quantity) {
+      case 'nửa':
+        return '1/2';
+      case 'bán':
+        return '1/2';
+      case 'hai':
+        return '2';
+      case 'ba':
+        return '3';
+      case 'bốn':
+        return '4';
+      case 'một':
+        return '1';
+      case 'sáu':
+        return '6';
+      case 'bảy':
+        return '7';
+      case 'tám':
+        return '8';
+      case 'chín':
+        return '9';
+      default:
+        return quantity;
+    }
+  }
+
+  static String convertImageUrl(String url) {
+    return 'http://${Config.API_URL}/uploads/$url';
+  }
+   
+  static DateTime convertTime(String time) {
+    DateTime date = DateFormat("yyyy-MM-ddTHH:mm:ss.SSS'Z'").parseUtc(time);
+    return date;
+  }
+  static String formatDate(DateTime date) {
+    return 'Vào lúc ${date.hour}:${date.minute} ngày ${date.day} tháng ${date.month} năm ${date.year}';
+  }
+
+  static String calculateDuration(DateTime date) {
+    final difference = DateTime.now().difference(date);
+    if (difference.inDays > 0) {
+      return '${difference.inDays} ngày trước';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours} giờ trước';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes} phút trước';
+    } else {
+      return '${difference.inSeconds} giây trước';
+    }
   }
 }
 

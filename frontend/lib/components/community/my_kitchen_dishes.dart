@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:frontend/components/card/food_card.dart';
 import 'package:frontend/components/item/item_ingredient.dart';
 import 'package:frontend/models/category/category.dart';
+import 'package:frontend/models/community/dish.dart';
 import 'package:frontend/navigation/router/community.dart';
 import 'package:frontend/services/category/category_service.dart';
+import 'package:frontend/services/community/dish_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
-import 'package:frontend/types/dish.dart';
-import 'package:frontend/utils/test_constants.dart';
 import 'package:frontend/widgets/text.dart';
 
 class MyKitchenDishes extends StatefulWidget {
@@ -25,7 +25,6 @@ class _MyKitchenDishesState extends State<MyKitchenDishes> {
   @override
   void initState() {
     super.initState();
-    dishes = listDishes;
     getAllCategories();
   }
 
@@ -33,6 +32,17 @@ class _MyKitchenDishesState extends State<MyKitchenDishes> {
     List<Category> categories = await CategoryService().getAllCategories();
     setState(() {
       allCategories = categories;
+      selectedCategories.add(categories[0]);
+      selectedCategories.add(categories[1]);
+      getAllDishes(categories[0].value!, categories[1].value!);
+    });
+  }
+
+  Future<void> getAllDishes(String ingredient1, String ingredient2) async {
+    List<Dish> dishes =
+        await DishService.getDishByIngredient(ingredient1, ingredient2, 1, 10);
+    setState(() {
+      this.dishes = dishes;
     });
   }
 
@@ -84,6 +94,13 @@ class _MyKitchenDishesState extends State<MyKitchenDishes> {
                             selectedCategories.add(e);
                           });
                         }
+                        var ingredient1 = selectedCategories.isNotEmpty
+                            ? selectedCategories[0].value!
+                            : '';
+                        var ingredient2 = selectedCategories.length == 2
+                            ? selectedCategories[1].value!
+                            : '';
+                        getAllDishes(ingredient1, ingredient2);
                       },
                       child: ItemIngredient(
                           category: e,
@@ -102,19 +119,11 @@ class _MyKitchenDishesState extends State<MyKitchenDishes> {
                   ...dishes!
                       .map((e) => Row(
                             children: [
-                              GestureDetector(
-                                onTap: () {
-                                  print('a');
-                                  Navigator.pushNamed(context, RouterCommunity.dishDetail, arguments: {
-                                    'dish': e
-                                  });
-                                },
-                                child: FoodCard(
-                                    dish: e,
-                                    onSave: () {
-                                      setState(() {});
-                                    }),
-                              ),
+                              FoodCard(
+                                  dish: e,
+                                  onSave: () {
+                                    setState(() {});
+                                  }),
                               const SizedBox(width: 10),
                             ],
                           ))
