@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/components/card/food_card.dart';
 import 'package:frontend/components/community/my_kitchen_dishes.dart';
-import 'package:frontend/components/community/recent_recipes.dart';
+import 'package:frontend/models/community/dish.dart';
+import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/account/account_screen.dart';
 import 'package:frontend/screens/search/search_screen.dart';
+import 'package:frontend/services/community/dish_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/widgets/text.dart';
+import 'package:provider/provider.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
@@ -15,7 +19,125 @@ class CommunityScreen extends StatefulWidget {
 }
 
 class _CommunityScreenState extends State<CommunityScreen> {
+  final controller = ScrollController();
+  List<Dish> dishes = [];
+  bool hasMore = true;
+  bool isLoading = false;
+  @override
+  void initState() {
+    super.initState();
+    getAllDishes(1, 10);
+    controller.addListener(() {
+      if (controller.offset == controller.position.maxScrollExtent) {
+        getAllDishes(dishes.length ~/ 10 + 1, 10);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> getAllDishes(int page, int pageSize) async {
+    if (isLoading || !hasMore) {
+      return;
+    }
+    isLoading = true;
+    List<Dish> newDishes = await DishService.getAllDish(page, pageSize);
+    setState(() {
+      dishes.addAll(newDishes);
+      if (newDishes.length < pageSize) {
+        hasMore = false;
+      }
+      isLoading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: CustomScrollView(
+        controller: controller,
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            automaticallyImplyLeading: true,
+            floating: true,
+            flexibleSpace: _buildHeader(),
+          ),
+          SliverToBoxAdapter(
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                Container(
+                    color: MyColors.white['c900']!,
+                    child: const MyKitchenDishes()),
+                const SizedBox(height: 10),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  color: MyColors.white['c900']!,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: MyText(
+                                text: 'Công thức nấu ăn gần đây',
+                                fontSize: FontSize.z18,
+                                fontWeight: FontWeight.w600,
+                                color: MyColors.grey['c800']!),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Wrap(
+                                  spacing: 8,
+                                  runSpacing: 16,
+                                  children: [
+                                    ...dishes
+                                        .map((dish) => FoodCard(
+                                              dish: dish,
+                                              type: CardType.small,
+                                            ))
+                                        .toList(),
+                                  ],
+                                ),
+                          const SizedBox(
+                            height: 30,
+                          ),
+                          hasMore
+                              ? const Center(child: CircularProgressIndicator())
+                              : Center(
+                                child: MyText(
+                                    text: 'Không còn món nào nữa',
+                                    fontSize: FontSize.z18,
+                                    fontWeight: FontWeight.w600,
+                                    color: MyColors.grey['c800']!),
+                              ),
+                          const SizedBox(
+                            height: 30,
+                          )
+                        ]),
+                  ),
+                )
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   Widget _buildHeader() {
+    final user = Provider.of<UserProvider>(context, listen: false).user;
     return Stack(children: [
       Column(
         children: [
@@ -83,7 +205,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                         ),
                         MyText(
                           text: 'Gõ vào tên các nguyên liệu...',
-                          fontSize: FontSize.z16,
+                          fontSize: FontSize.z13,
                           fontWeight: FontWeight.w400,
                           color: MyColors.grey['c500']!,
                         )
@@ -102,8 +224,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       radius: 25,
                       backgroundColor:
                           MyColors.primary['CulturalYellow']!['c600']!,
-                      backgroundImage:
-                          const AssetImage('assets/icons/i16/logo.png'),
+                      backgroundImage: NetworkImage((user!.imageUrl!)),
                     ),
                   )
                 ],
@@ -111,37 +232,5 @@ class _CommunityScreenState extends State<CommunityScreen> {
             )),
       ),
     ]);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          SliverAppBar(
-            automaticallyImplyLeading: true,
-            floating: true,
-            flexibleSpace: _buildHeader(),
-          ),
-          SliverToBoxAdapter(
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                Container(
-                    color: MyColors.white['c900']!,
-                    child: const MyKitchenDishes()),
-                const SizedBox(height: 10),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  color: MyColors.white['c900']!,
-                  child: const RecentRecipes(),
-                )
-              ],
-            ),
-          )
-        ],
-      ),
-    );
   }
 }

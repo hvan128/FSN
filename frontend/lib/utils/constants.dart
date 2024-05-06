@@ -3206,6 +3206,12 @@ List<Item> reactions = [
     ),
 ];
 
+Map<int, Item> feels = {
+  1: reactions[0],
+  2: reactions[1],
+  3: reactions[2],
+};
+
 List<Item> positions = [
   Item(
       value: '1',

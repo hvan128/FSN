@@ -16,7 +16,6 @@ var dishUpload = upload.fields([
 ]);
 
 export const createDish = (req, res, next) => {
-
   dishUpload(req, res, (err) => {
     if (err) {
       next(err);
@@ -67,7 +66,9 @@ export const getDishById = (req, res, next) => {
 
 export const getDishByOwnerId = (req, res, next) => {
   var ownerId = req.params.id;
-  Dish.findByOwnerId(ownerId, (err, result) => {
+  var page = req.query.page || 1;
+  var pageSize = req.query.pageSize || 10;
+  Dish.findByOwnerId(ownerId, page, pageSize, (err, result) => {
     if (err) {
       next(err);
     } else {
@@ -100,6 +101,19 @@ export const getAllDish = (req, res, next) => {
   var page = req.query.page || 1;
   var pageSize = req.query.pageSize || 10;
   Dish.getAllDish(page, pageSize, (err, result) => {
+    if (err) {
+      next(err);
+    } else {
+      res.send(result);
+    }
+  });
+};
+
+export const getSavedDishesByUserId = (req, res, next) => {
+  var userId = req.params.id;
+  var page = req.query.page || 1;
+  var pageSize = req.query.pageSize || 10;
+  Dish.getSavedDishesByUserId(userId, page, pageSize, (err, result) => {
     if (err) {
       next(err);
     } else {

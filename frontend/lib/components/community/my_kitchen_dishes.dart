@@ -3,7 +3,6 @@ import 'package:frontend/components/card/food_card.dart';
 import 'package:frontend/components/item/item_ingredient.dart';
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/models/community/dish.dart';
-import 'package:frontend/navigation/router/community.dart';
 import 'package:frontend/services/category/category_service.dart';
 import 'package:frontend/services/community/dish_service.dart';
 import 'package:frontend/theme/color.dart';
@@ -120,14 +119,30 @@ class _MyKitchenDishesState extends State<MyKitchenDishes> {
                       .map((e) => Row(
                             children: [
                               FoodCard(
-                                  dish: e,
-                                  onSave: () {
-                                    setState(() {});
-                                  }),
+                                dish: e,
+                              ),
                               const SizedBox(width: 10),
                             ],
                           ))
                       .toList(),
+                  const SizedBox(width: 10),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(100),
+                            border: Border.all(
+                              color: MyColors.grey['c300']!,
+                            )),
+                        child: Image.asset('assets/icons/i16/arrow-left.png',
+                            width: 25,
+                            height: 25,
+                            color: MyColors.grey['c700']!),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 20),
                 ])
               : Container(),
         ),

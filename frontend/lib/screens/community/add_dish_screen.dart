@@ -9,7 +9,9 @@ import 'package:frontend/models/community/dish.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/account.dart';
 import 'package:frontend/navigation/router/community.dart';
+import 'package:frontend/navigation/router/home.dart';
 import 'package:frontend/provider/user.dart';
+import 'package:frontend/screens/community/community_screen.dart';
 import 'package:frontend/services/community/dish_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
@@ -590,17 +592,18 @@ class _AddDishScreenState extends State<AddDishScreen> {
       label: _labelController.text,
       description: _descriptionController.text,
       image: selectedImagePath,
-      rangOfPeople: _rangeOfPeopleController.text,
+      rangeOfPeople: _rangeOfPeopleController.text,
       steps: listStepsModel,
       ingredients: ingredientsList,
       cookingTime: _cookingTimeController.text,
       ownerId: userId,
     );
-
     final response = await DishService.addDish(dish);
     if (response) {
-      Navigate.pop();
-      Navigate.pop();
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const CommunityScreen()),
+          ModalRoute.withName('/community'));
       showDialog(
           context: context,
           builder: (context) => const MyAlert(

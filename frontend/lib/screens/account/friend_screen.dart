@@ -1,38 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/account/my_food_field.dart';
-import 'package:frontend/components/account/my_saved_dish.dart';
 import 'package:frontend/models/user/user.dart';
+import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/community.dart';
-import 'package:frontend/provider/user.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_icon.dart';
 import 'package:frontend/widgets/text.dart';
-import 'package:provider/provider.dart';
 
-class AccountScreen extends StatefulWidget {
-  const AccountScreen({super.key});
+class FriendScreen extends StatefulWidget {
+  const FriendScreen({super.key});
 
   @override
-  State<AccountScreen> createState() => _AccountScreenState();
+  State<FriendScreen> createState() => _FriendScreenState();
 }
 
-class _AccountScreenState extends State<AccountScreen>
-    with TickerProviderStateMixin {
-  late final TabController _tabController;
-  UserModel user = UserModel();
+class _FriendScreenState extends State<FriendScreen> {
+  UserModel? user;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    user = Provider.of<UserProvider>(context, listen: false).user!;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final arguments = ModalRoute.of(context)?.settings.arguments as Map;
+      setState(() {
+        user = arguments['owner'];
+      });
+    });
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
     super.dispose();
   }
 
@@ -49,7 +48,9 @@ class _AccountScreenState extends State<AccountScreen>
           title:
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             MyIconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigate.pop();
+                },
                 icon: Image.asset('assets/icons/i16/back.png',
                     width: 25, height: 25, color: MyColors.grey['c900']!)),
             Row(
@@ -61,28 +62,11 @@ class _AccountScreenState extends State<AccountScreen>
                 const SizedBox(width: 20),
                 MyIconButton(
                     onPressed: () {},
-                    icon: Image.asset('assets/icons/i16/setting.png',
+                    icon: Image.asset('assets/icons/i16/dots-vertical.png',
                         width: 25, height: 25, color: MyColors.grey['c900']!)),
               ],
             ),
           ]),
-          bottom: TabBar(
-            controller: _tabController,
-            tabs: <Widget>[
-              SizedBox(
-                width: MediaQuery.of(context).size.width / 2,
-                child: const Tab(
-                  text: 'Món của tôi',
-                ),
-              ),
-              SizedBox(
-                width: MediaQuery.of(context).size.width / 2,
-                child: const Tab(
-                  text: 'Món đã lưu',
-                ),
-              ),
-            ],
-          ),
           flexibleSpace: FlexibleSpaceBar(
             background: _buildHeader(),
           )),
@@ -90,23 +74,11 @@ class _AccountScreenState extends State<AccountScreen>
         child: Container(
           color: MyColors.primary['CulturalYellow']!['c50']!,
           height: MediaQuery.of(context).size.height,
-          child: TabBarView(
-            controller: _tabController,
-            children: <Widget>[
-              Column(
-                children: [
-                  _buildAddButton(),
-                  const SizedBox(height: 10),
-                  MyFoodField(
-                    userId: user.id!
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  const SizedBox(height: 10),
-                  MySavedDish(userId: user.id!),
-                ],
+          child: Column(
+            children: [
+              const SizedBox(height: 10),
+              user == null ? Container() : MyFoodField(
+                userId: user!.id!,
               ),
             ],
           ),
@@ -126,7 +98,7 @@ class _AccountScreenState extends State<AccountScreen>
             CircleAvatar(
               radius: 40,
               backgroundImage:
-                  user.imageUrl == null ? null : NetworkImage(user.imageUrl!),
+                  user?.imageUrl == null ? null : NetworkImage(user!.imageUrl!),
             ),
             const SizedBox(width: 20),
             Column(
@@ -134,13 +106,13 @@ class _AccountScreenState extends State<AccountScreen>
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   MyText(
-                    text: user.displayName ?? '',
+                    text: user?.displayName ?? '',
                     fontSize: FontSize.z20,
                     fontWeight: FontWeight.w600,
                     color: MyColors.grey['c900']!,
                   ),
                   MyText(
-                    text: '@${user.username ?? ''}',
+                    text: '@${user?.username ?? ''}',
                     fontSize: FontSize.z15,
                     fontWeight: FontWeight.w400,
                     color: MyColors.grey['c900']!,

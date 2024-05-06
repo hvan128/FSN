@@ -144,8 +144,7 @@ List<Dish> listDishes = [
             'Pour egg mixture over spaghetti and toss quickly to coat. Serve immediately.',
       ),
     ],
-    rangOfPeople: '4',
-    isSaved: true,
+    rangeOfPeople: '4',
   ),
   Dish(
     ownerId: 0,
@@ -235,8 +234,7 @@ List<Dish> listDishes = [
             'Garnish with fresh coriander leaves and serve hot with rice or naan.',
       ),
     ],
-    rangOfPeople: '6',
-    isSaved: false,
+    rangeOfPeople: '6',
   ),
   Dish(
     ownerId: 2,
@@ -315,8 +313,7 @@ List<Dish> listDishes = [
         description: 'Remove from oven, slice, and serve hot.',
       ),
     ],
-    rangOfPeople: '2',
-    isSaved: true,
+    rangeOfPeople: '2',
   ),
 ];
 
@@ -324,15 +321,15 @@ List<Dish> listDishes = [
 List<Reaction> listTestReactions = [
   Reaction(
     type: reactions[0].value,
-    quantity: '20',
+    quantity: 20,
     isSelected: true,
   ),
   Reaction(
     type: reactions[1].value,
-    quantity: '100',
+    quantity: 100,
   ),  
   Reaction(
     type: reactions[2].value,
-    quantity: '50',
+    quantity: 50,
   ),
 ];

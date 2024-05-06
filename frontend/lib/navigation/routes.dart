@@ -22,7 +22,6 @@ import 'package:frontend/screens/my_fridge/edit_category_detail_screen.dart';
 
 Map<String, WidgetBuilder> appRoutes = {
   RouterHome.home: (context) => const HomeScreen(),
-  RouterAccount.account: (context) => const AccountScreen(),
   //* INTRODUCTION ROUTES */
   RouterIntroduction.introduction: (context) => const IntroductionScreen(),
   //* AUTH ROUTES */
@@ -41,6 +40,7 @@ Map<String, WidgetBuilder> appRoutes = {
   ...introductionRoutes,
   ...settingRoutes,
   ...todoRoutes,
+  ...accountRoutes,
   
 };
 

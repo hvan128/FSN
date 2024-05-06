@@ -21,7 +21,7 @@ app.use("/uploads", express.static("./public/uploads"));
 
 
 authRouter(app);
-app.use(middleware.isAuthenticated);
+// app.use(middleware.isAuthenticated);
 homeRouter(app);
 userRouter(app); 
 fridgeRouter(app);  

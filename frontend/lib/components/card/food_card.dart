@@ -1,14 +1,14 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:frontend/components/item/item_reaction.dart';
 import 'package:frontend/config.dart';
 import 'package:frontend/models/community/dish.dart';
 import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/router/community.dart';
+import 'package:frontend/provider/user.dart';
 import 'package:frontend/services/api_service.dart';
+import 'package:frontend/services/community/dish_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/type.dart';
@@ -16,37 +16,60 @@ import 'package:frontend/utils/constants.dart';
 import 'package:frontend/utils/functions_core.dart';
 import 'package:frontend/widgets/reaction_button.dart';
 import 'package:frontend/widgets/text.dart';
+import 'package:provider/provider.dart';
 
 enum CardType { normal, small }
 
 class FoodCard extends StatefulWidget {
   final Dish dish;
-  final Function()? onSave;
-  final Function(Item)? onReactionChanged;
   final CardType? type;
-  const FoodCard(
-      {super.key,
-      required this.dish,
-      this.onSave,
-      this.type = CardType.normal,
-      this.onReactionChanged});
+  const FoodCard({
+    super.key,
+    required this.dish,
+    this.type = CardType.normal,
+  });
 
   @override
   State<FoodCard> createState() => _FoodCardState();
 }
 
 class _FoodCardState extends State<FoodCard> {
+  bool? isSaved = false;
   UserModel? owner;
+  List<Reaction> listReactions = [
+    Reaction(type: 'like', quantity: 0, isSelected: false),
+    Reaction(type: 'love', quantity: 0, isSelected: false),
+    Reaction(type: 'delicious', quantity: 0, isSelected: false),
+  ];
+
   @override
   void initState() {
     super.initState();
     fetchUser();
+    checkSaved();
+    processFeels(
+        widget.dish.feels!,
+        Provider.of<UserProvider>(context, listen: false).user!.id!,
+        listReactions);
+  }
+
+  void checkSaved() {
+    List<Saved> savedList = widget.dish.saves!;
+    for (Saved saved in savedList) {
+      if (saved.userId ==
+          Provider.of<UserProvider>(context, listen: false).user!.id!) {
+        setState(() {
+          isSaved = true;
+        });
+        break;
+      }
+    }
   }
 
   void fetchUser() async {
     await ApiService.get('${Config.USER_API}/${widget.dish.ownerId}')
         .then((value) {
-      if (value != null) {
+      if (value != null && value.isNotEmpty) {
         setState(() {
           owner = UserModel.fromJson(jsonDecode(value)[0]);
         });
@@ -54,13 +77,68 @@ class _FoodCardState extends State<FoodCard> {
     });
   }
 
+  void processFeels(List<Feel> feels, int ownerId, List<Reaction> reactions) {
+    for (Feel feel in feels) {
+      switch (feel.type) {
+        case 1:
+          incrementQuantity('like', reactions);
+          break;
+        case 2:
+          incrementQuantity('love', reactions);
+          break;
+        case 3:
+          incrementQuantity('delicious', reactions);
+          break;
+      }
+
+      if (feel.userId == ownerId) {
+        switch (feel.type) {
+          case 1:
+            setSelected('like', true, reactions);
+            break;
+          case 2:
+            setSelected('love', true, reactions);
+            break;
+          case 3:
+            setSelected('delicious', true, reactions);
+            break;
+        }
+      }
+    }
+  }
+
+  void incrementQuantity(String reactionType, List<Reaction> reactions) {
+    Reaction? reactionToUpdate = reactions.firstWhere(
+      (reaction) => reaction.type == reactionType,
+      orElse: () => Reaction(),
+    );
+
+    reactionToUpdate.quantity = (reactionToUpdate.quantity ?? 0) + 1;
+  }
+
+  void decrementQuantity(String reactionType, List<Reaction> reactions) {
+    Reaction? reactionToUpdate = reactions.firstWhere(
+      (reaction) => reaction.type == reactionType,
+      orElse: () => Reaction(),
+    );
+
+    reactionToUpdate.quantity = (reactionToUpdate.quantity ?? 0) - 1;
+  }
+
+  void setSelected(
+      String reactionType, bool isSelected, List<Reaction> reactions) {
+    Reaction? reactionToUpdate = reactions.firstWhere(
+      (reaction) => reaction.type == reactionType,
+      orElse: () => Reaction(),
+    );
+
+    reactionToUpdate.isSelected = isSelected;
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<Reaction> listReactions = [
-      Reaction(type: 'love', quantity: '0', isSelected: false)
-    ];
     final Image noImage = Image.asset(
-      "assets/icons/i16/logo.png",
+      "assets/icons/i16/image-default.png",
       width: 30,
       height: 30,
     );
@@ -92,9 +170,13 @@ class _FoodCardState extends State<FoodCard> {
           Stack(children: [
             GestureDetector(
               onTap: () {
-                Navigator.pushNamed(
-                                      context, RouterCommunity.dishDetail,
-                                      arguments: {'dish': widget.dish, 'owner': owner});
+                Navigator.pushNamed(context, RouterCommunity.dishDetail,
+                    arguments: {
+                      'dish': widget.dish,
+                      'owner': owner,
+                      'isSaved': isSaved,
+                      'reactions': listReactions
+                    }).then((_) => setState(() {}));
               },
               child: Container(
                 width: widget.type == CardType.small
@@ -111,7 +193,8 @@ class _FoodCardState extends State<FoodCard> {
                     topLeft: Radius.circular(8),
                     topRight: Radius.circular(8),
                   ),
-                  child: widget.dish.image != null && widget.dish.image!.startsWith('assets') != true
+                  child: widget.dish.image != null &&
+                          widget.dish.image!.startsWith('assets') != true
                       ? Image.network(
                           FunctionCore.convertImageUrl(widget.dish.image!),
                           fit: BoxFit.cover)
@@ -136,16 +219,17 @@ class _FoodCardState extends State<FoodCard> {
                               children: [
                                 Row(children: [
                                   ClipRRect(
-                                    borderRadius: BorderRadius.circular(100),
-                                    child: image
-                                  ),
+                                      borderRadius: BorderRadius.circular(100),
+                                      child: image),
                                   const SizedBox(width: 10),
-                                  owner == null ? Container() : MyText(
-                                    text: owner!.username!,
-                                    fontSize: FontSize.z13,
-                                    fontWeight: FontWeight.w700,
-                                    color: MyColors.white['c900']!,
-                                  )
+                                  owner == null
+                                      ? Container()
+                                      : MyText(
+                                          text: owner!.username!,
+                                          fontSize: FontSize.z13,
+                                          fontWeight: FontWeight.w700,
+                                          color: MyColors.white['c900']!,
+                                        )
                                 ]),
                                 Flexible(
                                   child: MyText(
@@ -162,23 +246,25 @@ class _FoodCardState extends State<FoodCard> {
                 ? Positioned.fill(
                     child: Align(
                         alignment: Alignment.topRight,
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 10, top: 10),
-                          child: widget.dish.isSaved != null &&
-                                  widget.dish.isSaved!
-                              ? Image.asset(
-                                  'assets/icons/i16/save-book-mark.png',
-                                  width: 25,
-                                  height: 25,
-                                  color: MyColors
-                                      .primary['CulturalYellow']!['c700']!,
-                                )
-                              : Image.asset(
-                                  'assets/icons/i16/bookmark-outline.png',
-                                  width: 25,
-                                  height: 25,
-                                  color: MyColors.white['c900']!,
-                                ),
+                        child: GestureDetector(
+                          onTap: onSave,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 10, top: 10),
+                            child: isSaved == true
+                                ? Image.asset(
+                                    'assets/icons/i16/save-book-mark.png',
+                                    width: 25,
+                                    height: 25,
+                                    color: MyColors
+                                        .primary['CulturalYellow']!['c700']!,
+                                  )
+                                : Image.asset(
+                                    'assets/icons/i16/bookmark-outline.png',
+                                    width: 25,
+                                    height: 25,
+                                    color: MyColors.white['c900']!,
+                                  ),
+                          ),
                         )))
                 : Container()
           ]),
@@ -200,7 +286,7 @@ class _FoodCardState extends State<FoodCard> {
                               width: widget.type == CardType.small
                                   ? MediaQuery.of(context).size.width * 0.5 - 42
                                   : 300,
-                            child: Column(
+                              child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -210,12 +296,14 @@ class _FoodCardState extends State<FoodCard> {
                                       child: image,
                                     ),
                                     const SizedBox(width: 5),
-                                    owner == null ? Container() : MyText(
-                                      text: owner!.username!,
-                                      fontSize: FontSize.z12,
-                                      fontWeight: FontWeight.w400,
-                                      color: MyColors.grey['c700']!,
-                                    )
+                                    owner == null
+                                        ? Container()
+                                        : MyText(
+                                            text: owner!.username!,
+                                            fontSize: FontSize.z12,
+                                            fontWeight: FontWeight.w400,
+                                            color: MyColors.grey['c700']!,
+                                          )
                                   ]),
                                   Flexible(
                                     child: MyText(
@@ -226,53 +314,66 @@ class _FoodCardState extends State<FoodCard> {
                                     ),
                                   ),
                                   const SizedBox(height: 20),
-                                  widget.dish.createdAt == null ? Container() : MyText(
-                                      text: FunctionCore.calculateDuration(widget.dish.createdAt!),
-                                      fontSize: FontSize.z12,
-                                      fontWeight: FontWeight.w400,
-                                      color: MyColors.grey['c700']!),
+                                  widget.dish.createdAt == null
+                                      ? Container()
+                                      : MyText(
+                                          text: FunctionCore.calculateDuration(
+                                              widget.dish.createdAt!),
+                                          fontSize: FontSize.z12,
+                                          fontWeight: FontWeight.w400,
+                                          color: MyColors.grey['c700']!),
                                   const SizedBox(height: 10),
                                 ],
                               ),
-                          ),
-                      Row(children: [
-                        ...listReactions.map((e) {
-                          return Row(
-                            children: [
-                              Row(
-                                children: [
-                                  e.quantity == '0'
-                                      ? Container()
-                                      : ItemReaction(
-                                          reaction: reactions.firstWhere(
-                                              (element) =>
-                                                  element.value == e.type),
-                                          quantity: e.quantity,
-                                          isSelected: e.isSelected,
-                                        ),
-                                  const SizedBox(width: 5),
-                                ],
-                              ),
-                            ],
-                          );
-                        }).toList(),
-                        listReactions.length < 3
-                            ? ReactionButton(
-                                initialReaction: EReaction.none,
-                                onReactionChanged: (reaction) {
-                                  print(reaction.name);
+                            ),
+                      Row(
+                        children: [
+                          Row(children: [
+                            ...listReactions.map((e) {
+                              return GestureDetector(
+                                onTap: () {
+                                  onTapReactionItem(e);
                                 },
-                              )
-                            : const SizedBox(),
-                      ]),
+                                child: Row(
+                                  children: [
+                                    e.quantity == 0
+                                        ? Container()
+                                        : Row(
+                                            children: [
+                                              ItemReaction(
+                                                reaction: reactions.firstWhere(
+                                                    (element) =>
+                                                        element.value ==
+                                                        e.type),
+                                                quantity:
+                                                    e.quantity!.toString(),
+                                                isSelected: e.isSelected,
+                                              ),
+                                              const SizedBox(width: 5),
+                                            ],
+                                          ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          ]),
+                          !listReactions
+                                  .every((reaction) => reaction.quantity! > 0)
+                              ? ReactionButton(
+                                  initialReaction: EReaction.none,
+                                  onReactionChanged: (reaction) {
+                                    onReactionChanged(reaction);
+                                  },
+                                )
+                              : const SizedBox(),
+                        ],
+                      ),
                     ],
                   ),
                   GestureDetector(
-                      onTap: () {
-                        widget.onSave?.call();
-                      },
+                      onTap: onSave,
                       child: widget.type == CardType.normal
-                          ? itemSave(widget.dish.isSaved ?? false)
+                          ? itemSave(isSaved ?? false)
                           : Container()),
                 ],
               ),
@@ -318,5 +419,76 @@ class _FoodCardState extends State<FoodCard> {
         ],
       ),
     );
+  }
+
+  void onReactionChanged(EReaction reaction) async {
+    if (listReactions
+            .firstWhere((element) => element.type == reaction.name, orElse: () => Reaction())
+            .isSelected ==
+        false) {
+      final Feel feel = Feel(
+        type: reaction.name == 'like'
+            ? 1
+            : reaction.name == 'love'
+                ? 2
+                : 3,
+        userId: Provider.of<UserProvider>(context, listen: false).user!.id,
+        dishId: widget.dish.id,
+      );
+      incrementQuantity(reaction.name, listReactions);
+      setSelected(reaction.name, true, listReactions);
+      await DishService.addFeel(feel);
+    }
+    setState(() {});
+  }
+
+  void onSave() async {
+    if (isSaved == true) {
+      setState(() {
+        isSaved = false;
+      });
+      await DishService.unSavedDish(Saved(
+        userId: Provider.of<UserProvider>(context, listen: false).user!.id,
+        dishId: widget.dish.id,
+      ));
+    } else {
+      setState(() {
+        isSaved = true;
+      });
+      await DishService.saveDish(Saved(
+        userId: Provider.of<UserProvider>(context, listen: false).user!.id,
+        dishId: widget.dish.id,
+      ));
+    }
+  }
+
+  void onTapReactionItem(Reaction e) async {
+    if (e.isSelected == false) {
+      setSelected(e.type!, true, listReactions);
+      incrementQuantity(e.type!, listReactions);
+      await DishService.addFeel(Feel(
+        type: e.type == 'like'
+            ? 1
+            : e.type == 'love'
+                ? 2
+                : 3,
+        userId: Provider.of<UserProvider>(context, listen: false).user!.id,
+        dishId: widget.dish.id,
+      ));
+    } else {
+      setSelected(e.type!, false, listReactions);
+      decrementQuantity(e.type!, listReactions);
+      final feel = widget.dish.feels!.firstWhere((element) =>
+          element.userId ==
+              Provider.of<UserProvider>(context, listen: false).user!.id &&
+          element.type ==
+              (e.type == 'like'
+                  ? 1
+                  : e.type == 'love'
+                      ? 2
+                      : 3));
+      await DishService.deleteFeel(feel);
+    }
+    setState(() {});
   }
 }

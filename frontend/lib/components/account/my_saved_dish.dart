@@ -3,24 +3,22 @@ import 'package:frontend/components/card/food_card.dart';
 import 'package:frontend/models/community/dish.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/account.dart';
-import 'package:frontend/provider/user.dart';
 import 'package:frontend/services/community/dish_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_icon.dart';
 import 'package:frontend/widgets/text.dart';
-import 'package:provider/provider.dart';
 
-class MyFoodField extends StatefulWidget {
+class MySavedDish extends StatefulWidget {
   final int userId;
-  const MyFoodField({super.key, required this.userId});
+  const MySavedDish({super.key, required this.userId});
 
   @override
-  State<MyFoodField> createState() => _MyFoodFieldState();
+  State<MySavedDish> createState() => _MySavedDishState();
 }
 
-class _MyFoodFieldState extends State<MyFoodField> {
+class _MySavedDishState extends State<MySavedDish> {
   List<Dish>? dishes;
   int? total;
   @override
@@ -30,8 +28,7 @@ class _MyFoodFieldState extends State<MyFoodField> {
   }
 
   Future<void> getAllDishes(int page, int pageSize) async {
-    final res =
-        await DishService.getDishByOwnerId(widget.userId, page, pageSize);
+    final res = await DishService.getSavedDish(widget.userId, page, pageSize);
     setState(() {
       dishes = res['dishes'];
       total = res['total'];
@@ -119,7 +116,7 @@ class _MyFoodFieldState extends State<MyFoodField> {
   }
 
   void viewAll() {
-    Navigate.pushNamed(RouterAccount.myFood,
+    Navigate.pushNamed(RouterAccount.mySavedFood,
         arguments: {'userId': widget.userId});
   }
 }

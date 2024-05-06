@@ -20,8 +20,8 @@ class DishService {
     request.headers.addAll(requestHeaders);
     request.fields['label'] = dish.label!;
     request.fields['description'] = dish.description!;
-    request.fields['rangOfPeople'] = dish.rangOfPeople.toString();
-    request.fields['cookingTime'] = dish.cookingTime.toString();
+    request.fields['rangeOfPeople'] = dish.rangeOfPeople!;
+    request.fields['cookingTime'] = dish.cookingTime!;
     request.fields['ownerId'] = dish.ownerId!.toString();
     request.fields['ingredients'] = jsonEncode(ingredients);
     request.fields['steps'] = jsonEncode(steps);
@@ -49,13 +49,16 @@ class DishService {
 
   static Future<List<Dish>> getAllDish(int page, int pageSize) async {
     List<Dish> dishes = [];
-    final queryParams = {'page': page.toString(), 'pageSize': pageSize.toString()};
+    final queryParams = {
+      'page': page.toString(),
+      'pageSize': pageSize.toString()
+    };
     await ApiService.get(Config.DISH_API, queryParams: queryParams)
         .then((value) {
       if (value != null) {
         final data = jsonDecode(value.toString())['data'];
         dishes = dishFromJson(data);
-      }                                                                                                                                                                                                                                                                                                                                                                                                                       
+      }
     });
     return dishes;
   }
@@ -71,5 +74,89 @@ class DishService {
       }
     });
     return dishes;
+  }
+
+  static Future<Map<String, dynamic>> getDishByOwnerId(
+      int ownerId, int page, int pageSize) async {
+    List<Dish> dishes = [];
+    int total = 0;
+    final queryParams = {
+      'page': page.toString(),
+      'pageSize': pageSize.toString()
+    };
+    await ApiService.get('${Config.DISH_API}/owner/$ownerId',
+            queryParams: queryParams)
+        .then((value) {
+      if (value != null) {
+        final data = jsonDecode(value.toString())['data'];
+        total = jsonDecode(value.toString())['totalItems'];
+        dishes = dishFromJson(data);
+      }
+    });
+    return {
+      'dishes': dishes,
+      'total': total,
+    };
+  }
+
+   static Future<Map<String, dynamic>> getSavedDish(int userId, int page, int pageSize) async {
+    List<Dish> dishes = [];
+    int total = 0;
+    final queryParams = {
+      'page': page.toString(),
+      'pageSize': pageSize.toString()
+    };
+    await ApiService.get('${Config.DISH_API}/saved/$userId', queryParams: queryParams).then((value) {
+      if (value != null) {
+        final data = jsonDecode(value.toString())['data'];
+        total = jsonDecode(value.toString())['total'];
+        dishes = dishFromJson(data);
+      }
+    });
+    return {
+      'dishes': dishes,
+      'total': total,
+    };
+   }
+
+  static Future<Dish> getDishById({required int id}) async {
+    return await ApiService.get('${Config.DISH_API}/$id').then((value) {
+      if (value != null) {
+        return Dish.fromJson(jsonDecode(value));
+      } else {
+        return Dish();
+      }
+    });
+  }
+
+ 
+
+  static Future<void> addFeel(Feel feel) async {
+    var model = {
+      'type': feel.type,
+      'userId': feel.userId,
+      'dishId': feel.dishId
+    };
+    await ApiService.post('${Config.DISH_API}/feel', model);
+  }
+
+  static Future<void> deleteFeel(Feel feel) async {
+    await ApiService.delete('${Config.DISH_API}/feel/${feel.id}');
+  }
+
+  static Future<void> saveDish(Saved saved) async {
+    var model = {
+      'userId': saved.userId,
+      'dishId': saved.dishId,
+    };
+    await ApiService.post('${Config.DISH_API}/save', model);
+  }
+
+  static Future<void> unSavedDish(Saved saved) async {
+    var model = {
+      'userId': saved.userId,
+      'dishId': saved.dishId,
+    };
+    await ApiService.post('${Config.DISH_API}/unsaved', model);
   }
 }

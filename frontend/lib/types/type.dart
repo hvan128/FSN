@@ -11,12 +11,12 @@ class Item {
 }
 
 class Reaction {
-  final String type;
-  final String quantity;
-  final bool? isSelected;
+  String? type;
+  int? quantity;
+  bool? isSelected;
   Reaction({
-    required this.type,
-    required this.quantity,
+    this.type,
+    this.quantity,
     this.isSelected = false,
   });
 }

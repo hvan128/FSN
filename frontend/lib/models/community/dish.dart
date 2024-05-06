@@ -4,34 +4,39 @@ List<Dish> dishFromJson(dynamic str) =>
     List<Dish>.from((str).map((x) => Dish.fromJson(x)));
 
 class Dish {
+  int? id;
   int? ownerId;
   String? label;
   String? image;
   String? description;
   List<StepModel>? steps;
   List<Ingredient>? ingredients;
-  String? rangOfPeople;
-  bool? isSaved;
+  String? rangeOfPeople;
   String? cookingTime;
   DateTime? createdAt;
   DateTime? updatedAt;
+  List<Feel>? feels;
+  List<Saved>? saves;
 
   Dish({
+    this.id,
     this.ownerId,
     this.label,
     this.image,
     this.description,
     this.ingredients,
     this.steps,
-    this.rangOfPeople,
-    this.isSaved = false,
+    this.rangeOfPeople,
     this.cookingTime,
     this.createdAt,
     this.updatedAt,
+    this.feels,
+    this.saves,
   });
 
   factory Dish.fromJson(Map<String, dynamic> json) {
     return Dish(
+      id: json['id'],
       ownerId: json['ownerId'],
       label: json['label'],
       image: json['image'],
@@ -42,27 +47,109 @@ class Dish {
       steps: (json['steps'] as List<dynamic>?)
           ?.map((e) => StepModel.fromJson(e))
           .toList(),
-      rangOfPeople: json['rangOfPeople'],
-      isSaved: json['isSaved'],
+      rangeOfPeople: json['rangeOfPeople'],
       cookingTime: json['cookingTime'],
-      createdAt:
-          json['createdAt'] != null ? FunctionCore.convertTime(json['createdAt']) : null,
-      updatedAt:
-          json['updatedAt'] != null ? FunctionCore.convertTime(json['updatedAt']) : null,
+      feels: (json['feels'] as List<dynamic>?)
+          ?.map((e) => Feel.fromJson(e))
+          .toList(),
+      saves: (json['saves'] as List<dynamic>?)
+          ?.map((e) => Saved.fromJson(e))
+          .toList(),
+      createdAt: json['createdAt'] != null
+          ? FunctionCore.convertTime(json['createdAt'])
+          : null,
+      updatedAt: json['updatedAt'] != null
+          ? FunctionCore.convertTime(json['updatedAt'])
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'ownerId': ownerId,
       'label': label,
       'image': image,
       'description': description,
       'ingredients': ingredients?.map((e) => e.toJson()).toList(),
       'steps': steps?.map((e) => e.toJson()).toList(),
-      'rangOfPeople': rangOfPeople,
-      'isSaved': isSaved,
+      'rangeOfPeople': rangeOfPeople,
       'cookingTime': cookingTime,
+      'feels': feels?.map((e) => e.toJson()).toList(),
+      'saves': saves?.map((e) => e.toJson()).toList(),
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
+    };
+  }
+}
+
+class Saved {
+  int? userId;
+  int? dishId;
+  DateTime? savedAt;
+
+  Saved({
+    this.userId,
+    this.dishId,
+    this.savedAt,
+  });
+
+  factory Saved.fromJson(Map<String, dynamic> json) {
+    return Saved(
+      userId: json['userId'],
+      dishId: json['dishId'],
+      savedAt: json['savedAt'] != null
+          ? FunctionCore.convertTime(json['savedAt'])
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'dishId': dishId,
+      'savedAt': savedAt?.toIso8601String(),
+    };
+  }
+}
+
+class Feel {
+  int? id;
+  int? type;
+  int? userId;
+  int? dishId;
+  DateTime? createdAt;
+  DateTime? updatedAt;
+
+  Feel({
+    this.id,
+    this.type,
+    this.userId,
+    this.dishId,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory Feel.fromJson(Map<String, dynamic> json) {
+    return Feel(
+      id: json['id'],
+      type: json['type'],
+      userId: json['userId'],
+      dishId: json['dishId'],
+      createdAt: json['createdAt'] != null
+          ? FunctionCore.convertTime(json['createdAt'])
+          : null,
+      updatedAt: json['updatedAt'] != null
+          ? FunctionCore.convertTime(json['updatedAt'])
+          : null,
+    );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'type': type,
+      'userId': userId,
+      'dishId': dishId,
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
