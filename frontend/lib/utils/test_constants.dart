@@ -1,4 +1,5 @@
-import 'package:frontend/types/dish.dart';
+import 'package:frontend/models/category/category.dart';
+import 'package:frontend/models/community/dish.dart';
 import 'package:frontend/types/food.dart';
 import 'package:frontend/types/type.dart';
 import 'package:frontend/types/user.dart';
@@ -36,7 +37,7 @@ List<ItemFood> listFoodsTest3 = foods.map((food) {
   );
 }).toList();
 
-List<ItemCategory> listCategoriesTest =
+List<Category> listCategoriesTest =
     listFoodsTest.expand((food) => food.categories).toSet().toList();
 
 //! User
@@ -86,8 +87,8 @@ List<User> users = [
 
 List<Dish> listDishes = [
   Dish(
-    ownerId: '1',
-    cookingTime: 20,
+    ownerId: 1,
+    cookingTime: '20',
     label: 'Spaghetti Carbonara',
     image: 'assets/images/pizza.jpg',
     description: 'Classic Italian pasta dish with creamy sauce. Simple yet delicious pizza topped with tomato sauce, mozzarella cheese, and basil leaves. Simple yet delicious pizza topped with tomato sauce, mozzarella cheese, and basil leaves. Simple yet delicious pizza topped with tomato sauce, mozzarella cheese, and basil leaves.',
@@ -119,37 +120,35 @@ List<Dish> listDishes = [
       ),
     ],
     steps: [
-      Step(
+      StepModel(
         no: 1,
         description: 'Cook spaghetti according to package instructions.',
       ),
-      Step(
+      StepModel(
         no: 2,
         description: 'In a separate pan, cook bacon until crispy.',
       ),
-      Step(
+      StepModel(
         no: 3,
         description:
             'In a bowl, whisk together eggs, Parmesan cheese, and black pepper.',
       ),
-      Step(
+      StepModel(
         no: 4,
         description:
             'Drain spaghetti and add to the pan with bacon. Toss together.',
       ),
-      Step(
+      StepModel(
         no: 5,
         description:
             'Pour egg mixture over spaghetti and toss quickly to coat. Serve immediately.',
       ),
     ],
-    rangOfPeople: 4,
-    isSaved: true,
-    reactions: [Reaction(type: 'like', quantity: '2'), Reaction(type: 'love', quantity: '1', isSelected: true)],
+    rangeOfPeople: '4',
   ),
   Dish(
-    ownerId: '0',
-    cookingTime: 15,
+    ownerId: 0,
+    cookingTime: '15',
     label: 'Chicken Curry',
     image: 'assets/images/thit-kho.jpg',
     description: 'Delicious Indian curry with tender chicken pieces.',
@@ -206,43 +205,41 @@ List<Dish> listDishes = [
       ),
     ],
     steps: [
-      Step(
+      StepModel(
         no: 1,
         description:
             'Heat oil in a pan. Add chopped onion, garlic, and ginger. Sauté until golden brown.',
       ),
-      Step(
+      StepModel(
         no: 2,
         description: 'Add chopped tomatoes and cook until soft.',
       ),
-      Step(
+      StepModel(
         no: 3,
         description: 'Add chicken pieces and cook until they turn white.',
       ),
-      Step(
+      StepModel(
         no: 4,
         description:
             'Add coriander powder, turmeric powder, chili powder, and salt. Mix well.',
       ),
-      Step(
+      StepModel(
         no: 5,
         description:
             'Pour in coconut milk and simmer until chicken is cooked through and the sauce thickens.',
       ),
-      Step(
+      StepModel(
         no: 6,
         description:
             'Garnish with fresh coriander leaves and serve hot with rice or naan.',
       ),
     ],
-    rangOfPeople: 6,
-    isSaved: false,
-    reactions: listTestReactions,
+    rangeOfPeople: '6',
   ),
   Dish(
-    ownerId: '2',
+    ownerId: 2,
     label: 'Margherita Pizza',
-    cookingTime: 30,
+    cookingTime: '30',
     image: 'assets/images/ga.jpg',
     description:
         'Simple yet delicious pizza topped with tomato sauce, mozzarella cheese, and basil leaves.',
@@ -279,46 +276,44 @@ List<Dish> listDishes = [
       ),
     ],
     steps: [
-      Step(
+      StepModel(
         no: 1,
         description: 'Preheat oven to 220°C (425°F).',
       ),
-      Step(
+      StepModel(
         no: 2,
         description:
             'Roll out pizza dough on a floured surface to desired thickness.',
       ),
-      Step(
+      StepModel(
         no: 3,
         description:
             'Spread tomato sauce evenly over the dough, leaving a small border around the edges.',
       ),
-      Step(
+      StepModel(
         no: 4,
         description: 'Sprinkle shredded mozzarella cheese over the sauce.',
       ),
-      Step(
+      StepModel(
         no: 5,
         description: 'Arrange fresh basil leaves on top of the cheese.',
       ),
-      Step(
+      StepModel(
         no: 6,
         description:
             'Drizzle olive oil over the pizza and season with a pinch of salt.',
       ),
-      Step(
+      StepModel(
         no: 7,
         description:
             'Bake in the preheated oven for 12-15 minutes, or until the crust is golden brown and the cheese is bubbly.',
       ),
-      Step(
+      StepModel(
         no: 8,
         description: 'Remove from oven, slice, and serve hot.',
       ),
     ],
-    rangOfPeople: 2,
-    isSaved: true,
-    reactions: listTestReactions,
+    rangeOfPeople: '2',
   ),
 ];
 
@@ -326,15 +321,15 @@ List<Dish> listDishes = [
 List<Reaction> listTestReactions = [
   Reaction(
     type: reactions[0].value,
-    quantity: '20',
+    quantity: 20,
     isSelected: true,
   ),
   Reaction(
     type: reactions[1].value,
-    quantity: '100',
+    quantity: 100,
   ),  
   Reaction(
     type: reactions[2].value,
-    quantity: '50',
+    quantity: 50,
   ),
 ];

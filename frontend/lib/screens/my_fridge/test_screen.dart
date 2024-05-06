@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/item/item_category.dart';
+import 'package:frontend/models/category/category.dart';
 import 'package:frontend/screens/my_fridge/add_category_detail_screen.dart';
 import 'package:frontend/screens/search/search_screen.dart';
 import 'package:frontend/theme/color.dart';
@@ -24,7 +25,7 @@ class _TestScreenState extends State<TestScreen> with TickerProviderStateMixin {
   String selectedFilter = '';
   int selectedTabIndex = 0;
   bool isSelecting = false;
-  List<ItemCategory> isSelected = [];
+  List<Category> isSelected = [];
   final List<Item> listPositions = [
     Item(
       label: "Tủ lạnh",

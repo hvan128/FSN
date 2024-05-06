@@ -1,64 +1,155 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:frontend/components/item/item_reaction.dart';
+import 'package:frontend/config.dart';
+import 'package:frontend/models/community/dish.dart';
+import 'package:frontend/models/user/user.dart';
+import 'package:frontend/navigation/router/community.dart';
+import 'package:frontend/provider/user.dart';
+import 'package:frontend/services/api_service.dart';
+import 'package:frontend/services/community/dish_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
-import 'package:frontend/types/dish.dart';
 import 'package:frontend/types/type.dart';
-import 'package:frontend/types/user.dart';
 import 'package:frontend/utils/constants.dart';
-import 'package:frontend/utils/test_constants.dart';
+import 'package:frontend/utils/functions_core.dart';
 import 'package:frontend/widgets/reaction_button.dart';
 import 'package:frontend/widgets/text.dart';
+import 'package:provider/provider.dart';
 
 enum CardType { normal, small }
 
 class FoodCard extends StatefulWidget {
   final Dish dish;
-  final Function()? onSave;
-  final Function(Item)? onReactionChanged;
   final CardType? type;
-  const FoodCard(
-      {super.key,
-      required this.dish,
-      this.onSave,
-      this.type = CardType.normal,
-      this.onReactionChanged});
+  const FoodCard({
+    super.key,
+    required this.dish,
+    this.type = CardType.normal,
+  });
 
   @override
   State<FoodCard> createState() => _FoodCardState();
 }
 
 class _FoodCardState extends State<FoodCard> {
+  bool? isSaved = false;
+  UserModel? owner;
+  List<Reaction> listReactions = [
+    Reaction(type: 'like', quantity: 0, isSelected: false),
+    Reaction(type: 'love', quantity: 0, isSelected: false),
+    Reaction(type: 'delicious', quantity: 0, isSelected: false),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUser();
+    checkSaved();
+    processFeels(
+        widget.dish.feels!,
+        Provider.of<UserProvider>(context, listen: false).user!.id!,
+        listReactions);
+  }
+
+  void checkSaved() {
+    List<Saved> savedList = widget.dish.saves!;
+    for (Saved saved in savedList) {
+      if (saved.userId ==
+          Provider.of<UserProvider>(context, listen: false).user!.id!) {
+        setState(() {
+          isSaved = true;
+        });
+        break;
+      }
+    }
+  }
+
+  void fetchUser() async {
+    await ApiService.get('${Config.USER_API}/${widget.dish.ownerId}')
+        .then((value) {
+      if (value != null && value.isNotEmpty) {
+        setState(() {
+          owner = UserModel.fromJson(jsonDecode(value)[0]);
+        });
+      }
+    });
+  }
+
+  void processFeels(List<Feel> feels, int ownerId, List<Reaction> reactions) {
+    for (Feel feel in feels) {
+      switch (feel.type) {
+        case 1:
+          incrementQuantity('like', reactions);
+          break;
+        case 2:
+          incrementQuantity('love', reactions);
+          break;
+        case 3:
+          incrementQuantity('delicious', reactions);
+          break;
+      }
+
+      if (feel.userId == ownerId) {
+        switch (feel.type) {
+          case 1:
+            setSelected('like', true, reactions);
+            break;
+          case 2:
+            setSelected('love', true, reactions);
+            break;
+          case 3:
+            setSelected('delicious', true, reactions);
+            break;
+        }
+      }
+    }
+  }
+
+  void incrementQuantity(String reactionType, List<Reaction> reactions) {
+    Reaction? reactionToUpdate = reactions.firstWhere(
+      (reaction) => reaction.type == reactionType,
+      orElse: () => Reaction(),
+    );
+
+    reactionToUpdate.quantity = (reactionToUpdate.quantity ?? 0) + 1;
+  }
+
+  void decrementQuantity(String reactionType, List<Reaction> reactions) {
+    Reaction? reactionToUpdate = reactions.firstWhere(
+      (reaction) => reaction.type == reactionType,
+      orElse: () => Reaction(),
+    );
+
+    reactionToUpdate.quantity = (reactionToUpdate.quantity ?? 0) - 1;
+  }
+
+  void setSelected(
+      String reactionType, bool isSelected, List<Reaction> reactions) {
+    Reaction? reactionToUpdate = reactions.firstWhere(
+      (reaction) => reaction.type == reactionType,
+      orElse: () => Reaction(),
+    );
+
+    reactionToUpdate.isSelected = isSelected;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final User owner =
-        users.firstWhere((owner) => owner.id == widget.dish.ownerId,
-            orElse: () => User(
-                  id: '0',
-                  username: 'john_doe',
-                  email: 'john.doe@example.com',
-                  image:
-                      'https://www.facebook.com/photo?fbid=3516518468585687&set=a.1525178521053035',
-                  description: 'Hello, I am John Doe!',
-                  address: '123 Main Street, City, Country',
-                  phone: '+1234567890',
-                  birthday: '1990-01-01',
-                  gender: 'Male',
-                  role: 'User',
-                ));
-    List<Reaction> listReactions = widget.dish.reactions ??
-        [Reaction(type: 'love', quantity: '0', isSelected: false)];
     final Image noImage = Image.asset(
-      "assets/icons/i16/logo.png",
+      "assets/icons/i16/image-default.png",
       width: 30,
       height: 30,
     );
-    final imageUrl = owner.image;
+    final imageUrl = owner?.imageUrl;
 
     final Image image = (imageUrl != null)
         ? Image.network(
             imageUrl,
+            width: 30,
+            height: 30,
+            fit: BoxFit.cover,
             loadingBuilder: (context, child, loadingProgress) =>
                 (loadingProgress == null)
                     ? child
@@ -77,24 +168,40 @@ class _FoodCardState extends State<FoodCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Stack(children: [
-            Container(
-              width: widget.type == CardType.small
-                  ? MediaQuery.of(context).size.width * 0.5 - 22
-                  : 300,
-              height: widget.type == CardType.small
-                  ? MediaQuery.of(context).size.width * 0.4
-                  : 200,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(8),
-                  topRight: Radius.circular(8),
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, RouterCommunity.dishDetail,
+                    arguments: {
+                      'dish': widget.dish,
+                      'owner': owner,
+                      'isSaved': isSaved,
+                      'reactions': listReactions
+                    }).then((_) => setState(() {}));
+              },
+              child: Container(
+                width: widget.type == CardType.small
+                    ? MediaQuery.of(context).size.width * 0.5 - 22
+                    : 300,
+                height: widget.type == CardType.small
+                    ? MediaQuery.of(context).size.width * 0.4
+                    : 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: Image.asset(
-                  widget.dish.image,
-                  fit: BoxFit.cover,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(8),
+                    topRight: Radius.circular(8),
+                  ),
+                  child: widget.dish.image != null &&
+                          widget.dish.image!.startsWith('assets') != true
+                      ? Image.network(
+                          FunctionCore.convertImageUrl(widget.dish.image!),
+                          fit: BoxFit.cover)
+                      : Image.asset(
+                          widget.dish.image!,
+                          fit: BoxFit.cover,
+                        ),
                 ),
               ),
             ),
@@ -111,26 +218,26 @@ class _FoodCardState extends State<FoodCard> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(children: [
-                                  Container(
-                                      decoration: BoxDecoration(
-                                        color: MyColors.primary[
-                                            'CulturalYellow']!['c700']!,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
+                                  ClipRRect(
+                                      borderRadius: BorderRadius.circular(100),
                                       child: image),
                                   const SizedBox(width: 10),
-                                  MyText(
-                                    text: owner.username,
-                                    fontSize: FontSize.z12,
-                                    fontWeight: FontWeight.w600,
-                                    color: MyColors.white['c900']!,
-                                  )
+                                  owner == null
+                                      ? Container()
+                                      : MyText(
+                                          text: owner!.username!,
+                                          fontSize: FontSize.z13,
+                                          fontWeight: FontWeight.w700,
+                                          color: MyColors.white['c900']!,
+                                        )
                                 ]),
-                                MyText(
-                                  text: widget.dish.label,
-                                  fontSize: FontSize.z22,
-                                  fontWeight: FontWeight.w600,
-                                  color: MyColors.white['c900']!,
+                                Flexible(
+                                  child: MyText(
+                                    text: widget.dish.label!,
+                                    fontSize: FontSize.z20,
+                                    fontWeight: FontWeight.w700,
+                                    color: MyColors.white['c900']!,
+                                  ),
                                 ),
                               ],
                             ))),
@@ -139,23 +246,25 @@ class _FoodCardState extends State<FoodCard> {
                 ? Positioned.fill(
                     child: Align(
                         alignment: Alignment.topRight,
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 10, top: 10),
-                          child: widget.dish.isSaved != null &&
-                                  widget.dish.isSaved!
-                              ? Image.asset(
-                                  'assets/icons/i16/save-book-mark.png',
-                                  width: 25,
-                                  height: 25,
-                                  color: MyColors
-                                      .primary['CulturalYellow']!['c700']!,
-                                )
-                              : Image.asset(
-                                  'assets/icons/i16/bookmark-outline.png',
-                                  width: 25,
-                                  height: 25,
-                                  color: MyColors.white['c900']!,
-                                ),
+                        child: GestureDetector(
+                          onTap: onSave,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 10, top: 10),
+                            child: isSaved == true
+                                ? Image.asset(
+                                    'assets/icons/i16/save-book-mark.png',
+                                    width: 25,
+                                    height: 25,
+                                    color: MyColors
+                                        .primary['CulturalYellow']!['c700']!,
+                                  )
+                                : Image.asset(
+                                    'assets/icons/i16/bookmark-outline.png',
+                                    width: 25,
+                                    height: 25,
+                                    color: MyColors.white['c900']!,
+                                  ),
+                          ),
                         )))
                 : Container()
           ]),
@@ -173,79 +282,98 @@ class _FoodCardState extends State<FoodCard> {
                     children: [
                       widget.type == CardType.normal
                           ? const SizedBox()
-                          : Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(children: [
-                                  Container(
-                                      decoration: BoxDecoration(
-                                        color: MyColors.primary[
-                                            'CulturalYellow']!['c700']!,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: image),
-                                  const SizedBox(width: 5),
-                                  MyText(
-                                    text: owner.username,
-                                    fontSize: FontSize.z12,
-                                    fontWeight: FontWeight.w400,
-                                    color: MyColors.grey['c700']!,
-                                  )
-                                ]),
-                                MyText(
-                                  text: widget.dish.label,
-                                  fontSize: FontSize.z14,
-                                  fontWeight: FontWeight.w600,
-                                  color: MyColors.grey['c900']!,
-                                ),
-                                const SizedBox(height: 20),
-                                MyText(
-                                    text: '21 giờ trước',
-                                    fontSize: FontSize.z12,
-                                    fontWeight: FontWeight.w400,
-                                    color: MyColors.grey['c700']!),
-                                const SizedBox(height: 10),
-                              ],
-                            ),
-                      Row(children: [
-                        ...listReactions.map((e) {
-                          return Row(
-                            children: [
-                              Row(
+                          : SizedBox(
+                              width: widget.type == CardType.small
+                                  ? MediaQuery.of(context).size.width * 0.5 - 42
+                                  : 300,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  e.quantity == '0'
+                                  Row(children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(100),
+                                      child: image,
+                                    ),
+                                    const SizedBox(width: 5),
+                                    owner == null
+                                        ? Container()
+                                        : MyText(
+                                            text: owner!.username!,
+                                            fontSize: FontSize.z12,
+                                            fontWeight: FontWeight.w400,
+                                            color: MyColors.grey['c700']!,
+                                          )
+                                  ]),
+                                  Flexible(
+                                    child: MyText(
+                                      text: widget.dish.label!,
+                                      fontSize: FontSize.z14,
+                                      fontWeight: FontWeight.w600,
+                                      color: MyColors.grey['c900']!,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  widget.dish.createdAt == null
                                       ? Container()
-                                      : ItemReaction(
-                                          reaction: reactions.firstWhere(
-                                              (element) =>
-                                                  element.value == e.type),
-                                          quantity: e.quantity,
-                                          isSelected: e.isSelected,
-                                        ),
-                                  const SizedBox(width: 5),
+                                      : MyText(
+                                          text: FunctionCore.calculateDuration(
+                                              widget.dish.createdAt!),
+                                          fontSize: FontSize.z12,
+                                          fontWeight: FontWeight.w400,
+                                          color: MyColors.grey['c700']!),
+                                  const SizedBox(height: 10),
                                 ],
                               ),
-                            ],
-                          );
-                        }).toList(),
-                        listReactions.length < 3
-                            ? ReactionButton(
-                                initialReaction: EReaction.none,
-                                onReactionChanged: (reaction) {
-                                  print(reaction.name);
+                            ),
+                      Row(
+                        children: [
+                          Row(children: [
+                            ...listReactions.map((e) {
+                              return GestureDetector(
+                                onTap: () {
+                                  onTapReactionItem(e);
                                 },
-                              )
-                            : const SizedBox(),
-                      ]),
+                                child: Row(
+                                  children: [
+                                    e.quantity == 0
+                                        ? Container()
+                                        : Row(
+                                            children: [
+                                              ItemReaction(
+                                                reaction: reactions.firstWhere(
+                                                    (element) =>
+                                                        element.value ==
+                                                        e.type),
+                                                quantity:
+                                                    e.quantity!.toString(),
+                                                isSelected: e.isSelected,
+                                              ),
+                                              const SizedBox(width: 5),
+                                            ],
+                                          ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          ]),
+                          !listReactions
+                                  .every((reaction) => reaction.quantity! > 0)
+                              ? ReactionButton(
+                                  initialReaction: EReaction.none,
+                                  onReactionChanged: (reaction) {
+                                    onReactionChanged(reaction);
+                                  },
+                                )
+                              : const SizedBox(),
+                        ],
+                      ),
                     ],
                   ),
                   GestureDetector(
-                      onTap: () {
-                        widget.onSave?.call();
-                      },
+                      onTap: onSave,
                       child: widget.type == CardType.normal
-                          ? itemSave(widget.dish.isSaved ?? false)
+                          ? itemSave(isSaved ?? false)
                           : Container()),
                 ],
               ),
@@ -255,6 +383,7 @@ class _FoodCardState extends State<FoodCard> {
       ),
     );
   }
+
   EReaction? getFakeInitialReaction(int index) {
     if (index % 5 == 0) {
       return EReaction.like;
@@ -290,5 +419,76 @@ class _FoodCardState extends State<FoodCard> {
         ],
       ),
     );
+  }
+
+  void onReactionChanged(EReaction reaction) async {
+    if (listReactions
+            .firstWhere((element) => element.type == reaction.name, orElse: () => Reaction())
+            .isSelected ==
+        false) {
+      final Feel feel = Feel(
+        type: reaction.name == 'like'
+            ? 1
+            : reaction.name == 'love'
+                ? 2
+                : 3,
+        userId: Provider.of<UserProvider>(context, listen: false).user!.id,
+        dishId: widget.dish.id,
+      );
+      incrementQuantity(reaction.name, listReactions);
+      setSelected(reaction.name, true, listReactions);
+      await DishService.addFeel(feel);
+    }
+    setState(() {});
+  }
+
+  void onSave() async {
+    if (isSaved == true) {
+      setState(() {
+        isSaved = false;
+      });
+      await DishService.unSavedDish(Saved(
+        userId: Provider.of<UserProvider>(context, listen: false).user!.id,
+        dishId: widget.dish.id,
+      ));
+    } else {
+      setState(() {
+        isSaved = true;
+      });
+      await DishService.saveDish(Saved(
+        userId: Provider.of<UserProvider>(context, listen: false).user!.id,
+        dishId: widget.dish.id,
+      ));
+    }
+  }
+
+  void onTapReactionItem(Reaction e) async {
+    if (e.isSelected == false) {
+      setSelected(e.type!, true, listReactions);
+      incrementQuantity(e.type!, listReactions);
+      await DishService.addFeel(Feel(
+        type: e.type == 'like'
+            ? 1
+            : e.type == 'love'
+                ? 2
+                : 3,
+        userId: Provider.of<UserProvider>(context, listen: false).user!.id,
+        dishId: widget.dish.id,
+      ));
+    } else {
+      setSelected(e.type!, false, listReactions);
+      decrementQuantity(e.type!, listReactions);
+      final feel = widget.dish.feels!.firstWhere((element) =>
+          element.userId ==
+              Provider.of<UserProvider>(context, listen: false).user!.id &&
+          element.type ==
+              (e.type == 'like'
+                  ? 1
+                  : e.type == 'love'
+                      ? 2
+                      : 3));
+      await DishService.deleteFeel(feel);
+    }
+    setState(() {});
   }
 }

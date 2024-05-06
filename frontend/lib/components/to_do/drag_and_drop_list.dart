@@ -1,8 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
+import 'package:flutter/widgets.dart';
+import 'package:frontend/components/modals/notification_modal.dart';
+import 'package:frontend/config.dart';
+import 'package:frontend/models/category/category.dart';
+import 'package:frontend/services/api_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/food.dart';
+import 'package:frontend/utils/icons.dart';
+import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/divider.dart';
 import 'package:frontend/widgets/header.dart';
 import 'package:frontend/widgets/text.dart';
@@ -18,7 +27,7 @@ class DraggableList {
 }
 
 class DraggableListItem {
-  final ItemCategory category;
+  final Category category;
   bool isDeleted;
   bool isSelected;
 
@@ -58,7 +67,6 @@ class _DragNDropList extends State<DragNDropList> {
   @override
   void initState() {
     super.initState();
-
     allLists = widget.listFoods.map((food) {
       return DraggableList(
         header: food.label,
@@ -70,7 +78,7 @@ class _DragNDropList extends State<DragNDropList> {
       );
     }).toList();
     lists = allLists!.map(buildList).toList();
-    List<ItemCategory> allCategories =
+    List<Category> allCategories =
         widget.listFoods.expand((food) => food.categories).toSet().toList();
     allItems = allCategories.isNotEmpty
         ? allCategories.map((e) {
@@ -271,6 +279,57 @@ class _DragNDropList extends State<DragNDropList> {
                 ? allItems!
                     .map((item) => Dismissible(
                           key: ValueKey(item.category.value),
+                          confirmDismiss: (direction) async {
+                            if (direction == DismissDirection.endToStart) {
+                              return await showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return MyNotification(
+                                      title: 'Xóa',
+                                      description:
+                                          'Xóa ${item.category.label} ?',
+                                      notificationType: NotificationType.info,
+                                      btnList: [
+                                        MyButton(
+                                            text: 'Xóa',
+                                            onPressed: () {
+                                              Navigator.pop(context, true);
+                                            }),
+                                        MyButton(
+                                            text: 'Trở lại danh sách',
+                                            onPressed: () {
+                                              Navigator.pop(context, false);
+                                            })
+                                      ],
+                                    );
+                                  });
+                            } else {
+                              return await showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return MyNotification(
+                                      title: 'Xóa',
+                                      description:
+                                          'Xóa ${item.category.label} ?',
+                                      notificationType: NotificationType.info,
+                                      btnList: [
+                                        MyButton(
+                                            text: 'Xóa',
+                                            onPressed: () {
+                                              Navigator.pop(context, true);
+                                            }),
+                                        MyButton(
+                                            text: 'Trở lại danh sách',
+                                            onPressed: () {
+                                              Navigator.pop(context, false);
+                                            })
+                                      ],
+                                    );
+                                  });
+                            }
+                          },
+                          onDismissed: (direction) =>
+                              onDismissedItem(direction, item),
                           secondaryBackground: Container(
                               height: 40,
                               color: const Color.fromARGB(255, 200, 72, 63),
@@ -351,7 +410,7 @@ class _DragNDropList extends State<DragNDropList> {
                                     Expanded(
                                       child: ListTile(
                                         leading: Image.asset(
-                                          item.category.icon,
+                                          allIcons[item.category.value]!,
                                           width: 40,
                                           height: 40,
                                           color: item.isDeleted
@@ -361,7 +420,7 @@ class _DragNDropList extends State<DragNDropList> {
                                           fit: BoxFit.cover,
                                         ),
                                         title: Text(
-                                          item.category.label,
+                                          item.category.label!,
                                           style: item.isDeleted
                                               ? const TextStyle(
                                                   // color: MyColors.grey['c500']!,
@@ -466,12 +525,12 @@ class _DragNDropList extends State<DragNDropList> {
             .map((item) => DragAndDropItem(
                   child: ListTile(
                     leading: Image.asset(
-                      item.category.icon,
+                      item.category.icon!,
                       width: 40,
                       height: 40,
                       fit: BoxFit.cover,
                     ),
-                    title: Text(item.category.label,
+                    title: Text(item.category.label!,
                         style: TextStyle(
                             fontSize: 14,
                             decoration: item.isDeleted
@@ -513,8 +572,8 @@ class _DragNDropList extends State<DragNDropList> {
 
   Widget _buildOptions() {
     return Container(
-      height: 70,
-      padding: const EdgeInsets.symmetric(vertical: 9),
+      height: 60,
+      padding: const EdgeInsets.symmetric(vertical: 4),
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
         color: MyColors.primary['CulturalYellow']!['c700']!,
@@ -525,6 +584,14 @@ class _DragNDropList extends State<DragNDropList> {
           children: [
             _option('assets/icons/i16/save.png', 'Bảo quản'),
             _option('assets/icons/i16/delete.png', 'Xóa'),
+            GestureDetector(
+                onTap: () {
+                  setState(() {
+                    selectedListItems.clear();
+                  });
+                },
+                child:
+                    _option('assets/icons/i16/un-check.png', 'Bỏ chọn tất cả')),
           ]),
     );
   }
@@ -532,7 +599,7 @@ class _DragNDropList extends State<DragNDropList> {
   Widget _option(String icon, String label) {
     return Column(
       children: [
-        Image.asset(icon, width: 30, height: 30, color: MyColors.grey['c900']!),
+        Image.asset(icon, width: 25, height: 25, color: MyColors.grey['c900']!),
         const SizedBox(
           height: 5,
         ),
@@ -568,5 +635,80 @@ class _DragNDropList extends State<DragNDropList> {
           allItems!.removeAt(allItems!.indexOf(item));
       allItems!.add(newItem);
     }
+  }
+
+  FutureOr<bool> onConfirmDismiss(
+      DismissDirection direction, DraggableListItem item) async {
+    if (direction == DismissDirection.endToStart) {
+      return await showDialog(
+          context: context,
+          builder: (context) {
+            return MyNotification(
+              title: 'Xóa',
+              description: 'Xóa ${item.category.label} ?',
+              notificationType: NotificationType.info,
+              btnList: [
+                MyButton(
+                    text: 'Xóa',
+                    onPressed: () {
+                      Navigator.pop(context, true);
+                    }),
+                MyButton(
+                    text: 'Trở lại danh sách',
+                    onPressed: () {
+                      Navigator.pop(context, false);
+                    })
+              ],
+            );
+          });
+    } else {
+      return await showDialog(
+          context: context,
+          builder: (context) {
+            return MyNotification(
+              title: 'Xóa',
+              description: 'Xóa ${item.category.label} ?',
+              notificationType: NotificationType.info,
+              btnList: [
+                MyButton(
+                    text: 'Xóa',
+                    onPressed: () {
+                      Navigator.pop(context, true);
+                    }),
+                MyButton(
+                    text: 'Trở lại danh sách',
+                    onPressed: () {
+                      Navigator.pop(context, false);
+                    })
+              ],
+            );
+          });
+    }
+  }
+
+  onDismissedItem(DismissDirection direction, DraggableListItem item) {
+    if (direction == DismissDirection.endToStart) {
+      
+    }
+  }
+  void onDelete() {
+    //   ApiService.delete('${Config.CATEGORIES_API}/$element').then((value) {
+    //     showDialog(
+    //         context: context,
+    //         builder: (context) {
+    //           return MyAlert(
+    //             alertType: AlertType.success,
+    //             position: AlertPosition.topCenter,
+    //             title: 'Thành công',
+    //             description: 'Xóa ${isSelected.length} đồ ăn khỏi tủ lạnh!',
+    //           );
+    //         });
+    //   });
+    
+    // setState(() {
+    //   isSelecting = false;
+    // });
+    // widget.showBottomBar!(true);
+    // clearCache();
   }
 }

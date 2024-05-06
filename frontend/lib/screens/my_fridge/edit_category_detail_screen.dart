@@ -1,5 +1,13 @@
+import 'package:api_cache_manager/api_cache_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend/components/modals/alert_modal.dart';
+import 'package:frontend/config.dart';
 import 'package:frontend/models/category/category.dart';
+import 'package:frontend/navigation/navigation.dart';
+import 'package:frontend/provider/user.dart';
+import 'package:frontend/screens/home_screen.dart';
+import 'package:frontend/services/api_service.dart';
+import 'package:frontend/services/category/category_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/type.dart';
@@ -13,6 +21,7 @@ import 'package:frontend/widgets/header.dart';
 import 'package:frontend/widgets/input-form.dart';
 import 'package:frontend/widgets/text.dart';
 import 'package:frontend/widgets/text_area.dart';
+import 'package:provider/provider.dart';
 
 class EditCategoryDetailScreen extends StatefulWidget {
   const EditCategoryDetailScreen({super.key});
@@ -53,7 +62,9 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
       value: '1',
     ),
   ];
+  int? id;
   String? position;
+  String? label;
   String? unit;
   String? type;
   String? subPosition;
@@ -61,6 +72,7 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
   DateTime? manufactureDate;
   int quantity = 1;
   Category? category;
+  String? value;
   String? icon;
   String note = '';
 
@@ -74,11 +86,14 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
         final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
         setState(() {
           category = arguments['category'];
+          id = category!.id;
           _controller.text = category!.label ?? '';
           icon = allIcons[category!.icon] ?? 'assets/icons/i16/logo.png';
           type = category!.type ?? '';
           position = '${category!.positionId}';
+          label = category!.label ?? '';
           unit = category!.unit;
+          value = category!.value;
           subPosition = '${category!.subPositionId}';
           manufactureDate = category!.manufactureDate;
           expiryDate = category!.expiryDate;
@@ -89,6 +104,15 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
         listUnits = FunctionCore.getUnitList(type ?? '');
       });
     });
+  }
+
+  String formatDate(DateTime date) {
+    final str = date.toIso8601String();
+    if (str.length != 24) {
+      return str;
+    }
+    var newStr = '${str.substring(0, 10)} ${str.substring(11, 23)}';
+    return newStr;
   }
 
   @override
@@ -110,7 +134,7 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
           child: SafeArea(
               child: Column(children: [
             MyHeader(
-              title: "Add Category",
+              title: "Chỉnh sửa đồ ăn",
               bgColor: MyColors.white['c900']!,
             ),
             Expanded(
@@ -297,7 +321,7 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
                       child: IconButton(
                           padding: EdgeInsets.zero,
                           onPressed: () {
-                            if (quantity > 1) {
+                            if (quantity >= 1) {
                               setState(() {
                                 quantity--;
                               });
@@ -369,32 +393,36 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
       const SizedBox(
         height: 20,
       ),
-      manufactureDate == null ? Container() : InputForm(
-        label: 'Ngày nhập',
-        content: MyDatePicker(
-          defaultValue: manufactureDate,
-          onDateSelected: (DateTime date) {
-            setState(() {
-              manufactureDate = date;
-            });
-          },
-        ),
-      ),
+      manufactureDate == null
+          ? Container()
+          : InputForm(
+              label: 'Ngày nhập',
+              content: MyDatePicker(
+                defaultValue: manufactureDate,
+                onDateSelected: (DateTime date) {
+                  setState(() {
+                    manufactureDate = date;
+                  });
+                },
+              ),
+            ),
       const SizedBox(
         height: 20,
       ),
-      expiryDate == null ? Container() : InputForm(
-        label: 'Ngày hết hạn',
-        content: MyDatePicker(
-          label: 'Date of birth',
-          defaultValue: expiryDate,
-          onDateSelected: (DateTime date) {
-            setState(() {
-              expiryDate = date;
-            });
-          },
-        ),
-      ),
+      expiryDate == null
+          ? Container()
+          : InputForm(
+              label: 'Ngày hết hạn',
+              content: MyDatePicker(
+                label: 'Date of birth',
+                defaultValue: expiryDate,
+                onDateSelected: (DateTime date) {
+                  setState(() {
+                    expiryDate = date;
+                  });
+                },
+              ),
+            ),
       const SizedBox(
         height: 20,
       ),
@@ -409,44 +437,39 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
   }
 
   void onPressAdd() async {
-    setState(() {});
-    // ApiService.post(Config.CATEGORIES_API, {
-    //   'label': category!.label,
-    //   'value': category!.value,
-    //   'icon': category!.value,
-    //   'type': category!.type,
-    //   'quantity': quantity,
-    //   'unit': unit,
-    //   'positionId': int.parse(position!),
-    //   'subPositionId': int.parse(subPosition!),
-    //   'manufactureDate': manufactureDate!.toIso8601String(),
-    //   'expiryDate': expDate!.toIso8601String(),
-    // });
-    // Navigator.push(
-    //     context, MaterialPageRoute(builder: (context) => const HomeScreen()));
-    // showDialog(
-    //     context: context,
-    //     builder: (context) {
-    //       return MyAlert(
-    //         alertType: AlertType.success,
-    //         position: AlertPosition.topCenter,
-    //         title: 'Thành công',
-    //         description:
-    //             'Thêm đồ ăn ${category!.label} vào $position thành công!',
-    //       );
-    //     });
-    // print({
-    //   'label': widget.category!.label,
-    //   'value': widget.category!.value,
-    //   'icon': widget.category!.icon,
-    //   'type': widget.category!.type,
-    //   'quantity': quantity,
-    //   'unit': unit,
-    //   'position': position,
-    //   'subPosition': subPosition,
-    //   'manufactureDate': manufactureDate,
-    //   'expDate': expDate,
-    //   'note': note
-    // });
+    final fridgeId = Provider.of<UserProvider>(
+            Navigate().navigationKey.currentContext!,
+            listen: false)
+        .user!
+        .fridgeId;
+    ApiService.put(Config.CATEGORIES_API, {
+      'id': id,
+      'label': label,
+      'value': value,
+      'icon': value,
+      'type': type,
+      'quantity': quantity,
+      'unit': unit,
+      'positionId': int.parse(position!),
+      'subPositionId': int.parse(subPosition!),
+      'manufactureDate': formatDate(manufactureDate!),
+      'expiryDate': formatDate(expiryDate!),
+      'fridgeId': fridgeId
+    });
+    await CategoryService().deleteCache();
+    await APICacheManager().deleteCache('categories');
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+    showDialog(
+        context: context,
+        builder: (context) {
+          return MyAlert(
+            alertType: AlertType.success,
+            position: AlertPosition.topCenter,
+            title: 'Thành công',
+            description:
+                'Thêm đồ ăn ${category!.label} vào $position thành công!',
+          );
+        });
   }
 }

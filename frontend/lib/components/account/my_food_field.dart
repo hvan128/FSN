@@ -1,20 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/card/food_card.dart';
+import 'package:frontend/models/community/dish.dart';
+import 'package:frontend/navigation/navigation.dart';
+import 'package:frontend/navigation/router/account.dart';
+import 'package:frontend/provider/user.dart';
+import 'package:frontend/services/community/dish_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
-import 'package:frontend/utils/test_constants.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_icon.dart';
 import 'package:frontend/widgets/text.dart';
+import 'package:provider/provider.dart';
 
 class MyFoodField extends StatefulWidget {
-  const MyFoodField({super.key});
+  final int userId;
+  const MyFoodField({super.key, required this.userId});
 
   @override
   State<MyFoodField> createState() => _MyFoodFieldState();
 }
 
 class _MyFoodFieldState extends State<MyFoodField> {
+  List<Dish>? dishes;
+  int? total;
+  @override
+  void initState() {
+    super.initState();
+    getAllDishes(1, 5);
+  }
+
+  Future<void> getAllDishes(int page, int pageSize) async {
+    final res =
+        await DishService.getDishByOwnerId(widget.userId, page, pageSize);
+    setState(() {
+      dishes = res['dishes'];
+      total = res['total'];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -28,7 +51,7 @@ class _MyFoodFieldState extends State<MyFoodField> {
               Image.asset('assets/icons/i16/dish.png', width: 25, height: 25),
               const SizedBox(width: 10),
               MyText(
-                  text: '3',
+                  text: total.toString(),
                   fontSize: FontSize.z16,
                   fontWeight: FontWeight.w600,
                   color: MyColors.grey['c900']!),
@@ -48,7 +71,7 @@ class _MyFoodFieldState extends State<MyFoodField> {
           const SizedBox(height: 20),
           MyButton(
             text: 'Xem tất cả các món',
-            onPressed: () {},
+            onPressed: viewAll,
           )
         ],
       ),
@@ -58,28 +81,45 @@ class _MyFoodFieldState extends State<MyFoodField> {
   Widget _buildListDish() {
     return SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: Row(children: [
-          ...listDishes
-              .map((dish) => Row(
+        child: dishes == null
+            ? Container()
+            : Row(
+                children: [
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    ...dishes!
+                        .map((dish) => Row(
+                              children: [
+                                FoodCard(
+                                  dish: dish,
+                                  type: CardType.small,
+                                ),
+                                const SizedBox(width: 20),
+                              ],
+                            ))
+                        .toList(),
+                  ]),
+                  Row(
                     children: [
-                      FoodCard(
-                        dish: dish,
-                        type: CardType.small,
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(100),
+                            border: Border.all(
+                              color: MyColors.grey['c300']!,
+                            )),
+                        child: Image.asset('assets/icons/i16/arrow-left.png',
+                            width: 25,
+                            height: 25,
+                            color: MyColors.grey['c700']!),
                       ),
-                      const SizedBox(width: 20),
                     ],
-                  ))
-              .toList(),
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(100),
-                border: Border.all(
-                  color: MyColors.grey['c300']!,
-                )),
-            child: Image.asset('assets/icons/i16/arrow-left.png',
-                width: 25, height: 25, color: MyColors.grey['c700']!),
-          ),
-        ]));
+                  ),
+                ],
+              ));
+  }
+
+  void viewAll() {
+    Navigate.pushNamed(RouterAccount.myFood,
+        arguments: {'userId': widget.userId});
   }
 }

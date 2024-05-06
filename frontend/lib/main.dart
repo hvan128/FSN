@@ -22,8 +22,8 @@ void main() async {
   bool result = await SharedService.isLoggedIn();
   if (result) {
     await GoogleSignInProvider().refreshToken();
-    Timer.periodic(const Duration(seconds: 3601), (timer) {
-      GoogleSignInProvider().refreshToken();
+    Timer.periodic(const Duration(seconds: 3601), (timer) async {
+      await GoogleSignInProvider().refreshToken();
     });
     _defaultRoute = RouterIntroduction.afterLogin;
   }

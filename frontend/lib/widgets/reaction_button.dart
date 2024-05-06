@@ -63,7 +63,7 @@ class _ReactionButtonState extends State<ReactionButton> {
     }
     overlayEntry = OverlayEntry(
       builder: (BuildContext context) => Positioned(
-        left: left - 50,
+        left: left,
         top: tapPosition.dy - 65,
         child: Material(
           color: Colors.transparent,

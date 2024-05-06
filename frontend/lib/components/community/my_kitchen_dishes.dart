@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/card/food_card.dart';
 import 'package:frontend/components/item/item_ingredient.dart';
-import 'package:frontend/navigation/navigation.dart';
-import 'package:frontend/navigation/router/community.dart';
-import 'package:frontend/screens/community/dish_detail_screen.dart';
+import 'package:frontend/models/category/category.dart';
+import 'package:frontend/models/community/dish.dart';
+import 'package:frontend/services/category/category_service.dart';
+import 'package:frontend/services/community/dish_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
-import 'package:frontend/types/dish.dart';
-import 'package:frontend/types/food.dart';
-import 'package:frontend/utils/constants.dart';
-import 'package:frontend/utils/test_constants.dart';
 import 'package:frontend/widgets/text.dart';
 
 class MyKitchenDishes extends StatefulWidget {
@@ -20,13 +17,32 @@ class MyKitchenDishes extends StatefulWidget {
 }
 
 class _MyKitchenDishesState extends State<MyKitchenDishes> {
-  List<ItemCategory> selectedCategories = [];
+  List<Category> selectedCategories = [];
+  List<Category> allCategories = [];
   List<Dish>? dishes;
 
   @override
   void initState() {
     super.initState();
-    dishes = listDishes;
+    getAllCategories();
+  }
+
+  void getAllCategories() async {
+    List<Category> categories = await CategoryService().getAllCategories();
+    setState(() {
+      allCategories = categories;
+      selectedCategories.add(categories[0]);
+      selectedCategories.add(categories[1]);
+      getAllDishes(categories[0].value!, categories[1].value!);
+    });
+  }
+
+  Future<void> getAllDishes(String ingredient1, String ingredient2) async {
+    List<Dish> dishes =
+        await DishService.getDishByIngredient(ingredient1, ingredient2, 1, 10);
+    setState(() {
+      this.dishes = dishes;
+    });
   }
 
   @override
@@ -63,9 +79,9 @@ class _MyKitchenDishesState extends State<MyKitchenDishes> {
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: SizedBox(
-            width: MediaQuery.of(context).size.width * meats.length / 6,
+            width: 110 * allCategories.length / 2,
             child: Wrap(spacing: 8, runSpacing: 8, children: [
-              ...meats
+              ...allCategories
                   .map((e) => GestureDetector(
                       onTap: () {
                         if (selectedCategories.contains(e)) {
@@ -77,6 +93,13 @@ class _MyKitchenDishesState extends State<MyKitchenDishes> {
                             selectedCategories.add(e);
                           });
                         }
+                        var ingredient1 = selectedCategories.isNotEmpty
+                            ? selectedCategories[0].value!
+                            : '';
+                        var ingredient2 = selectedCategories.length == 2
+                            ? selectedCategories[1].value!
+                            : '';
+                        getAllDishes(ingredient1, ingredient2);
                       },
                       child: ItemIngredient(
                           category: e,
@@ -95,23 +118,31 @@ class _MyKitchenDishesState extends State<MyKitchenDishes> {
                   ...dishes!
                       .map((e) => Row(
                             children: [
-                              GestureDetector(
-                                onTap: () {
-                                  print('a');
-                                  Navigator.pushNamed(context, RouterCommunity.dishDetail, arguments: {
-                                    'dish': e
-                                  });
-                                },
-                                child: FoodCard(
-                                    dish: e,
-                                    onSave: () {
-                                      setState(() {});
-                                    }),
+                              FoodCard(
+                                dish: e,
                               ),
                               const SizedBox(width: 10),
                             ],
                           ))
                       .toList(),
+                  const SizedBox(width: 10),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(100),
+                            border: Border.all(
+                              color: MyColors.grey['c300']!,
+                            )),
+                        child: Image.asset('assets/icons/i16/arrow-left.png',
+                            width: 25,
+                            height: 25,
+                            color: MyColors.grey['c700']!),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 20),
                 ])
               : Container(),
         ),

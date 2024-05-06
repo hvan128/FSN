@@ -21,13 +21,11 @@ class CategoryService {
     var isCacheExist =
         await APICacheManager().isAPICacheKeyExist('categories_$positionId');
     if (isCacheExist) {
-      print('cache exist');
       var cacheData =
-          await APICacheManager().getCacheData('categories_$positionId');
+          await APICacheManager().getCacheData('categories_$positionId');  
       final data = jsonDecode(cacheData.syncData)['data'];
       return categoryFromJson(data);
     } else {
-      print('cache not exist');
       await ApiService.get(
               '${Config.CATEGORIES_API}/position/$positionId/${user.fridgeId}')
           .then((value) {
@@ -44,7 +42,7 @@ class CategoryService {
         }
       });
       return categories;
-    }
+    } 
   }
 
   Future deleteCache() async {
@@ -78,7 +76,7 @@ class CategoryService {
         final data2 = jsonDecode(cache2Data.syncData)['data'];
         final data3 = jsonDecode(cache3Data.syncData)['data'];
         categories = data1 + data2 + data3;
-            print(categories.length);
+        print(categories.length);
         APICacheDBModel cacheDBModel = APICacheDBModel(
           key: 'categories',
           syncData: jsonEncode(categories),
@@ -101,4 +99,9 @@ class CategoryService {
       return categoryFromJson(categories);
     }
   }
+
+  Future<void> deleteCategory(int id) async {
+    await ApiService.delete('${Config.CATEGORIES_API}/$id');   
+    await APICacheManager().deleteCache('categories'); 
+  } 
 }

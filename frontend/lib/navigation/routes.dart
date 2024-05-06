@@ -6,6 +6,7 @@ import 'package:frontend/navigation/router/home.dart';
 import 'package:frontend/navigation/router/introduction.dart';
 import 'package:frontend/navigation/router/my_fridge.dart';
 import 'package:frontend/navigation/router/settings.dart';
+import 'package:frontend/navigation/router/to_do.dart';
 import 'package:frontend/screens/account/account_screen.dart';
 import 'package:frontend/screens/auth/create_id_screen.dart';
 import 'package:frontend/screens/auth/login_screen.dart';
@@ -21,7 +22,6 @@ import 'package:frontend/screens/my_fridge/edit_category_detail_screen.dart';
 
 Map<String, WidgetBuilder> appRoutes = {
   RouterHome.home: (context) => const HomeScreen(),
-  RouterAccount.account: (context) => const AccountScreen(),
   //* INTRODUCTION ROUTES */
   RouterIntroduction.introduction: (context) => const IntroductionScreen(),
   //* AUTH ROUTES */
@@ -39,6 +39,8 @@ Map<String, WidgetBuilder> appRoutes = {
 
   ...introductionRoutes,
   ...settingRoutes,
+  ...todoRoutes,
+  ...accountRoutes,
   
 };
 

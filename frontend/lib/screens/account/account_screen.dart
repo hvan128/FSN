@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/account/my_food_field.dart';
-import 'package:frontend/navigation/navigation.dart';
+import 'package:frontend/components/account/my_saved_dish.dart';
+import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/router/community.dart';
-import 'package:frontend/screens/community/add_dish_screen.dart';
+import 'package:frontend/provider/user.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_icon.dart';
 import 'package:frontend/widgets/text.dart';
+import 'package:provider/provider.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -19,10 +21,13 @@ class AccountScreen extends StatefulWidget {
 class _AccountScreenState extends State<AccountScreen>
     with TickerProviderStateMixin {
   late final TabController _tabController;
+  UserModel user = UserModel();
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    user = Provider.of<UserProvider>(context, listen: false).user!;
   }
 
   @override
@@ -34,9 +39,8 @@ class _AccountScreenState extends State<AccountScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
-          slivers: [
+        body:
+            CustomScrollView(physics: const BouncingScrollPhysics(), slivers: [
       SliverAppBar(
           pinned: true,
           expandedHeight: 200,
@@ -93,12 +97,17 @@ class _AccountScreenState extends State<AccountScreen>
                 children: [
                   _buildAddButton(),
                   const SizedBox(height: 10),
-                  const MyFoodField(),
+                  MyFoodField(
+                    userId: user.id!
+                  ),
                 ],
               ),
-              const Center(
-                child: Text('Môn ăn đã lưu'),
-              )
+              Column(
+                children: [
+                  const SizedBox(height: 10),
+                  MySavedDish(userId: user.id!),
+                ],
+              ),
             ],
           ),
         ),
@@ -114,10 +123,10 @@ class _AccountScreenState extends State<AccountScreen>
         children: [
           const SizedBox(height: 50),
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const CircleAvatar(
+            CircleAvatar(
               radius: 40,
-              backgroundImage: NetworkImage(
-                  'https://scontent.fhan14-3.fna.fbcdn.net/v/t39.30808-6/344771274_635656204564021_5313788662963468311_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeHOKImvTwCiDzliOSGGKL_NJufFjy4-vqEm58WPLj6-oQxnd0EhiFoOlqZgBSwhBo7iM378XRvIqQlK56Ma37ZB&_nc_ohc=lFehLRvcoeMAX9IEo4n&_nc_ht=scontent.fhan14-3.fna&oh=00_AfCX7HzV8vA-uHApwtNlP10nHn5Nk20nLCC8xciA06Y_SQ&oe=6604A259'),
+              backgroundImage:
+                  user.imageUrl == null ? null : NetworkImage(user.imageUrl!),
             ),
             const SizedBox(width: 20),
             Column(
@@ -125,13 +134,13 @@ class _AccountScreenState extends State<AccountScreen>
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   MyText(
-                    text: 'Ngô Hải Văn',
+                    text: user.displayName ?? '',
                     fontSize: FontSize.z20,
                     fontWeight: FontWeight.w600,
                     color: MyColors.grey['c900']!,
                   ),
                   MyText(
-                    text: '@hvan128',
+                    text: '@${user.username ?? ''}',
                     fontSize: FontSize.z15,
                     fontWeight: FontWeight.w400,
                     color: MyColors.grey['c900']!,

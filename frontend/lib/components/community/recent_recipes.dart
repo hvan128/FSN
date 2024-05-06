@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/card/food_card.dart';
+import 'package:frontend/models/community/dish.dart';
+import 'package:frontend/services/community/dish_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
-import 'package:frontend/types/dish.dart';
-import 'package:frontend/utils/test_constants.dart';
 import 'package:frontend/widgets/text.dart';
 
 class RecentRecipes extends StatefulWidget {
   const RecentRecipes({super.key});
-
   @override
   State<RecentRecipes> createState() => _RecentRecipesState();
 }
@@ -18,7 +17,15 @@ class _RecentRecipesState extends State<RecentRecipes> {
      @override
   void initState() {
     super.initState();
-    dishes = listDishes;
+    getAllDishes(1, 10);
+  }
+
+   Future<void> getAllDishes(int page, int pageSize) async {
+    List<Dish> dishes =
+        await DishService.getAllDish(page, pageSize);
+    setState(() {
+      this.dishes = dishes;
+    });
   }
 
   @override
@@ -42,11 +49,11 @@ class _RecentRecipesState extends State<RecentRecipes> {
         const SizedBox(
           height: 20,
         ),
-        Wrap(
+        dishes == null ? Container() : Wrap(
           spacing: 8,
           runSpacing: 16,
           children: [
-            ...listDishes.map((dish) => FoodCard(dish: dish, type: CardType.small,)).toList(),
+            ...dishes!.map((dish) => FoodCard(dish: dish, type: CardType.small,)).toList(),
           ],
         )
         ]

@@ -52,12 +52,15 @@ class _ItemSearchState extends State<ItemSearch> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: MyText(
-              text: widget.type == SearchType.all
+              text: widget.type == SearchType.all || widget.type == SearchType.shoppingList
                   ? foods
                       .firstWhere(
                           (element) => element.value == widget.category.type)
                       .label
-                  : 'Tủ lạnh',
+                  : positions
+                      .firstWhere((element) =>
+                          int.parse(element.value) == widget.category.positionId)
+                      .label,
               fontSize: FontSize.z12,
               fontWeight: FontWeight.w400,
               color: MyColors.grey['c700']!),

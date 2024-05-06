@@ -58,7 +58,7 @@ class MyButton extends StatelessWidget {
         textColor = MyColors.support['Error']!['c900']!;
         break;
       case ButtonType.transparent:
-        bgColor = MyColors.white['c900'];
+        bgColor = MyColors.transparent;
         textColor = MyColors.grey['c900']!;
         break;
       default:
