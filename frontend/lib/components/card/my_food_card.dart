@@ -138,7 +138,7 @@ class _MyFoodCardState extends State<MyFoodCard> {
                 ),
                 child: Image.network(
                     FunctionCore.convertImageUrl(widget.dish.image!),
-                    height: 160,
+                    height: 170,
                     fit: BoxFit.cover),
               ))
         ]),

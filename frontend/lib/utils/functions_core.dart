@@ -9,6 +9,22 @@ import 'package:frontend/widgets/loading.dart';
 import 'package:intl/intl.dart';
 
 class FunctionCore {
+  static showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(8.0),
+        animation: CurvedAnimation(
+            parent: AnimationController(
+              duration: const Duration(milliseconds: 500),
+              // ignore: use_build_context_synchronously
+              vsync: Scaffold.of(context),
+            ),
+            curve: Curves.easeInOut),
+      ),
+    );
+  }
   static List<Item> getUnitList(String type) {
     switch (type) {
       case 'fruits':

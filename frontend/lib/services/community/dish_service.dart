@@ -76,6 +76,7 @@ class DishService {
     return dishes;
   }
 
+
   static Future<Map<String, dynamic>> getDishByOwnerId(
       int ownerId, int page, int pageSize) async {
     List<Dish> dishes = [];
@@ -99,14 +100,17 @@ class DishService {
     };
   }
 
-   static Future<Map<String, dynamic>> getSavedDish(int userId, int page, int pageSize) async {
+  static Future<Map<String, dynamic>> getSavedDish(
+      int userId, int page, int pageSize) async {
     List<Dish> dishes = [];
     int total = 0;
     final queryParams = {
       'page': page.toString(),
       'pageSize': pageSize.toString()
     };
-    await ApiService.get('${Config.DISH_API}/saved/$userId', queryParams: queryParams).then((value) {
+    await ApiService.get('${Config.DISH_API}/saved/$userId',
+            queryParams: queryParams)
+        .then((value) {
       if (value != null) {
         final data = jsonDecode(value.toString())['data'];
         total = jsonDecode(value.toString())['total'];
@@ -117,7 +121,7 @@ class DishService {
       'dishes': dishes,
       'total': total,
     };
-   }
+  }
 
   static Future<Dish> getDishById({required int id}) async {
     return await ApiService.get('${Config.DISH_API}/$id').then((value) {
@@ -129,13 +133,12 @@ class DishService {
     });
   }
 
- 
-
   static Future<void> addFeel(Feel feel) async {
     var model = {
       'type': feel.type,
       'userId': feel.userId,
-      'dishId': feel.dishId
+      'dishId': feel.dishId,
+      'feedbackId': feel.feedbackId
     };
     await ApiService.post('${Config.DISH_API}/feel', model);
   }
@@ -158,5 +161,51 @@ class DishService {
       'dishId': saved.dishId,
     };
     await ApiService.post('${Config.DISH_API}/unsaved', model);
+  }
+
+  static Future<bool> createFeedback(FeedbackModel feedback) async {
+    var loginDetails = await SharedService.loginDetails();
+    Map<String, String> requestHeaders = {
+      'Content-Type': 'multipart/form-data',
+      'Authorization': loginDetails!.data!.token
+    };
+    var url = Uri.http(Config.API_URL, '${Config.DISH_API}/feedback');
+    var request = http.MultipartRequest("POST", url);
+    request.headers.addAll(requestHeaders);
+    request.fields['dishId'] = feedback.dishId.toString();
+    request.fields['content'] = feedback.content!;
+    request.fields['rating'] = feedback.rating.toString();
+    request.fields['userId'] = feedback.userId.toString();
+    http.MultipartFile multipartFile = await http.MultipartFile.fromPath(
+      'image',
+      feedback.image!,
+    );
+    request.files.add(multipartFile);
+    var response = await request.send();
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  static Future<Map<String, dynamic>> getFeedbackByDishId(int dishId, int page, int pageSize) async {
+    List<FeedbackModel> feedbacks = [];
+    int total = 0;
+    final queryParams = {
+      'page': page.toString(),
+      'pageSize': pageSize.toString()
+    };
+    await ApiService.get('${Config.DISH_API}/feedback/$dishId', queryParams: queryParams).then((value) {
+      if (value != null) {
+        final data = jsonDecode(value.toString())['data'];
+        total = jsonDecode(value.toString())['total'];
+        feedbacks = feedbacksFromJson(data);
+      }
+    });
+    return {
+      'feedbacks': feedbacks,
+      'total': total,
+    };
   }
 }

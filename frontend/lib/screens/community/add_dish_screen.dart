@@ -1,15 +1,12 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:frontend/components/community/image_picker.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
+import 'package:frontend/components/modals/notification_modal.dart';
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/models/community/dish.dart';
-import 'package:frontend/navigation/navigation.dart';
-import 'package:frontend/navigation/router/account.dart';
-import 'package:frontend/navigation/router/community.dart';
-import 'package:frontend/navigation/router/home.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/community/community_screen.dart';
 import 'package:frontend/services/community/dish_service.dart';
@@ -554,11 +551,28 @@ class _AddDishScreenState extends State<AddDishScreen> {
                               color: MyColors.grey['c400']!),
                         ),
                       )
-                    : Image.file(
-                        File(listStepsModel[index].image!),
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.cover,
+                    : Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(5),
+                            child: Image.file(
+                              File(listStepsModel[index].image!),
+                              width: 200,
+                              height: 200,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: IconButton(
+                              icon: Icon(Icons.close,
+                                  color: MyColors.grey['c900']),
+                              onPressed: () => setState(
+                                  () => listStepsModel[index].image = null),
+                            ),
+                          )
+                        ],
                       ),
               ],
             )),
@@ -575,11 +589,22 @@ class _AddDishScreenState extends State<AddDishScreen> {
   }
 
   imagePreview() {
-    return Image.file(
-      File(selectedImagePath!),
-      width: double.infinity,
-      height: MediaQuery.of(context).size.width,
-      fit: BoxFit.cover,
+    return Stack(
+      children: [
+        Image.file(
+          File(selectedImagePath!),
+          width: double.infinity,
+          height: MediaQuery.of(context).size.width,
+          fit: BoxFit.cover,
+        ),
+        Positioned(
+            top: 10,
+            right: 10,
+            child: IconButton(
+              icon: Icon(Icons.close, color: MyColors.grey['c900']),
+              onPressed: () => setState(() => selectedImagePath = null),
+            ))
+      ],
     );
   }
 
@@ -587,33 +612,73 @@ class _AddDishScreenState extends State<AddDishScreen> {
     for (var i = 0; i < listStepsModel.length; i++) {
       listStepsModel[i].no = i + 1;
     }
-    final userId = Provider.of<UserProvider>(context, listen: false).user!.id;
-    final Dish dish = Dish(
-      label: _labelController.text,
-      description: _descriptionController.text,
-      image: selectedImagePath,
-      rangeOfPeople: _rangeOfPeopleController.text,
-      steps: listStepsModel,
-      ingredients: ingredientsList,
-      cookingTime: _cookingTimeController.text,
-      ownerId: userId,
-    );
-    final response = await DishService.addDish(dish);
-    if (response) {
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const CommunityScreen()),
-          ModalRoute.withName('/community'));
+    String missField = '';
+    if (selectedImagePath == null) {
+      missField += 'ảnh đại diện';
+    }
+    if (_labelController.text.isEmpty) {
+      missField += ', tên món';
+    }
+    if (_descriptionController.text.isEmpty) {
+      missField += ', mô tả món';
+    }
+    if (_rangeOfPeopleController.text.isEmpty) {
+      missField += ', khẩu phần ăn';
+    }
+    if (_cookingTimeController.text.isEmpty) {
+      missField += ', thời gian nấu';
+    }
+    if (missField != '') {
       showDialog(
           context: context,
-          builder: (context) => const MyAlert(
-                alertType: AlertType.success,
-                title: 'Thành công',
-                description:
-                    'Thêm món ăn thành công! Hãy chia sẽ chúng với bạn bè và người thân nhé.',
+          builder: (context) => MyAlert(
+                alertType: AlertType.error,
+                title: 'Hãy điền đầy đủ thông tin',
+                description: 'Bạn quên chưa nhập các thông tin sau $missField',
               ));
     } else {
-      print('add dish fail');
+      final userId = Provider.of<UserProvider>(context, listen: false).user!.id;
+      final Dish dish = Dish(
+        label: _labelController.text,
+        description: _descriptionController.text,
+        image: selectedImagePath,
+        rangeOfPeople: _rangeOfPeopleController.text,
+        steps: listStepsModel,
+        ingredients: ingredientsList,
+        cookingTime: _cookingTimeController.text,
+        ownerId: userId,
+      );
+      final response = await DishService.addDish(dish);
+      if (response) {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const CommunityScreen()),
+            ModalRoute.withName('/community'));
+        showDialog(
+            context: context,
+            builder: (context) => const MyAlert(
+                  alertType: AlertType.success,
+                  title: 'Thành công',
+                  description:
+                      'Thêm món ăn thành công! Hãy chia sẽ chúng với bạn bè và người thân nhé.',
+                ));
+      } else {
+        showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return MyNotification(
+                  notificationType: NotificationType.error,
+                  title: 'Lỗi',
+                  btnList: [
+                    MyButton(
+                      text: 'Thử lại',
+                      buttonType: ButtonType.secondary,
+                      onPressed: () => Navigator.pop(context),
+                    )
+                  ],
+                  description: 'Chỉ cho phép định dạng .png, .jpg và .jpeg!');
+            });
+      }
     }
   }
 

@@ -7,6 +7,7 @@ import 'package:frontend/services/category/category_service.dart';
 import 'package:frontend/services/community/dish_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
+import 'package:frontend/utils/functions_core.dart';
 import 'package:frontend/widgets/text.dart';
 
 class MyKitchenDishes extends StatefulWidget {
@@ -89,9 +90,14 @@ class _MyKitchenDishesState extends State<MyKitchenDishes> {
                             selectedCategories.remove(e);
                           });
                         } else {
-                          setState(() {
-                            selectedCategories.add(e);
-                          });
+                          if (selectedCategories.length == 2) {
+                            FunctionCore.showSnackBar(
+                                context, 'Chọn tối đa 2 nguyên liệu');
+                          } else {
+                            setState(() {
+                              selectedCategories.add(e);
+                            });
+                          }
                         }
                         var ingredient1 = selectedCategories.isNotEmpty
                             ? selectedCategories[0].value!

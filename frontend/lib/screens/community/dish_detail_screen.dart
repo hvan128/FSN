@@ -1,6 +1,7 @@
 import 'package:api_cache_manager/api_cache_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:frontend/components/card/feedback_card.dart';
 import 'package:frontend/components/card/food_card.dart';
 import 'package:frontend/components/item/item_reaction.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
@@ -11,6 +12,7 @@ import 'package:frontend/models/community/dish.dart';
 import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/account.dart';
+import 'package:frontend/navigation/router/community.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/services/api_service.dart';
 import 'package:frontend/services/category/category_service.dart';
@@ -40,9 +42,15 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
   Image? image;
   List<Dish> relatedDishes = [];
   int? total;
+  int? totalFeedback;
   bool isMine = false;
   bool isSaved = false;
-  List<Reaction> listReactions = [];
+  List<Reaction> listReactions = [
+    Reaction(type: 'like', quantity: 0, isSelected: false),
+    Reaction(type: 'love', quantity: 0, isSelected: false),
+    Reaction(type: 'delicious', quantity: 0, isSelected: false),
+  ];
+  List<FeedbackModel> listFeedbacks = [];
 
   Future<void> getAllDishes(int page, int pageSize) async {
     final res = await DishService.getDishByOwnerId(owner!.id!, page, pageSize);
@@ -50,6 +58,58 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
       relatedDishes = res['dishes'];
       total = res['total'];
     });
+  }
+
+  Future<void> getAllFeedback(int page, int pageSize) async {
+    final res =
+        await DishService.getFeedbackByDishId(dish!.id!, page, pageSize);
+    setState(() {
+      listFeedbacks = res['feedbacks'];
+      totalFeedback = res['total'];
+    });
+  }
+
+  void processFeels(List<Feel> feels, int ownerId, List<Reaction> reactions) {
+    for (Feel feel in feels) {
+      switch (feel.type) {
+        case 1:
+          incrementQuantity('like', reactions);
+          break;
+        case 2:
+          incrementQuantity('love', reactions);
+          break;
+        case 3:
+          incrementQuantity('delicious', reactions);
+          break;
+      }
+
+      if (feel.userId == ownerId) {
+        switch (feel.type) {
+          case 1:
+            setSelected('like', true, reactions);
+            break;
+          case 2:
+            setSelected('love', true, reactions);
+            break;
+          case 3:
+            setSelected('delicious', true, reactions);
+            break;
+        }
+      }
+    }
+  }
+
+  void checkSaved() {
+    List<Saved> savedList = dish!.saves!;
+    for (Saved saved in savedList) {
+      if (saved.userId ==
+          Provider.of<UserProvider>(context, listen: false).user!.id!) {
+        setState(() {
+          isSaved = true;
+        });
+        break;
+      }
+    }
   }
 
   @override
@@ -63,8 +123,19 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
       setState(() {
         dish = arguments['dish'];
         owner = arguments['owner'];
-        isSaved = arguments['isSaved'];
-        listReactions = arguments['reactions'];
+        if (arguments['reactions'] != null) {
+          listReactions = arguments['reactions'];
+        } else {
+          processFeels(
+              dish!.feels!,
+              Provider.of<UserProvider>(context, listen: false).user!.id!,
+              listReactions);
+        }
+        if (arguments['isSaved'] != null) {
+          isSaved = arguments['isSaved'];
+        } else {
+          checkSaved();
+        }
         final Image noImage = Image.asset(
           "assets/icons/i16/logo.png",
           width: 70,
@@ -84,6 +155,7 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
               )
             : noImage;
         getAllDishes(1, 4);
+        getAllFeedback(1, 4);
         isMine = dish!.ownerId ==
             Provider.of<UserProvider>(context, listen: false).user!.id!;
       });
@@ -216,7 +288,7 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
                                   'assets/icons/i16/bookmark-outline.png',
                                   width: 30,
                                   height: 30,
-                                  color: MyColors.white['c900']!,
+                                  color: MyColors.grey['c900']!,
                                 ),
                         ),
                       ],
@@ -596,34 +668,88 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
 
   Widget _buildFeedback() {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      MyText(
-        text: 'Thành quả của bạn',
-        fontSize: FontSize.z20,
-        fontWeight: FontWeight.w600,
-        color: MyColors.grey['c900']!,
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          totalFeedback == 0
+              ? MyText(
+                  text: 'Thành quả của bạn',
+                  fontSize: FontSize.z20,
+                  fontWeight: FontWeight.w600,
+                  color: MyColors.grey['c900']!,
+                )
+              : MyText(
+                  text: 'Thành quả của mọi người ( $totalFeedback )',
+                  fontSize: FontSize.z20,
+                  fontWeight: FontWeight.w600,
+                  color: MyColors.grey['c900']!,
+                ),
+          totalFeedback == 0
+              ? Container()
+              : IconButton(
+                  onPressed: () {
+                    listFeedbacks.clear();
+                    Navigate.pushNamed(RouterCommunity.feedback,
+                        arguments: {'dishId': dish!.id}).then((_) {
+                      getAllFeedback(1, 4);
+                    });
+                  },
+                  icon: Icon(
+                    Icons.arrow_forward,
+                    color: MyColors.grey['c900']!,
+                  ))
+        ],
       ),
-      const SizedBox(height: 20),
-      Row(children: [
-        Flexible(
-          child: MyText(
-            text:
-                'Bạn đã làm thử theo công thức này chưa? Cùng chia sẻ thành quả của mình với mọi người nhé!',
-            fontSize: FontSize.z15,
-            fontWeight: FontWeight.w400,
-            color: MyColors.grey['c900']!,
-          ),
-        ),
-        const SizedBox(width: 20),
-        Image.asset(
-          "assets/icons/i16/logo.png",
-          width: 70,
-          height: 70,
-        )
-      ]),
+      const SizedBox(height: 15),
+      listFeedbacks.isNotEmpty
+          ? feedback()
+          : Row(children: [
+              Flexible(
+                child: MyText(
+                  text:
+                      'Bạn đã làm thử theo công thức này chưa? Cùng chia sẻ thành quả của mình với mọi người nhé!',
+                  fontSize: FontSize.z15,
+                  fontWeight: FontWeight.w400,
+                  color: MyColors.grey['c900']!,
+                ),
+              ),
+              const SizedBox(width: 20),
+              Image.asset(
+                "assets/icons/i16/logo.png",
+                width: 70,
+                height: 70,
+              )
+            ]),
       const SizedBox(height: 20),
       Center(
-          child: MyButton(text: 'Gửi Feedback', width: 200, onPressed: () {})),
+          child: MyButton(
+              text: 'Gửi Feedback',
+              width: 200,
+              onPressed: () {
+                Navigator.pushNamed(context, RouterCommunity.addFeedback,
+                        arguments: {'dishId': dish!.id})
+                    .then((_) => getAllFeedback(1, 4));
+              })),
     ]);
+  }
+
+  feedback() {
+    return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: listFeedbacks
+              .map((e) => Row(
+                    children: [
+                      FeedbackCard(
+                        feedbackModel: e,
+                        type: FeedbackCardType.small,
+                      ),
+                      const SizedBox(width: 20),
+                    ],
+                  ))
+              .toList(),
+        ));
   }
 
   Widget _buildOwnerRecentDishes() {

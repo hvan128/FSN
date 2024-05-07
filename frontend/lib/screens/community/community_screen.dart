@@ -224,7 +224,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       radius: 25,
                       backgroundColor:
                           MyColors.primary['CulturalYellow']!['c600']!,
-                      backgroundImage: NetworkImage((user!.imageUrl!)),
+                      backgroundImage: user!.imageUrl == null ? null : NetworkImage((user.imageUrl!)),
                     ),
                   )
                 ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/components/account/my_food_field.dart';
 import 'package:frontend/components/account/my_saved_dish.dart';
 import 'package:frontend/models/user/user.dart';
+import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/community.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/theme/color.dart';
@@ -49,7 +50,9 @@ class _AccountScreenState extends State<AccountScreen>
           title:
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             MyIconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigate.pop();
+                },
                 icon: Image.asset('assets/icons/i16/back.png',
                     width: 25, height: 25, color: MyColors.grey['c900']!)),
             Row(

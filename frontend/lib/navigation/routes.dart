@@ -28,9 +28,7 @@ Map<String, WidgetBuilder> appRoutes = {
   RouterAuth.login: (context) => const LoginScreen(),
   RouterAuth.register: (context) => const RegisterScreen(),
   RouterAuth.createId: (context) => const CreateIdScreen(),
-  //** COMMUNITY ROUTES */
-  RouterCommunity.addDish: (context) => const AddDishScreen(),
-  RouterCommunity.dishDetail: (context) => const DishDetailScreen(),
+
   //** MY FRIDGE ROUTES */
   RouterMyFridge.addCategory: (context) => const AddCategoryScreen(),
   RouterMyFridge.addCategoryDetail: (context) => const AddCategoryDetailScreen(),
@@ -41,6 +39,7 @@ Map<String, WidgetBuilder> appRoutes = {
   ...settingRoutes,
   ...todoRoutes,
   ...accountRoutes,
+  ...communityRoutes,
   
 };
 

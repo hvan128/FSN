@@ -118,6 +118,7 @@ class Feel {
   int? type;
   int? userId;
   int? dishId;
+  int? feedbackId;
   DateTime? createdAt;
   DateTime? updatedAt;
 
@@ -127,6 +128,7 @@ class Feel {
     this.userId,
     this.dishId,
     this.createdAt,
+    this.feedbackId,
     this.updatedAt,
   });
 
@@ -136,6 +138,7 @@ class Feel {
       type: json['type'],
       userId: json['userId'],
       dishId: json['dishId'],
+      feedbackId: json['feedbackId'],
       createdAt: json['createdAt'] != null
           ? FunctionCore.convertTime(json['createdAt'])
           : null,
@@ -150,6 +153,7 @@ class Feel {
       'type': type,
       'userId': userId,
       'dishId': dishId,
+      'feedbackId': feedbackId,
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
@@ -217,3 +221,77 @@ class StepModel {
     };
   }
 }
+
+List<Feel> feelsFromJson(dynamic str) =>
+    List<Feel>.from((str).map((x) => Feel.fromJson(x)));
+
+class FeedbackModel {
+  int? id;
+  int? userId;
+  int? dishId;
+  int? rating;
+  String? content;
+  String? image;
+  String? originalDish;
+  String? ownerDish;
+  String? ownerDishImage;
+  List<Feel>? feels;
+  DateTime? createdAt;
+  DateTime? updatedAt;
+
+  FeedbackModel({
+    this.id,
+    this.userId,
+    this.dishId,
+    this.rating,
+    this.content,
+    this.originalDish,
+    this.ownerDish,
+    this.ownerDishImage,
+    this.image,
+    this.feels,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory FeedbackModel.fromJson(Map<String, dynamic> json) {
+    return FeedbackModel(
+      id: json['id'],
+      userId: json['userId'],
+      dishId: json['dishId'],
+      rating: json['rating'],
+      content: json['content'],
+      originalDish: json['originalDish'],
+      ownerDishImage: json['ownerDishImage'],
+      ownerDish: json['ownerDish'],
+      feels: json['feels'] != null ? feelsFromJson(json['feels']) : null,
+      image: json['image'],
+      createdAt: json['createdAt'] != null
+          ? FunctionCore.convertTime(json['createdAt'])
+          : null,
+      updatedAt: json['updatedAt'] != null
+          ? FunctionCore.convertTime(json['updatedAt'])
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'dishId': dishId,
+      'rating': rating,
+      'originalDish': originalDish,
+      'ownerDish': ownerDish,
+      'ownerDishImage': ownerDishImage,
+      'content': content,
+      'image': image,
+      'feels': feels?.map((x) => x.toJson()).toList(),
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
+    };
+  }
+}
+
+List<FeedbackModel> feedbacksFromJson(dynamic str) =>
+    List<FeedbackModel>.from((str).map((x) => FeedbackModel.fromJson(x)));
