@@ -11,7 +11,7 @@ const storage = diskStorage({
 });
 
 const fileFilter = (req, file, callback) => {
-  const acceptableExtensions = [".png", ".jpg", ".mp4"];
+  const acceptableExtensions = [".png", ".jpg", ".mp4", ".mov", ".jpeg", "webp"];
   if (!acceptableExtensions.includes(extname(file.originalname))) {
     return callback(new Error("Only .png, .jpg and .jpeg format allowed!"));
   }
@@ -27,7 +27,7 @@ const fileFilter = (req, file, callback) => {
 let upload = multer({
   storage: storage,
   fileFilter: fileFilter,
-  fileSize: 5048576, // 10 Mb
+  fileSize: 1048576, 
 });
 
 export default upload;

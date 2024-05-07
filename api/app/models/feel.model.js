@@ -1,9 +1,10 @@
 import db from "../common/connect.js";
 class Feel {
-    constructor(type, userId, dishId, createdAt, updatedAt, id) {
+    constructor(type, userId, dishId, feedbackId, createdAt, updatedAt, id) {
         this.type = type;
         this.userId = userId;
         this.dishId = dishId;
+        this.feedbackId = feedbackId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.id = id;
@@ -24,6 +25,18 @@ Feel.create = (data, result) => {
 
 Feel.findByDishId = (dishId, result) => {
     db.query('SELECT * FROM feel WHERE dishId = ?', [dishId], (err, res) => {
+        if (err) {
+            console.log(err);
+            result(err, null);
+            return;
+        } else {
+            result(null, res);
+        }
+    })
+}
+
+Feel.findByFeedbackId = (feedbackId, result) => {
+    db.query('SELECT * FROM feel WHERE feedbackId = ?', [feedbackId], (err, res) => {
         if (err) {
             console.log(err);
             result(err, null);

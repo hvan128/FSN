@@ -1,6 +1,7 @@
 import * as dishController from "../controllers/dish.controller.js";
 import * as feelController from "../controllers/feel.controller.js";
 import * as saveController from "../controllers/save.controller.js";
+import * as feedbackController from "../controllers/feedback.controller.js";
 
 export default (router) => {
   router.get("/api/v1/community/dish", function (req, res, next) {
@@ -19,6 +20,10 @@ export default (router) => {
     dishController.getSavedDishesByUserId(req, res, next);
   })
 
+  router.get("/api/v1/community/dish/feedback/:id", function (req, res, next) {
+    feedbackController.getFeedbackByDishId(req, res, next);
+  })
+
   router.post("/api/v1/community/dish", function (req, res, next) {
     dishController.createDish(req, res, next);
   });
@@ -31,12 +36,16 @@ export default (router) => {
     feelController.createFeel(req, res, next);
   })
 
-  router.post("/api/v1/community/dish/save", function (req, res, next) {
+  router.post("/api/v1/community/dish/save", function (req, res, next) {  
     saveController.createSave(req, res, next);
   })
 
   router.post("/api/v1/community/dish/unsaved", function (req, res, next) {
     saveController.unSaved(req, res, next);
+  })
+
+  router.post("/api/v1/community/dish/feedback", function (req, res, next) {
+    feedbackController.create(req, res, next);
   })
 
   router.delete("/api/v1/community/dish/feel/:id", function (req, res, next) {

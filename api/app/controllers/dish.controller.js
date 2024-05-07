@@ -18,6 +18,7 @@ var dishUpload = upload.fields([
 export const createDish = (req, res, next) => {
   dishUpload(req, res, (err) => {
     if (err) {
+      console.log(err);
       next(err);
     } else {
       var body = req.body;
