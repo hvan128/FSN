@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/card/food_card.dart';
+import 'package:frontend/components/card/food_card_loading.dart';
 import 'package:frontend/components/community/my_kitchen_dishes.dart';
 import 'package:frontend/models/community/dish.dart';
 import 'package:frontend/provider/user.dart';
@@ -10,6 +11,7 @@ import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/widgets/text.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
@@ -98,7 +100,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
                           const SizedBox(
                             height: 20,
                           ),
-                          Wrap(
+                          dishes.isEmpty
+                              ? loading()
+                              : Wrap(
                                   spacing: 8,
                                   runSpacing: 16,
                                   children: [
@@ -116,12 +120,12 @@ class _CommunityScreenState extends State<CommunityScreen> {
                           hasMore
                               ? const Center(child: CircularProgressIndicator())
                               : Center(
-                                child: MyText(
-                                    text: 'Không còn món nào nữa',
-                                    fontSize: FontSize.z18,
-                                    fontWeight: FontWeight.w600,
-                                    color: MyColors.grey['c800']!),
-                              ),
+                                  child: MyText(
+                                      text: 'Không còn món nào nữa',
+                                      fontSize: FontSize.z18,
+                                      fontWeight: FontWeight.w600,
+                                      color: MyColors.grey['c800']!),
+                                ),
                           const SizedBox(
                             height: 30,
                           )
@@ -224,7 +228,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       radius: 25,
                       backgroundColor:
                           MyColors.primary['CulturalYellow']!['c600']!,
-                      backgroundImage: user!.imageUrl == null ? null : NetworkImage((user.imageUrl!)),
+                      backgroundImage: user!.imageUrl == null
+                          ? null
+                          : NetworkImage((user.imageUrl!)),
                     ),
                   )
                 ],
@@ -232,5 +238,23 @@ class _CommunityScreenState extends State<CommunityScreen> {
             )),
       ),
     ]);
+  }
+
+  loading() {
+    return Shimmer.fromColors(
+      baseColor: Colors.black,
+      highlightColor: MyColors.white['c900']!,
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 16,
+        children: [
+          ...List.generate(
+              4,
+              (index) => const FoodCardLoading(
+                    type: CardType.small,
+                  )).toList(),
+        ],
+      ),
+    );
   }
 }

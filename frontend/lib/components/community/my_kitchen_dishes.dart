@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/card/food_card.dart';
+import 'package:frontend/components/card/food_card_loading.dart';
 import 'package:frontend/components/item/item_ingredient.dart';
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/models/community/dish.dart';
@@ -9,6 +10,7 @@ import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/utils/functions_core.dart';
 import 'package:frontend/widgets/text.dart';
+import 'package:shimmer/shimmer.dart';
 
 class MyKitchenDishes extends StatefulWidget {
   const MyKitchenDishes({super.key});
@@ -118,40 +120,41 @@ class _MyKitchenDishesState extends State<MyKitchenDishes> {
           height: 20,
         ),
         SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: dishes != null && dishes!.isNotEmpty
-              ? Row(children: [
-                  ...dishes!
-                      .map((e) => Row(
-                            children: [
-                              FoodCard(
-                                dish: e,
-                              ),
-                              const SizedBox(width: 10),
-                            ],
-                          ))
-                      .toList(),
-                  const SizedBox(width: 10),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(100),
-                            border: Border.all(
-                              color: MyColors.grey['c300']!,
-                            )),
-                        child: Image.asset('assets/icons/i16/arrow-left.png',
-                            width: 25,
-                            height: 25,
-                            color: MyColors.grey['c700']!),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(width: 20),
-                ])
-              : Container(),
-        ),
+                scrollDirection: Axis.horizontal,
+                child: dishes != null && dishes!.isNotEmpty
+                    ? Row(children: [
+                        ...dishes!
+                            .map((e) => Row(
+                                  children: [
+                                    FoodCard(
+                                      dish: e,
+                                    ),
+                                    const SizedBox(width: 10),
+                                  ],
+                                ))
+                            .toList(),
+                        const SizedBox(width: 10),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(100),
+                                  border: Border.all(
+                                    color: MyColors.grey['c300']!,
+                                  )),
+                              child: Image.asset(
+                                  'assets/icons/i16/arrow-left.png',
+                                  width: 25,
+                                  height: 25,
+                                  color: MyColors.grey['c700']!),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 20),
+                      ])
+                    : loading(),
+              ),
         const SizedBox(
           height: 20,
         ),
@@ -192,6 +195,23 @@ class _MyKitchenDishesState extends State<MyKitchenDishes> {
           height: 20,
         )
       ]),
+    );
+  }
+
+  loading() {
+    return Shimmer.fromColors(
+      baseColor: Colors.black,
+      highlightColor: MyColors.white['c900']!,
+      child: Row(
+        children: [
+          ...List.generate(4, (index) => const Row(
+            children: [
+              FoodCardLoading(),
+              SizedBox(width: 10),
+            ],
+          )).toList(),
+        ]
+      ),
     );
   }
 }
