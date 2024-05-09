@@ -17,7 +17,17 @@ Step.create = (data, result) => {
       return;
     }
   });
-}; 
+};
+
+Step.deleteStepByDishId = (dishId, result) => {
+  db.query("DELETE FROM step WHERE dishId = ?", [dishId], (err, res) => {
+    if (err) {
+      console.log(err);
+      result(err, null);
+      return;
+    }
+  });
+};
 
 Step.getStepsByDishId = (dishId, result) => {
   console.log(dishId);

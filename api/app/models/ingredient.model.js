@@ -19,6 +19,16 @@ Ingredient.create = (data, result) => {
   });
 };
 
+Ingredient.deleteIngredientByDishId = (dishId, result) => {
+  db.query("DELETE FROM ingredient WHERE dishId = ?", [dishId], (err, res) => {
+    if (err) {
+      console.log(err);
+      result(err, null);
+      return;
+    }
+  });
+}
+
 Ingredient.getIngredientsByDishId = (dishId, result) => {
   db.query(
     "SELECT * FROM ingredient WHERE dishId = ?",

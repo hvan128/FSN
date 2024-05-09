@@ -44,7 +44,6 @@ Dish.create = (data, result) => {
     cookingTime,
     rangeOfPeople
   );
-  console.log(dish);
 
   db.query("INSERT INTO dish SET ?", dish, (err, res) => {
     if (err) {
@@ -66,7 +65,8 @@ Dish.create = (data, result) => {
       for (let i = 0; i < ingredients.length; i++) {
         Ingredient.create(
           {
-            category: ingredients[i].category,
+            value: ingredients[i].value,
+            label: ingredients[i].label,
             quantity: ingredients[i].quantity,
             unit: ingredients[i].unit,
             dishId: res.insertId,
@@ -76,6 +76,65 @@ Dish.create = (data, result) => {
       }
 
       result(null, { id: res.insertId, ...dish });
+    }
+  });
+};
+
+Dish.update = (data, result) => {
+  const {
+    ownerId,
+    cookingTime,
+    label,
+    image,
+    description,
+    ingredients,
+    steps,
+    rangeOfPeople,
+    id,
+  } = data;
+
+  const dish = new Dish(
+    ownerId,
+    label,
+    description,
+    image,
+    cookingTime,
+    rangeOfPeople,
+    id
+  );
+
+  db.query("UPDATE dish SET ? WHERE id = ?", [dish, id], (err, res) => {
+    if (err) {
+      console.log(err);
+      result(err, null);
+      return;
+    } else {
+      Step.deleteStepByDishId(id, result);
+      Ingredient.deleteIngredientByDishId(id, result);
+      for (let i = 0; i < steps.length; i++) {
+        Step.create(
+          {
+            no: steps[i].no,
+            description: steps[i].description,
+            dishId: id,
+            image: steps[i].image,
+          },
+          result
+        );
+      }
+      for (let i = 0; i < ingredients.length; i++) {
+        Ingredient.create(
+          {
+            value: ingredients[i].value,
+            label: ingredients[i].label,
+            quantity: ingredients[i].quantity,
+            unit: ingredients[i].unit,
+            dishId: id,
+          },
+          result
+        );
+      }
+      result(null, dish);
     }
   });
 };
@@ -375,7 +434,7 @@ Dish.getAllDish = (page, pageSize, result) => {
   });
 };
 
-Dish.getSavedDishesByUserId =(userId, page, pageSize, callback) => {
+Dish.getSavedDishesByUserId = (userId, page, pageSize, callback) => {
   const offset = (page - 1) * pageSize;
 
   const countQuery = `SELECT COUNT(*) AS total FROM saved_dish WHERE userId = ${userId}`;
@@ -425,6 +484,6 @@ Dish.getSavedDishesByUserId =(userId, page, pageSize, callback) => {
       }
     });
   });
-}
+};
 
 export default Dish;

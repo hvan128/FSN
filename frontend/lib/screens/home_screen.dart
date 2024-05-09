@@ -4,13 +4,13 @@ import 'package:frontend/screens/community/community_screen.dart';
 import 'package:frontend/screens/my_fridge/my_fridge_screen.dart';
 import 'package:frontend/screens/report/report_screen.dart';
 import 'package:frontend/screens/to_do/shopping_list_screen.dart';
-import 'package:frontend/screens/to_do/to_do_screen.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/widgets/text.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final int? tabIndex;
+  const HomeScreen({super.key, this.tabIndex});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -19,6 +19,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   bool _isShowBottomBar = true;
+  @override
+  void initState() {
+    super.initState();
+    if (widget.tabIndex != null) {
+      _currentIndex = widget.tabIndex!;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

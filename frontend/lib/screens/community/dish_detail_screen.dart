@@ -171,77 +171,98 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
           SliverAppBar(
               expandedHeight: 300,
               pinned: true,
-              title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    MyIconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: Image.asset('assets/icons/i16/back.png',
-                            width: 25,
-                            height: 25,
-                            color: MyColors.grey['c900']!)),
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            showModalBottomSheet(
-                                context: context,
-                                builder: (context) {
-                                  return MyNotification(
-                                    description:
-                                        'Thêm tất cả các nguyên liệu vào danh sách mua sắm. Các món ăn đã có trong danh sách sẽ không được thêm vào.',
-                                    notificationType: NotificationType.info,
-                                    title: 'Thêm nhanh',
-                                    btnList: [
-                                      MyButton(
-                                        text: 'Đồng ý',
-                                        onPressed: () =>
-                                            flashAddToShoppingList(context),
-                                      ),
-                                      MyButton(
-                                          text: 'Quay lại danh sách',
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          })
-                                    ],
-                                  );
-                                });
-                          },
-                          child: Image.asset(
-                            'assets/icons/i16/flash-auto.png',
-                            width: 26,
-                            height: 26,
-                            color: MyColors.grey['c900'],
-                          ),
-                        ),
-                        const SizedBox(width: 20),
-                        MyIconButton(
+              leading: MyIconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: Image.asset('assets/icons/i16/back.png',
+                      width: 25, height: 25, color: MyColors.grey['c900']!)),
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return MyNotification(
+                            description:
+                                'Thêm tất cả các nguyên liệu vào danh sách mua sắm. Các món ăn đã có trong danh sách sẽ không được thêm vào.',
+                            notificationType: NotificationType.info,
+                            title: 'Thêm nhanh',
+                            btnList: [
+                              MyButton(
+                                text: 'Đồng ý',
+                                onPressed: () =>
+                                    flashAddToShoppingList(context),
+                              ),
+                              MyButton(
+                                  text: 'Quay lại danh sách',
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  })
+                            ],
+                          );
+                        });
+                  },
+                  icon: Image.asset(
+                    'assets/icons/i16/flash-auto.png',
+                    width: 26,
+                    height: 26,
+                    color: MyColors.grey['c900'],
+                  ),
+                ),
+                IconButton(
+                    onPressed: () {},
+                    icon: Image.asset('assets/icons/i16/camera.png',
+                        width: 25, height: 25, color: MyColors.grey['c900']!)),
+                isMine
+                    ? SubmenuButton(
+                        menuChildren: <Widget>[
+                          MenuItemButton(
                             onPressed: () {},
-                            icon: Image.asset('assets/icons/i16/camera.png',
+                            child: const MenuAcceleratorLabel('&Xóa món ăn'),
+                          ),
+                          MenuItemButton(
+                            onPressed: () {
+                              Navigate.pushNamed(RouterCommunity.addDish, arguments: {
+                                'dish': dish,
+                                'type': 'edit',
+                              } );
+                            },
+                            child:
+                                const MenuAcceleratorLabel('&Chỉnh sửa món ăn'),
+                          ),
+                          MenuItemButton(
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Quit!'),
+                                ),
+                              );
+                            },
+                            child: const MenuAcceleratorLabel('&Quit'),
+                          ),
+                        ],
+                        child: Icon(
+                          Icons.more_vert,
+                          color: MyColors.grey['c900']!,
+                        ),
+                      )
+                    : IconButton(
+                        onPressed: onSave,
+                        icon: isSaved
+                            ? Image.asset(
+                                'assets/icons/i16/save-book-mark.png',
+                                width: 25,
+                                height: 25,
+                                color: MyColors
+                                    .primary['CulturalYellow']!['c700']!,
+                              )
+                            : Image.asset(
+                                'assets/icons/i16/bookmark-outline.png',
                                 width: 25,
                                 height: 25,
                                 color: MyColors.grey['c900']!)),
-                        const SizedBox(width: 20),
-                        MyIconButton(
-                            onPressed: onSave,
-                            icon: isSaved
-                                ? Image.asset(
-                                    'assets/icons/i16/save-book-mark.png',
-                                    width: 25,
-                                    height: 25,
-                                    color: MyColors
-                                        .primary['CulturalYellow']!['c700']!,
-                                  )
-                                : Image.asset(
-                                    'assets/icons/i16/bookmark-outline.png',
-                                    width: 25,
-                                    height: 25,
-                                    color: MyColors.grey['c900']!)),
-                      ],
-                    ),
-                  ]),
+              ],
               automaticallyImplyLeading: false,
               backgroundColor: MyColors.white['c900']!,
               flexibleSpace: FlexibleSpaceBar(
