@@ -491,11 +491,13 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
                           const SizedBox(width: 5),
                           MyText(
                             text: allCategories
-                                .firstWhere(
-                                    (category) =>
-                                        category.value == ingredient.category,
-                                    orElse: () => Category())
-                                .label!,
+                                    .firstWhere(
+                                        (category) =>
+                                            category.value == ingredient.value,
+                                        orElse: () => Category())
+                                    .label ??
+                                ingredient.label ??
+                                '',
                             fontSize: FontSize.z17,
                             fontWeight: FontWeight.w400,
                             color: MyColors.grey['c800']!,
@@ -801,36 +803,46 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
 
   void flashAddToShoppingList(BuildContext context) async {
     Loading.showLoading();
-    final List<String> categories =
-        dish!.ingredients!.map((e) => e.category!).toList();
+    final List<Ingredient> ingredients = dish!.ingredients!;
     final fridgeId =
         Provider.of<UserProvider>(context, listen: false).user!.fridgeId!;
-    for (var item in categories) {
-      final category =
-          allCategories.firstWhere((element) => element.value == item);
-      List<Category> categories =
-          await CategoryService().getCategoriesByPosition(positionId: 0);
-      bool isExist = false;
-
-      for (var item in categories) {
-        if (item.value == category.value) {
-          isExist = true;
-          break;
+    for (var item in ingredients) {
+      final category = allCategories.firstWhere(
+          (element) => element.value == item.value,
+          orElse: () => Category());
+      final int length = await CategoryService().getShoppingListLength();
+      if (category.value != null) {
+        bool isExist = await checkCategoryIsExist(category.value!);
+        if (!isExist) {
+          await ApiService.post(Config.CATEGORIES_API, {
+            'label': category.label,
+            'type': category.type,
+            'icon': category.icon,
+            'value': category.value,
+            'fridgeId': fridgeId,
+            'positionId': 0,
+            'no': length + 1
+          });
+          await APICacheManager().deleteCache('categories_0');
+        }
+      } else {
+        final newCategory = Category(
+          label: item.label,
+          value: item.value,
+        );
+        bool isExist = await checkCategoryIsExist(newCategory.value!);
+        if (!isExist) {
+          await ApiService.post(Config.CATEGORIES_API, {
+            'label': newCategory.label,
+            'value': newCategory.value,
+            'fridgeId': fridgeId,
+            'positionId': 0,
+            'no': length + 1
+          });
+          await APICacheManager().deleteCache('categories_0');
         }
       }
-      if (!isExist) {
-        await ApiService.post(Config.CATEGORIES_API, {
-          'label': category.label,
-          'type': category.type,
-          'icon': category.value,
-          'value': category.value,
-          'fridgeId': fridgeId,
-          'positionId': 0,
-          'no': categories.length + 1
-        });
-      }
     }
-    await APICacheManager().deleteCache('categories_0');
     await APICacheManager().deleteCache('categories');
     Loading.hideLoading();
     Navigate.pop();

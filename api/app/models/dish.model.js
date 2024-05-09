@@ -240,7 +240,7 @@ Dish.findByIngredients = (ingredient1, ingredient2, page, pageSize, result) => {
   const offset = (page - 1) * pageSize;
 
   db.query(
-    `SELECT DISTINCT dishId FROM ingredient WHERE category = '${ingredient1}'`,
+    `SELECT DISTINCT dishId FROM ingredient WHERE value = '${ingredient1}'`,
     (err, res1) => {
       if (err) {
         console.log(err);
@@ -249,7 +249,7 @@ Dish.findByIngredients = (ingredient1, ingredient2, page, pageSize, result) => {
       }
 
       db.query(
-        `SELECT DISTINCT dishId FROM ingredient WHERE category = '${ingredient2}'`,
+        `SELECT DISTINCT dishId FROM ingredient WHERE value = '${ingredient2}'`,
         (err, res2) => {
           if (err) {
             console.log(err);

@@ -9,6 +9,18 @@ import 'package:frontend/widgets/loading.dart';
 import 'package:intl/intl.dart';
 
 class FunctionCore {
+  static String convertToSlug(String text) {
+    text = text.replaceAll(RegExp(r'[àáạảãâầấậẩẫăằắặẳẵ]'), 'a');
+    text = text.replaceAll(RegExp(r'[èéẹẻẽêềếệểễ]'), 'e');
+    text = text.replaceAll(RegExp(r'[ìíịỉĩ]'), 'i');
+    text = text.replaceAll(RegExp(r'[òóọỏõôồốộổỗơờớợởỡ]'), 'o');
+    text = text.replaceAll(RegExp(r'[ùúụủũưừứựửữ]'), 'u');
+    text = text.replaceAll(RegExp(r'[ỳýỵỷỹ]'), 'y');
+    text = text.replaceAll(RegExp(r'[đ]'), 'd');
+
+    return text.toLowerCase().replaceAll(RegExp(r'[^a-z0-9-]+'), '-');
+  }
+
   static showSnackBar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -25,7 +37,8 @@ class FunctionCore {
       ),
     );
   }
-  static List<Item> getUnitList(String type) {
+
+  static List<Item> getUnitList(String? type) {
     switch (type) {
       case 'fruits':
         return [
@@ -483,11 +496,12 @@ class FunctionCore {
   static String convertImageUrl(String url) {
     return 'http://${Config.API_URL}/uploads/$url';
   }
-   
+
   static DateTime convertTime(String time) {
     DateTime date = DateFormat("yyyy-MM-ddTHH:mm:ss.SSS'Z'").parseUtc(time);
     return date;
   }
+
   static String formatDate(DateTime date) {
     return 'Vào lúc ${date.hour}:${date.minute} ngày ${date.day} tháng ${date.month} năm ${date.year}';
   }

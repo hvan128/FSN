@@ -2,15 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
-import 'package:flutter/widgets.dart';
 import 'package:frontend/components/modals/notification_modal.dart';
-import 'package:frontend/config.dart';
 import 'package:frontend/models/category/category.dart';
-import 'package:frontend/services/api_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/food.dart';
-import 'package:frontend/utils/icons.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/divider.dart';
 import 'package:frontend/widgets/header.dart';
@@ -410,7 +406,7 @@ class _DragNDropList extends State<DragNDropList> {
                                     Expanded(
                                       child: ListTile(
                                         leading: Image.asset(
-                                          allIcons[item.category.value]!,
+                                          item.category.icon!,
                                           width: 40,
                                           height: 40,
                                           color: item.isDeleted
@@ -423,7 +419,6 @@ class _DragNDropList extends State<DragNDropList> {
                                           item.category.label!,
                                           style: item.isDeleted
                                               ? const TextStyle(
-                                                  // color: MyColors.grey['c500']!,
                                                   decoration: TextDecoration
                                                       .lineThrough,
                                                   fontSize: FontSize.z14)

@@ -164,19 +164,22 @@ List<Ingredient> ingredientsFromJson(dynamic str) =>
     List<Ingredient>.from((str).map((x) => Ingredient.fromJson(x)));
 
 class Ingredient {
-  String? category;
+  String? value;
+  String? label;
   int? quantity;
   String? unit;
 
   Ingredient({
-    this.category,
+    this.value,
+    this.label,
     this.quantity,
     this.unit,
   });
 
   factory Ingredient.fromJson(Map<String, dynamic> json) {
     return Ingredient(
-      category: json['category'],
+      value: json['value'],
+      label: json['label'],
       quantity: json['quantity'],
       unit: json['unit'],
     );
@@ -184,7 +187,8 @@ class Ingredient {
 
   Map<String, dynamic> toJson() {
     return {
-      'category': category,
+      'value': value,
+      'label': label,
       'quantity': quantity,
       'unit': unit,
     };

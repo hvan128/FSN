@@ -15,7 +15,6 @@ import 'package:frontend/services/category/category_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/utils/functions_core.dart';
-import 'package:frontend/utils/icons.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/header.dart';
 import 'package:frontend/widgets/text.dart';
@@ -90,33 +89,38 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
         await Navigator.push(context, MaterialPageRoute(builder: (context) {
       return const SearchScreen(type: SearchType.shoppingList);
     }));
-    if (checkCategoryIsExist(result)) {
+    if (result == null) {
       Loading.hideLoading();
-      showDialog(
-          context: context,
-          builder: (context) => MyAlert(
-                alertType: AlertType.error,
-                description: '${result.label} đã tồn tại trong danh sách',
-                title: 'Vui lòng chọn danh mục khác',
-              ));
-      return;
     } else {
-      allCategories.add(result);
-      final fridgeId =
-          Provider.of<UserProvider>(context, listen: false).user!.fridgeId!;
-      await ApiService.post(Config.CATEGORIES_API, {
-        'label': result.label,
-        'type': result.type,
-        'icon': result.value,
-        'value': result.value,
-        'fridgeId': fridgeId,
-        'positionId': 0,
-        'no': allCategories.length + 1
-      });
-      await APICacheManager().deleteCache('categories_0');
-      await APICacheManager().deleteCache('categories');
-      Loading.hideLoading();
-      getAllCategories();
+      if (checkCategoryIsExist(result)) {
+        Loading.hideLoading();
+        showDialog(
+            context: context,
+            builder: (context) => MyAlert(
+                  alertType: AlertType.error,
+                  description:
+                      '${result.label} đã tồn tại trong danh sách',
+                  title: 'Vui lòng chọn danh mục khác',
+                ));
+        return;
+      } else {
+        allCategories.add(result);
+        final fridgeId =
+            Provider.of<UserProvider>(context, listen: false).user!.fridgeId!;
+        await ApiService.post(Config.CATEGORIES_API, {
+          'label': result.label,
+          'type': result.type,
+          'icon': result.icon,
+          'value': result.value,
+          'fridgeId': fridgeId,
+          'positionId': 0,
+          'no': allCategories.length + 1
+        });
+        await APICacheManager().deleteCache('categories_0');
+        await APICacheManager().deleteCache('categories');
+        Loading.hideLoading();
+        getAllCategories();
+      }
     }
   }
 
@@ -344,7 +348,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                 Expanded(
                   child: ListTile(
                     leading: Image.asset(
-                      allIcons[item.value]!,
+                      item.icon != null ? item.icon! : 'assets/icons/i16/image-default.png',
                       width: 40,
                       height: 40,
                       color: item.completed! == 1
@@ -625,7 +629,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
         await ApiService.post(Config.CATEGORIES_API, {
           'label': item.label,
           'type': item.type,
-          'icon': item.value,
+          'icon': item.icon,
           'value': item.value,
           'fridgeId': fridgeId,
           'positionId': 0,

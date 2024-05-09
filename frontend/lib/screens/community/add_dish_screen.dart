@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:frontend/components/community/image_picker.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
 import 'package:frontend/components/modals/notification_modal.dart';
@@ -294,12 +293,7 @@ class _AddDishScreenState extends State<AddDishScreen> {
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
         MyIconButton(
-          icon: Image.asset(
-            'assets/icons/i16/dots-horizontal.png',
-            width: 24,
-            height: 24,
-            color: MyColors.grey['c300'],
-          ),
+          icon: Icon(Icons.delete, color: MyColors.grey['c700']!),
           onPressed: () {
             setState(() {
               ingredientsList.removeAt(index);
@@ -334,10 +328,12 @@ class _AddDishScreenState extends State<AddDishScreen> {
                   final text = allCategories
                       .firstWhere(
                           (element) =>
-                              element.value == ingredientsList[index].category,
+                              element.value == ingredientsList[index].value,
                           orElse: () => Category())
                       .label;
-                  controller.text = text ?? '';
+                  if (text != null) {
+                    controller.text = text;
+                  } 
                   return TextField(
                       minLines: 1,
                       maxLines: 10,
@@ -345,6 +341,10 @@ class _AddDishScreenState extends State<AddDishScreen> {
                       controller: controller,
                       focusNode: focusNode,
                       onEditingComplete: onEditingComplete,
+                      onChanged: (value) {
+                        ingredientsList[index].label = controller.text;
+                        ingredientsList[index].value = FunctionCore.convertToSlug(controller.text);
+                      },
                       style: TextStyle(
                           color: MyColors.grey['c600']!,
                           fontSize: FontSize.z16,
@@ -375,25 +375,35 @@ class _AddDishScreenState extends State<AddDishScreen> {
                               width: 225,
                               height: 225,
                               child: ListView.builder(
-                                  itemCount: options.length,
+                                  itemCount: options.length + 1,
                                   itemBuilder: (context, i) {
-                                    final option = options.elementAt(i);
-                                    return GestureDetector(
-                                      onTap: () {
-                                        onSelected(option);
-                                        ingredientsList[index].category =
-                                            option.value;
-                                      },
-                                      child: ListTile(
-                                        title: Text(option.label!),
-                                        leading: Image.asset(
-                                          option.icon!,
-                                          width: 40,
-                                          height: 40,
-                                          fit: BoxFit.cover,
+                                    if (i < options.length) {
+                                      final option = options.elementAt(i);
+                                      return GestureDetector(
+                                        onTap: () {
+                                          onSelected(option);
+                                          ingredientsList[index].value =
+                                              option.value;
+                                        },
+                                        child: ListTile(
+                                          title: Text(option.label!),
+                                          leading: Image.asset(
+                                            option.icon!,
+                                            width: 40,
+                                            height: 40,
+                                            fit: BoxFit.cover,
+                                          ),
                                         ),
-                                      ),
-                                    );
+                                      );
+                                    } else {
+                                      return GestureDetector(
+                                        onTap: () {},
+                                        child: const ListTile(
+                                          title: Text('Thêm mới'),
+                                          leading: Icon(Icons.add),
+                                        ),
+                                      );
+                                    }
                                   }))));
                 },
                 optionsBuilder: (TextEditingValue textEditingValue) {
@@ -609,6 +619,10 @@ class _AddDishScreenState extends State<AddDishScreen> {
   }
 
   void onAddDish() async {
+    print(ingredientsList);
+    for (var i = 0; i < ingredientsList.length; i++) {
+      print(ingredientsList[i].toJson());
+    }
     for (var i = 0; i < listStepsModel.length; i++) {
       listStepsModel[i].no = i + 1;
     }

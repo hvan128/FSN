@@ -400,7 +400,7 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
     await ApiService.post(Config.CATEGORIES_API, {
       'label': widget.category!.label,
       'value': widget.category!.value,
-      'icon': widget.category!.value,
+      'icon': widget.category!.icon,
       'type': widget.category!.type,
       'quantity': quantity,
       'unit': unit,

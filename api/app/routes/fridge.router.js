@@ -17,8 +17,6 @@ export default (router) => {
     })
 
     router.delete('/api/v1/fridge/:id', function(req, res, next) {
-        // User.deleteFridge(req, res, next);
-        // Category.deleteCategoryByFridgeId(req, res, next);
         Fridge.deleteFridge(req, res, next);
     })
 }

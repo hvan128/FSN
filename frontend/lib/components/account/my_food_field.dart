@@ -3,14 +3,12 @@ import 'package:frontend/components/card/food_card.dart';
 import 'package:frontend/models/community/dish.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/account.dart';
-import 'package:frontend/provider/user.dart';
 import 'package:frontend/services/community/dish_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_icon.dart';
 import 'package:frontend/widgets/text.dart';
-import 'package:provider/provider.dart';
 
 class MyFoodField extends StatefulWidget {
   final int userId;

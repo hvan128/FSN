@@ -31,7 +31,7 @@ class ItemIngredient extends StatelessWidget {
                     color: MyColors.white['c900']!,
                     borderRadius: BorderRadius.circular(50),
                   ),
-                  child: Image.asset(allIcons[category.value!]!,
+                  child: Image.asset(category.icon!,
                       width: 20, height: 20))
               : Container(
                   decoration: BoxDecoration(

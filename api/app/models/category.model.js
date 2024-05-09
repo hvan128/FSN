@@ -48,6 +48,18 @@ Category.create = (data, result) => {
   });
 };
 
+Category.createNewCategory = (data, result) => {
+  db.query("INSERT INTO new_category SET ?", data, (err, res) => {
+    if (err) {
+      console.log(err);
+      result(err, null);
+      return;
+    } else {
+      result(null, { id: res.insertId, ...data });
+    }
+  });
+}
+
 /!* Get all Categories */;
 Category.getAllCategoryInFridge = (fridgeId, result) => {
   db.query(
@@ -90,6 +102,20 @@ Category.findByPositionId = ({ positionId, fridgeId }, result) => {
     }
   );
 };
+
+Category.getNewCategoryByFridgeId = (fridgeId, result) => {
+  db.query(
+    `SELECT * FROM new_category WHERE fridgeId = ${fridgeId}`,
+    (err, res) => {
+      if (err) {
+        console.log(err);
+        result(err, null);
+      } else {
+        result(null, res);
+      }
+    }
+  );
+}
 
 /!* Update Category */;
 Category.update = (data, result) => {

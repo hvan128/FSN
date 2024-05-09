@@ -14,7 +14,7 @@ class CategoryItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final duration = category.expiryDate!.difference(DateTime.now()).inDays;
-    final icon = allIcons[category.icon] ?? 'assets/icons/i16/logo.png';
+    final icon = category.icon ?? 'assets/icons/i16/logo.png';
     return Stack(children: [
       Padding(
         padding: const EdgeInsets.all(2.0),

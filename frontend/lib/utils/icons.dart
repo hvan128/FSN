@@ -478,21 +478,21 @@ Map<String, String> etcIcons = {
   'vitamin': 'assets/icons/etc/vitamin.png',
 };
 
-Map<String, String> allIcons = {
-  ...foodIcons,
-  ...fruitIcons,
-  ...vegetableIcons,
-  ...meatIcons,
-  ...seafoodIcons,
-  ...dishIcons,
-  ...dairyProductsIcons,
-  ...drinksIcons,
-  ...alcoholIcons,
-  ...saucesIcons,
-  ...spicesIcons,
-  ...breadIcons,
-  ...dessertIcons,
-  ...nutIcons,
-  ...cerealIcons,
-  ...etcIcons
-};
+// Map<String, String> allIcons = {
+//   ...foodIcons,
+//   ...fruitIcons,
+//   ...vegetableIcons,
+//   ...meatIcons,
+//   ...seafoodIcons,
+//   ...dishIcons,
+//   ...dairyProductsIcons,
+//   ...drinksIcons,
+//   ...alcoholIcons,
+//   ...saucesIcons,
+//   ...spicesIcons,
+//   ...breadIcons,
+//   ...dessertIcons,
+//   ...nutIcons,
+//   ...cerealIcons,
+//   ...etcIcons
+// };

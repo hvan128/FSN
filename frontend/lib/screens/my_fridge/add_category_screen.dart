@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/item/item_food.dart';
 import 'package:frontend/models/category/category.dart';
+import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/my_fridge/add_category_detail_screen.dart';
-import 'package:frontend/screens/my_fridge/add_food_screen.dart';
+import 'package:frontend/screens/my_fridge/create_new_category_screen.dart';
 import 'package:frontend/screens/search/search_screen.dart';
+import 'package:frontend/services/category/category_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/food.dart';
@@ -11,6 +13,7 @@ import 'package:frontend/utils/constants.dart';
 import 'package:frontend/widgets/divider.dart';
 import 'package:frontend/widgets/header.dart';
 import 'package:frontend/widgets/text.dart';
+import 'package:provider/provider.dart';
 
 class AddCategoryScreen extends StatefulWidget {
   const AddCategoryScreen({super.key});
@@ -22,11 +25,26 @@ class AddCategoryScreen extends StatefulWidget {
 class _AddCategoryScreenState extends State<AddCategoryScreen> {
   Category? selectedCategory;
   ItemFood? selectedFood;
+  List<ItemFood> listFoods = foods;
   @override
   void initState() {
     super.initState();
     selectedFood = null;
     selectedCategory = null;
+    fetchNewCategory();
+  }
+
+  void fetchNewCategory() async {
+    final fridgeId = Provider.of<UserProvider>(context, listen: false).user!.fridgeId!;
+    final result = await CategoryService().getNewCategories(fridgeId);
+    if (result.isNotEmpty) {
+      for (var item in result) {
+        listFoods
+            .firstWhere((element) => element.value == item.type)
+            .categories
+            .add(item);
+      }
+    }
   }
 
   @override
@@ -51,7 +69,10 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                 icon: Image.asset('assets/icons/i16/search.png',
                     width: 25, height: 25, color: MyColors.grey['c900']!)),
             leftIcon: IconButton(
-                icon:  Icon(Icons.close, color: MyColors.grey['c900']!,),
+                icon: Icon(
+                  Icons.close,
+                  color: MyColors.grey['c900']!,
+                ),
                 onPressed: () {
                   Navigator.pop(context);
                 }),
@@ -73,7 +94,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Wrap(spacing: 15, runSpacing: 5, children: [
-                              ...foods
+                              ...listFoods
                                   .map((e) => GestureDetector(
                                         onTap: () {
                                           setState(() {
@@ -107,7 +128,8 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                                                   ));
                                             },
                                             child: FoodItem(
-                                                label: e.label!, icon: e.icon!)))
+                                                label: e.label!,
+                                                icon: e.icon!)))
                                         .toList(),
                                     GestureDetector(
                                       onTap: () {
@@ -115,7 +137,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                                    AddFoodScreen(
+                                                    CreateNewCategoryScreen(
                                                       type: selectedFood!.value,
                                                     )));
                                       },
