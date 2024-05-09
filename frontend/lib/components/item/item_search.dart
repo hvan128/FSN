@@ -4,7 +4,6 @@ import 'package:frontend/screens/search/search_screen.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/utils/constants.dart';
-import 'package:frontend/utils/icons.dart';
 import 'package:frontend/widgets/text.dart';
 
 class ItemSearch extends StatefulWidget {
@@ -23,7 +22,7 @@ class ItemSearch extends StatefulWidget {
 class _ItemSearchState extends State<ItemSearch> {
   @override
   Widget build(BuildContext context) {
-    final icon = allIcons[widget.category.value] ?? 'assets/icons/i16/logo.png';
+    final icon = widget.category.icon ?? 'assets/icons/i16/logo.png';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       width: MediaQuery.of(context).size.width * 0.5,

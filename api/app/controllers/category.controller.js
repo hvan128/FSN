@@ -36,12 +36,32 @@ export const getCategoryByPositionId = (req, res, next) => {
   });
 };
 
+export const getNewCategoryByFridgeId = (req, res, next) => {
+  var fridgeId = req.params.fridgeId;
+  Category.getNewCategoryByFridgeId(fridgeId, (err, result) => {
+    if (err) {
+      return next(err);
+    } else {
+      return res.status(200).send({
+        message: "Success",
+        data: result,
+      });
+  }})
+}
+
 export const addCategory = (req, res) => {
   var data = req.body;
   Category.create(data, (result) => {
     res.send(result);
   });
 };
+
+export const addNewCategory = (req, res) => {
+  var data = req.body;
+  Category.createNewCategory(data, (result) => {
+    res.send(result);
+  });
+}
 
 export const updateCategory = (req, res) => {
   var data = req.body;

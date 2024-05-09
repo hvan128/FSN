@@ -7,18 +7,11 @@ import 'package:frontend/navigation/router/introduction.dart';
 import 'package:frontend/navigation/router/my_fridge.dart';
 import 'package:frontend/navigation/router/settings.dart';
 import 'package:frontend/navigation/router/to_do.dart';
-import 'package:frontend/screens/account/account_screen.dart';
 import 'package:frontend/screens/auth/create_id_screen.dart';
 import 'package:frontend/screens/auth/login_screen.dart';
 import 'package:frontend/screens/auth/register_screen.dart';
-import 'package:frontend/screens/community/add_dish_screen.dart';
-import 'package:frontend/screens/community/dish_detail_screen.dart';
 import 'package:frontend/screens/home_screen.dart';
 import 'package:frontend/screens/introduction/introduction_screen.dart';
-import 'package:frontend/screens/my_fridge/add_category_detail_screen.dart';
-import 'package:frontend/screens/my_fridge/add_category_screen.dart';
-import 'package:frontend/screens/my_fridge/add_food_screen.dart';
-import 'package:frontend/screens/my_fridge/edit_category_detail_screen.dart';
 
 Map<String, WidgetBuilder> appRoutes = {
   RouterHome.home: (context) => const HomeScreen(),
@@ -29,18 +22,12 @@ Map<String, WidgetBuilder> appRoutes = {
   RouterAuth.register: (context) => const RegisterScreen(),
   RouterAuth.createId: (context) => const CreateIdScreen(),
 
-  //** MY FRIDGE ROUTES */
-  RouterMyFridge.addCategory: (context) => const AddCategoryScreen(),
-  RouterMyFridge.addCategoryDetail: (context) => const AddCategoryDetailScreen(),
-  RouterMyFridge.editCategoryDetail: (context) => const EditCategoryDetailScreen(),
-  RouterMyFridge.addFood: (context) => const AddFoodScreen(),
-
+  ...myFridgeRoutes,
   ...introductionRoutes,
   ...settingRoutes,
   ...todoRoutes,
   ...accountRoutes,
   ...communityRoutes,
-  
 };
 
 Route<dynamic>? Function(RouteSettings)? onAnimateRoute = (settings) {

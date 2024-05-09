@@ -1,18 +1,22 @@
 import 'package:api_cache_manager/api_cache_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:frontend/components/item/item_food.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
 import 'package:frontend/components/modals/modal_select.dart';
 import 'package:frontend/config.dart';
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/provider/user.dart';
+import 'package:frontend/screens/my_fridge/choose_icon_screen.dart';
+import 'package:frontend/screens/my_fridge/choose_type_screen.dart';
 import 'package:frontend/services/api_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
+import 'package:frontend/types/food.dart';
 import 'package:frontend/types/type.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:frontend/utils/functions_core.dart';
-import 'package:frontend/utils/icons.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/date_picker.dart';
 import 'package:frontend/widgets/drop-down.dart';
@@ -63,17 +67,29 @@ class _CardAddCategoryState extends State<CardAddCategory> {
   DateTime? manufactureDate;
   int quantity = 1;
   String note = '';
+  String? type;
+  String? labelType;
+  String? icon;
+  String? helperText;
 
   @override
   void initState() {
     super.initState();
     _controller.text = widget.category.label!;
-    listUnits = FunctionCore.getUnitList(widget.category.type!);
+    listUnits = FunctionCore.getUnitList(widget.category.type);
     position = listPositions.first.value;
     unit = listUnits!.first.value;
     subPosition = listSubPositions.first.value;
     manufactureDate = DateTime.now();
-    expDate = DateTime.now().add(Duration(days: 1));
+    expDate = DateTime.now()
+        .add(Duration(days: widget.category.defaultDuration ?? 1));
+    type = widget.category.type;
+    labelType = widget.category.type == null
+        ? 'Chọn loại (bắt buộc)'
+        : foods
+            .firstWhere((element) => element.value == widget.category.type)
+            .label;
+    icon = widget.category.icon ?? 'assets/icons/i16/image-default.png';
   }
 
   @override
@@ -84,11 +100,7 @@ class _CardAddCategoryState extends State<CardAddCategory> {
 
   @override
   Widget build(BuildContext context) {
-    final type = foods
-        .firstWhere((element) => element.value == widget.category.type)
-        .label;
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.8,
+    return SafeArea(
       child: SingleChildScrollView(
         child: Column(children: [
           Container(
@@ -112,30 +124,35 @@ class _CardAddCategoryState extends State<CardAddCategory> {
                   height: 22,
                 ),
                 Row(children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        color: MyColors.primary['CulturalYellow']!['c100']!,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: MyColors.grey['c300']!,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
+                  GestureDetector(
+                    onTap: () {
+                      chooseIcon();
+                    },
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          color: MyColors.primary['CulturalYellow']!['c100']!,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
                             color: MyColors.grey['c300']!,
-                            blurRadius: 2,
-                            offset: const Offset(1, 2),
-                          )
-                        ]),
-                    child: SizedBox(
-                      height: 60,
-                      width: 60,
-                      child: Image.asset(
-                        allIcons[widget.category.value!]!,
-                        width: 50,
-                        height: 50,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: MyColors.grey['c300']!,
+                              blurRadius: 2,
+                              offset: const Offset(1, 2),
+                            )
+                          ]),
+                      child: SizedBox(
+                        height: 60,
+                        width: 60,
+                        child: Image.asset(
+                          icon!,
+                          width: 50,
+                          height: 50,
+                        ),
                       ),
                     ),
                   ),
@@ -143,67 +160,84 @@ class _CardAddCategoryState extends State<CardAddCategory> {
                     width: 20,
                   ),
                   Expanded(
-                    child: SizedBox(
-                      height: 80,
-                      child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 2),
-                              decoration: BoxDecoration(
-                                color:
-                                    MyColors.primary['CulturalYellow']!['c800']!,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: MyColors
-                                        .primary['CulturalYellow']!['c800']!,
-                                    blurRadius: 4,
-                                    offset: const Offset(1, 2),
-                                  )
-                                ],
-                              ),
-                              child: MyText(
-                                text: type,
-                                fontSize: FontSize.z16,
-                                fontWeight: FontWeight.w500,
-                                color: MyColors.white['c900']!,
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            TextField(
-                              controller: _controller,
-                              onChanged: (value) {
-                                setState(() {
-                                  _controller.text = value;
-                                });
-                              },
-                              style: TextStyle(
-                                color: MyColors.grey['c900']!,
-                                fontSize: FontSize.z16,
-                                fontWeight: FontWeight.w700,
-                              ),
-                              decoration: InputDecoration(
-                                contentPadding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                enabledBorder: UnderlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: MyColors.grey['c500']!),
-                                ),
-                                focusedBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(
-                                      width: 2,
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: MyColors
+                                      .primary['CulturalYellow']!['c800']!,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
                                       color: MyColors
-                                          .primary['CulturalYellow']!['c600']!),
+                                          .primary['CulturalYellow']!['c800']!,
+                                      blurRadius: 4,
+                                      offset: const Offset(1, 2),
+                                    )
+                                  ],
+                                ),
+                                child: GestureDetector(
+                                  onTap: chooseType,
+                                  child: MyText(
+                                    text: labelType!,
+                                    fontSize: FontSize.z16,
+                                    fontWeight: FontWeight.w500,
+                                    color: MyColors.white['c900']!,
+                                  ),
                                 ),
                               ),
-                            )
-                          ]),
-                    ),
+                              helperText != null
+                                  ? const SizedBox(height: 5)
+                                  : Container(),
+                              helperText != null
+                                  ? Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                    child: MyText(
+                                        text: helperText!,
+                                        fontSize: FontSize.z12,
+                                        fontWeight: FontWeight.w500,
+                                        color:
+                                            MyColors.support['Error']!['c900']!,
+                                      ),
+                                  )
+                                  : Container(),
+                            ],
+                          ),
+                          TextField(
+                            controller: _controller,
+                            onChanged: (value) {
+                              setState(() {
+                                _controller.text = value;
+                              });
+                            },
+                            style: TextStyle(
+                              color: MyColors.grey['c900']!,
+                              fontSize: FontSize.z16,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            decoration: InputDecoration(
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: MyColors.grey['c500']!),
+                              ),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                    width: 2,
+                                    color: MyColors
+                                        .primary['CulturalYellow']!['c600']!),
+                              ),
+                            ),
+                          )
+                        ]),
                   )
                 ]),
                 const SizedBox(
@@ -367,37 +401,72 @@ class _CardAddCategoryState extends State<CardAddCategory> {
   }
 
   void onPressAdd() async {
-    final fridgeId = Provider.of<UserProvider>(
-            Navigate().navigationKey.currentContext!,
-            listen: false)
-        .user!
-        .fridgeId;
-    await ApiService.post(Config.CATEGORIES_API, {
-      'label': widget.category.label,
-      'value': widget.category.value,
-      'icon': widget.category.value,
-      'type': widget.category.type,
-      'quantity': quantity,
-      'unit': unit,
-      'positionId': int.parse(position!),
-      'subPositionId': int.parse(subPosition!),
-      'manufactureDate': manufactureDate!.toIso8601String(),
-      'expiryDate': expDate!.toIso8601String(),
-      'fridgeId': fridgeId
-    });
-    await APICacheManager().deleteCache('categories_${int.parse(position!)}');
-    await APICacheManager().deleteCache('categories');
-    Navigator.pop(context, true);
-    showDialog(
-        context: context,
-        builder: (context) {
-          return MyAlert(
-            alertType: AlertType.success,
-            position: AlertPosition.topCenter,
-            title: 'Thành công',
-            description:
-                'Thêm đồ ăn ${widget.category.label} vào $position thành công!',
-          );
-        });
+    if (type == null) {
+      setState(() {
+        helperText = 'Vui lòng chọn loại thức ăn!';
+      });
+    } else {
+      final fridgeId = Provider.of<UserProvider>(
+              Navigate().navigationKey.currentContext!,
+              listen: false)
+          .user!
+          .fridgeId;
+      await ApiService.post(Config.CATEGORIES_API, {
+        'label': widget.category.label,
+        'value': widget.category.value,
+        'icon': icon,
+        'type': type,
+        'quantity': quantity,
+        'unit': unit,
+        'positionId': int.parse(position!),
+        'subPositionId': int.parse(subPosition!),
+        'manufactureDate': manufactureDate!.toIso8601String(),
+        'expiryDate': expDate!.toIso8601String(),
+        'fridgeId': fridgeId
+      });
+      await APICacheManager().deleteCache('categories_${int.parse(position!)}');
+      await APICacheManager().deleteCache('categories');
+      Navigator.pop(context, true);
+      showDialog(
+          context: context,
+          builder: (context) {
+            return MyAlert(
+              alertType: AlertType.success,
+              position: AlertPosition.topCenter,
+              title: 'Thành công',
+              description:
+                  'Thêm đồ ăn ${widget.category.label} vào $position thành công!',
+            );
+          });
+    }
+  }
+
+  void chooseType() async {
+    final result =
+        await Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return const ChooseTypeScreen();
+    }));
+    if (result != null) {
+      setState(() {
+        type = result.value;
+        labelType = result.label;
+        helperText = null;
+        listUnits = FunctionCore.getUnitList(type);
+      });
+    }
+  }
+
+  void chooseIcon() async {
+    final result =
+        await Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return ChooseIconScreen(
+        type: type,
+      );
+    }));
+    if (result != null) {
+      setState(() {
+        icon = result;
+      });
+    }
   }
 }

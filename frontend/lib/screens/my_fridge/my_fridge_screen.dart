@@ -16,6 +16,7 @@ import 'package:frontend/services/category/category_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/type.dart';
+import 'package:frontend/utils/constants.dart';
 import 'package:frontend/widgets/divider.dart';
 import 'package:frontend/widgets/tab_button.dart';
 import 'package:frontend/widgets/text.dart';
@@ -30,13 +31,15 @@ class MyFridgeScreen extends StatefulWidget {
   State<MyFridgeScreen> createState() => _MyFridgeScreenState();
 }
 
-class _MyFridgeScreenState extends State<MyFridgeScreen> {
+class _MyFridgeScreenState extends State<MyFridgeScreen>
+    with TickerProviderStateMixin {
   String selectedFilter = '';
   int selectedTabIndex = 0;
   bool isSelecting = false;
   List<int> isSelected = [];
   UserModel? user;
-  PageController pageController = PageController(initialPage: 0);
+  late final TabController tabController;
+
   final List<Item> listPositions = [
     Item(
       label: "Tủ lạnh",
@@ -60,6 +63,13 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
   void initState() {
     super.initState();
     user = Provider.of<UserProvider>(context, listen: false).user;
+    tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -121,11 +131,8 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
                               height: 16,
                             ),
                             Flexible(
-                              child: PageView(
-                                  controller: pageController,
-                                  onPageChanged: (value) => setState(() {
-                                        selectedTabIndex = value;
-                                      }),
+                              child: TabBarView(
+                                  controller: tabController,
                                   children: [
                                     _renderTab(1),
                                     _renderTab(2),
@@ -328,45 +335,23 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
   }
 
   Widget _buildTabBar() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5),
-        color: MyColors.primary['CulturalYellow']!['c100'],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(4),
-        child: Row(
-          children: [
-            MyTabButton(
-              title: 'Lạnh',
-              isSelected: selectedTabIndex == 0,
-              onTap: () {
-                pageController.animateToPage(0,
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeInOut);
-              },
-            ),
-            MyTabButton(
-              title: 'Đông',
-              isSelected: selectedTabIndex == 1,
-              onTap: () {
-                pageController.animateToPage(1,
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeInOut);
-              },
-            ),
-            MyTabButton(
-              title: 'Bếp',
-              isSelected: selectedTabIndex == 2,
-              onTap: () {
-                pageController.animateToPage(2,
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeInOut);
-              },
-            ),
-          ],
+    return TabBar(
+      controller: tabController,
+      dividerColor: Colors.transparent,
+      tabs: [
+        Tab(
+          text: 'Lạnh',
+          icon: Icon(Icons.kitchen),
         ),
-      ),
+        Tab(
+           text: 'Đông',
+          icon: Icon(Icons.ac_unit),
+        ),
+        Tab(
+          text: 'Bếp',
+          icon: Icon(Icons.countertops),
+        ),
+      ],
     );
   }
 
@@ -377,6 +362,9 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
   }
 
   Widget _renderTab(int positionId) {
+    String getFoodLabel(String value) {
+      return foods.firstWhere((element) => element.value == value).label;
+    }
     return FutureBuilder(
       future: CategoryService().getCategoriesByPosition(positionId: positionId),
       builder: (context, snapshot) {
@@ -406,7 +394,7 @@ class _MyFridgeScreenState extends State<MyFridgeScreen> {
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 10),
                                 child: MyText(
-                                  text: '${food.key} (${food.value.length})',
+                                  text: '${getFoodLabel(food.key)} (${food.value.length})',  
                                   fontSize: FontSize.z16,
                                   fontWeight: FontWeight.w600,
                                   color: MyColors.grey['c900']!,

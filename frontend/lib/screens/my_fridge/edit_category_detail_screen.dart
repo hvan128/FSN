@@ -13,7 +13,6 @@ import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/type.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:frontend/utils/functions_core.dart';
-import 'package:frontend/utils/icons.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/date_picker.dart';
 import 'package:frontend/widgets/drop-down.dart';
@@ -88,7 +87,7 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
           category = arguments['category'];
           id = category!.id;
           _controller.text = category!.label ?? '';
-          icon = allIcons[category!.icon] ?? 'assets/icons/i16/logo.png';
+          icon = category!.icon ?? 'assets/icons/i16/logo.png';
           type = category!.type ?? '';
           position = '${category!.positionId}';
           label = category!.label ?? '';
@@ -446,7 +445,7 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
       'id': id,
       'label': label,
       'value': value,
-      'icon': value,
+      'icon': icon,
       'type': type,
       'quantity': quantity,
       'unit': unit,

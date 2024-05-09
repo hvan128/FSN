@@ -15,6 +15,9 @@ export default (router) => {
     router.get('/api/v1/category/position/:positionId/:fridgeId', function(req, res, next) {
         categoryController.getCategoryByPositionId(req, res, next);
     })
+    router.get('/api/v1/newCategory/:fridgeId', function(req, res, next) {
+        categoryController.getNewCategoryByFridgeId(req, res, next);
+    })
 
     /* GET position */
     router.get('/api/v1/position', function(req, res, next) {
@@ -32,6 +35,10 @@ export default (router) => {
         categoryController.addCategory(req, res);
     })
 
+    router.post('/api/v1/category/new', function(req, res, next) {
+        categoryController.addNewCategory(req, res);
+    })
+
     router.post('/api/v1/position', function(req, res, next) {
         positionController.addPosition(req, res);
     })
@@ -47,6 +54,8 @@ export default (router) => {
     router.post('/api/v1/category/shoppingList/reorder', function(req, res, next) {
         categoryController.reOrderCategory(req, res, next);
     })
+
+
 
     //! PUT home page
     router.put('/api/v1/category', function(req, res, next) {

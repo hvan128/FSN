@@ -66,7 +66,7 @@ class _TodoScreenState extends State<TodoScreen> {
     await ApiService.post(Config.CATEGORIES_API, {
       'label': result.label,
       'type': result.type,
-      'icon': result.value,
+      'icon': result.icon,
       'value': result.value,
       'fridgeId': fridgeId,
       'positionId': 0
