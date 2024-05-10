@@ -64,6 +64,7 @@ export const updateDish = (req, res, next) => {
       var file = req.files;
       var fileSelected = JSON.parse(req.body.fileSelected);
       var id = req.params.id;
+      console.log(body);
       var data = {
         id: id,
         ownerId: body.ownerId,
@@ -77,12 +78,12 @@ export const updateDish = (req, res, next) => {
         ingredients:
           body.ingredients !== "" ? JSON.parse(body.ingredients) : [],
         steps: JSON.parse(body.steps).map((step, index) => {
-          var image = fileSelected.some((file) => file === `step_no_${index + 1}`) ? file[`step_no_${index + 1}`] : body[`step_no_${index + 1}`];
+          var image =  file[`step_no_${index + 1}`];
           return {
             no: step.no,
             description: step.description,
-            dishId: step.dishId,
-            image: image ? image[0].filename : null,
+            dishId: id,
+            image: image ? image[0].filename :  body[`step_no_${index + 1}`],
           };
         }),
       };

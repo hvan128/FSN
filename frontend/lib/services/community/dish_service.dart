@@ -84,7 +84,6 @@ class DishService {
         request.fields['step_no_${element.no}'] = element.image ?? '';
       }
     });
-    print(request.files);
     var response = await request.send();
     if (response.statusCode == 200) {
       return true;
