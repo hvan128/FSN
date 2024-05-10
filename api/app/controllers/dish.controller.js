@@ -54,6 +54,50 @@ export const createDish = (req, res, next) => {
   });
 };
 
+export const updateDish = (req, res, next) => {
+  dishUpload(req, res, (err) => {
+    if (err) {
+      console.log(err);
+      next(err);
+    } else {
+      var body = req.body;
+      var file = req.files;
+      var fileSelected = JSON.parse(req.body.fileSelected);
+      var id = req.params.id;
+      console.log(body);
+      var data = {
+        id: id,
+        ownerId: body.ownerId,
+        label: body.label,
+        description: body.description,
+        image: fileSelected.some((file) => file === "image")
+          ? file.image[0].filename
+          : body.image,
+        cookingTime: body.cookingTime,
+        rangeOfPeople: body.rangeOfPeople,
+        ingredients:
+          body.ingredients !== "" ? JSON.parse(body.ingredients) : [],
+        steps: JSON.parse(body.steps).map((step, index) => {
+          var image =  file[`step_no_${index + 1}`];
+          return {
+            no: step.no,
+            description: step.description,
+            dishId: id,
+            image: image ? image[0].filename :  body[`step_no_${index + 1}`],
+          };
+        }),
+      };
+      Dish.update(data, (err, result) => {
+        if (err) {
+          next(err);
+        } else {
+          res.send(result);
+        }
+      });
+    }
+  });
+};
+
 export const getDishById = (req, res, next) => {
   var id = req.params.id;
   Dish.findById(id, (err, result) => {

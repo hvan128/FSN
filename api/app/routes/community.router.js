@@ -18,11 +18,11 @@ export default (router) => {
 
   router.get("/api/v1/community/dish/saved/:id", function (req, res, next) {
     dishController.getSavedDishesByUserId(req, res, next);
-  })
+  });
 
   router.get("/api/v1/community/dish/feedback/:id", function (req, res, next) {
     feedbackController.getFeedbackByDishId(req, res, next);
-  })
+  });
 
   router.post("/api/v1/community/dish", function (req, res, next) {
     dishController.createDish(req, res, next);
@@ -34,23 +34,25 @@ export default (router) => {
 
   router.post("/api/v1/community/dish/feel", function (req, res, next) {
     feelController.createFeel(req, res, next);
-  })
+  });
 
-  router.post("/api/v1/community/dish/save", function (req, res, next) {  
+  router.post("/api/v1/community/dish/save", function (req, res, next) {
     saveController.createSave(req, res, next);
-  })
+  });
 
   router.post("/api/v1/community/dish/unsaved", function (req, res, next) {
     saveController.unSaved(req, res, next);
-  })
+  });
 
   router.post("/api/v1/community/dish/feedback", function (req, res, next) {
     feedbackController.create(req, res, next);
-  })
+  });
+
+  router.put("/api/v1/community/dish/:id", function (req, res, next) {
+    dishController.updateDish(req, res, next);
+  });
 
   router.delete("/api/v1/community/dish/feel/:id", function (req, res, next) {
     feelController.deleteFeel(req, res, next);
-  })
-
-
+  });
 };

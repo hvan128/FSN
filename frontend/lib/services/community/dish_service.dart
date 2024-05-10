@@ -38,7 +38,52 @@ class DishService {
         ));
       }
     });
+    var response = await request.send();
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
+  static Future<bool> updateDish(Dish dish, List<String> fileSelected) async {
+    var loginDetails = await SharedService.loginDetails();
+    Map<String, String> requestHeaders = {
+      'Content-Type': 'multipart/form-data',
+      'Authorization': loginDetails!.data!.token
+    };
+    var url = Uri.http(Config.API_URL, '${Config.DISH_API}/${dish.id}');
+    var request = http.MultipartRequest("PUT", url);
+    final ingredients = dish.ingredients!.map((e) => e.toJson()).toList();
+    final steps = dish.steps!.map((e) => e.toJson()).toList();
+    request.headers.addAll(requestHeaders);
+    request.fields['fileSelected'] = jsonEncode(fileSelected);
+    request.fields['label'] = dish.label!;
+    request.fields['ownerId'] = dish.ownerId!.toString();
+    request.fields['description'] = dish.description!;
+    request.fields['rangeOfPeople'] = dish.rangeOfPeople!;
+    request.fields['cookingTime'] = dish.cookingTime!;
+    request.fields['ingredients'] = jsonEncode(ingredients);
+    request.fields['steps'] = jsonEncode(steps);
+    if (fileSelected.contains('image')) {
+      http.MultipartFile multipartFile = await http.MultipartFile.fromPath(
+        'image',
+        dish.image!,
+      );
+      request.files.add(multipartFile);
+    } else {
+      request.fields['image'] = dish.image ?? '';
+    }
+    dish.steps?.forEach((element) async {
+      if (element.image != null && fileSelected.contains('step_no_${element.no}')) {
+        request.files.add(await http.MultipartFile.fromPath(
+          'step_no_${element.no}',
+          element.image!,
+        ));
+      } else {
+        request.fields['step_no_${element.no}'] = element.image ?? '';
+      }
+    });
     var response = await request.send();
     if (response.statusCode == 200) {
       return true;
@@ -75,7 +120,6 @@ class DishService {
     });
     return dishes;
   }
-
 
   static Future<Map<String, dynamic>> getDishByOwnerId(
       int ownerId, int page, int pageSize) async {
@@ -189,14 +233,17 @@ class DishService {
     }
   }
 
-  static Future<Map<String, dynamic>> getFeedbackByDishId(int dishId, int page, int pageSize) async {
+  static Future<Map<String, dynamic>> getFeedbackByDishId(
+      int dishId, int page, int pageSize) async {
     List<FeedbackModel> feedbacks = [];
     int total = 0;
     final queryParams = {
       'page': page.toString(),
       'pageSize': pageSize.toString()
     };
-    await ApiService.get('${Config.DISH_API}/feedback/$dishId', queryParams: queryParams).then((value) {
+    await ApiService.get('${Config.DISH_API}/feedback/$dishId',
+            queryParams: queryParams)
+        .then((value) {
       if (value != null) {
         final data = jsonDecode(value.toString())['data'];
         total = jsonDecode(value.toString())['total'];
