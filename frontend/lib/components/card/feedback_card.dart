@@ -431,15 +431,10 @@ class _FeedbackCardState extends State<FeedbackCard> {
   }
 
   void navigateToOriginalDish() async {
-    UserModel owner = UserModel();
     final Dish dish = await DishService.getDishById(id: widget.feedbackModel.dishId!);
-    await ApiService.get('${Config.USER_API}/${dish.ownerId}').then((value) {
-      if (value != null && value.isNotEmpty) {
-        owner = UserModel.fromJson(jsonDecode(value)[0]);
-      }
-    });
+    
 
     Navigate.pushNamed(RouterCommunity.dishDetail,
-        arguments: {'dish': dish, 'owner': owner});
+        arguments: {'dish': dish});
   }
 }

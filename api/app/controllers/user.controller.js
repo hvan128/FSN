@@ -1,6 +1,6 @@
 import User from "../models/user.model.js";
 
-export const getAllUser = (req, res) => {
+export const getAllUser = (req, res, next) => {
   User.getAllUser((err, data) => {
     if (err) {
       res.status(500).send({
@@ -10,7 +10,7 @@ export const getAllUser = (req, res) => {
   });
 };
 
-export const findById = (req, res) => {
+export const findById = (req, res, next) => {
   User.findById(req.params.id, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {

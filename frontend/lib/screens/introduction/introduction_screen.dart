@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/config.dart';
 import 'package:frontend/models/auth/login_response_model.dart';
@@ -10,6 +11,7 @@ import 'package:frontend/navigation/router/auth.dart';
 import 'package:frontend/navigation/router/introduction.dart';
 import 'package:frontend/provider/google_sign_in.dart';
 import 'package:frontend/provider/user.dart';
+import 'package:frontend/services/api_service.dart';
 import 'package:frontend/services/auth/shared_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
@@ -230,10 +232,12 @@ class IntroductionScreen extends StatelessWidget {
         Map<String, dynamic> body = {
           'email': user.additionalUserInfo!.profile!['email']
         };
-        var url = Uri.http(Config.API_URL,
-            '${Config.USER_API}/email');
-        var response = await client.post(url, headers: requestHeaders, body: jsonEncode(body));
-        UserModel currentUser = UserModel.fromJson(jsonDecode(response.body)[0]);
+        var url = Uri.http(Config.API_URL, '${Config.USER_API}/email');
+        var response = await client.post(url,
+            headers: requestHeaders, body: jsonEncode(body));
+        UserModel currentUser =
+            UserModel.fromJson(jsonDecode(response.body)[0]);
+
         context.read<UserProvider>().setUser(user: currentUser);
         Map<String, dynamic> loginResponse = {
           'message': 'Login successfully',
@@ -246,6 +250,10 @@ class IntroductionScreen extends StatelessWidget {
         };
         await SharedService.setLoginDetails(
             loginResponseJson(jsonEncode(loginResponse)));
+        FirebaseMessaging.instance.getToken().then((value) {
+          currentUser.fcmToken = value;
+          ApiService.put(Config.USER_API, currentUser.toJson());
+        });
         Navigator.pushReplacementNamed(context, RouterIntroduction.afterLogin);
       }
     } catch (e) {
@@ -253,7 +261,7 @@ class IntroductionScreen extends StatelessWidget {
       print(e);
     }
   }
-  
+
   void onPressTry(BuildContext context) {
     final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
     provider.logout();

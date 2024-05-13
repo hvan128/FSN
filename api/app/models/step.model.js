@@ -30,7 +30,6 @@ Step.deleteStepByDishId = (dishId, result) => {
 };
 
 Step.getStepsByDishId = (dishId, result) => {
-  console.log(dishId);
   db.query("SELECT * FROM step WHERE dishId = ?", [dishId], (err, res) => {
     if (err) {
       console.log(err);

@@ -2,12 +2,12 @@
 
 import 'dart:convert';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/config.dart';
 import 'package:frontend/models/auth/login_response_model.dart';
 import 'package:frontend/models/auth/register_request_model.dart';
 import 'package:frontend/models/user/user.dart';
-import 'package:frontend/navigation/router/home.dart';
 import 'package:frontend/navigation/router/introduction.dart';
 import 'package:frontend/services/auth/auth_service.dart';
 import 'package:frontend/services/auth/shared_service.dart';
@@ -135,11 +135,18 @@ class _CreateIdScreenState extends State<CreateIdScreen> {
   }
 
   void onPressConfirm(BuildContext context) {
+    String? fcmToken;
+    FirebaseMessaging.instance
+        .getToken()
+        .then((value) {
+          fcmToken = value;
+        });
     RegisterRequestModel registerRequestModel = RegisterRequestModel(
       username: _controller.text,
       email: user!.email,
       imageUrl: user!.imageUrl,
       displayName: user!.displayName,
+      fcmToken: fcmToken
     );
     AuthService.register(registerRequestModel).then((value) async {
       if (value.data != null) {

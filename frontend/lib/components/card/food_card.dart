@@ -35,7 +35,6 @@ class FoodCard extends StatefulWidget {
 
 class _FoodCardState extends State<FoodCard> {
   bool? isSaved = false;
-  UserModel? owner;
   List<Reaction> listReactions = [
     Reaction(type: 'like', quantity: 0, isSelected: false),
     Reaction(type: 'love', quantity: 0, isSelected: false),
@@ -45,7 +44,6 @@ class _FoodCardState extends State<FoodCard> {
   @override
   void initState() {
     super.initState();
-    fetchUser();
     checkSaved();
     processFeels(
         widget.dish.feels!,
@@ -66,16 +64,7 @@ class _FoodCardState extends State<FoodCard> {
     }
   }
 
-  void fetchUser() async {
-    await ApiService.get('${Config.USER_API}/${widget.dish.ownerId}')
-        .then((value) {
-      if (value != null && value.isNotEmpty) {
-        setState(() {
-          owner = UserModel.fromJson(jsonDecode(value)[0]);
-        });
-      }
-    });
-  }
+
 
   void processFeels(List<Feel> feels, int ownerId, List<Reaction> reactions) {
     for (Feel feel in feels) {
@@ -142,7 +131,7 @@ class _FoodCardState extends State<FoodCard> {
       width: 30,
       height: 30,
     );
-    final imageUrl = owner?.imageUrl;
+    final imageUrl = widget.dish.owner?.imageUrl;
 
     final Image image = (imageUrl != null)
         ? Image.network(
@@ -173,7 +162,6 @@ class _FoodCardState extends State<FoodCard> {
                 Navigator.pushNamed(context, RouterCommunity.dishDetail,
                     arguments: {
                       'dish': widget.dish,
-                      'owner': owner,
                       'isSaved': isSaved,
                       'reactions': listReactions
                     }).then((_) => setState(() {}));
@@ -222,10 +210,10 @@ class _FoodCardState extends State<FoodCard> {
                                       borderRadius: BorderRadius.circular(100),
                                       child: image),
                                   const SizedBox(width: 10),
-                                  owner == null
+                                  widget.dish.owner == null
                                       ? Container()
                                       : MyText(
-                                          text: owner!.username!,
+                                          text: widget.dish.owner!.username!,
                                           fontSize: FontSize.z13,
                                           fontWeight: FontWeight.w700,
                                           color: MyColors.white['c900']!,
@@ -296,10 +284,10 @@ class _FoodCardState extends State<FoodCard> {
                                       child: image,
                                     ),
                                     const SizedBox(width: 5),
-                                    owner == null
+                                    widget.dish.owner == null
                                         ? Container()
                                         : MyText(
-                                            text: owner!.username!,
+                                            text: widget.dish.owner!.username!,
                                             fontSize: FontSize.z12,
                                             fontWeight: FontWeight.w400,
                                             color: MyColors.grey['c700']!,
@@ -437,7 +425,7 @@ class _FoodCardState extends State<FoodCard> {
       );
       incrementQuantity(reaction.name, listReactions);
       setSelected(reaction.name, true, listReactions);
-      await DishService.addFeel(feel);
+      await DishService.addFeel(feel, widget.dish.owner);
     }
     setState(() {});
   }
@@ -474,7 +462,7 @@ class _FoodCardState extends State<FoodCard> {
                 : 3,
         userId: Provider.of<UserProvider>(context, listen: false).user!.id,
         dishId: widget.dish.id,
-      ));
+      ), widget.dish.owner);
     } else {
       setSelected(e.type!, false, listReactions);
       decrementQuantity(e.type!, listReactions);

@@ -673,7 +673,7 @@ class _AddDishScreenState extends State<AddDishScreen> {
       print('element: ${element.toJson()}');
     });
     print(fileSelected.toString());
-    final userId = Provider.of<UserProvider>(context, listen: false).user!.id;
+    final user = Provider.of<UserProvider>(context, listen: false).user!;
     final Dish dishModel = Dish(
       id: dish!.id!,
       label: _labelController.text,
@@ -681,7 +681,7 @@ class _AddDishScreenState extends State<AddDishScreen> {
       image: selectedImagePath,
       rangeOfPeople: _rangeOfPeopleController.text,
       steps: listStepsModel,
-      ownerId: userId,
+      owner: user,
       ingredients: ingredientsList,
       cookingTime: _cookingTimeController.text,
     );
@@ -722,7 +722,7 @@ class _AddDishScreenState extends State<AddDishScreen> {
   }
 
   void addDish() async {
-    final userId = Provider.of<UserProvider>(context, listen: false).user!.id;
+    final user = Provider.of<UserProvider>(context, listen: false).user!;
     final Dish dish = Dish(
       label: _labelController.text,
       description: _descriptionController.text,
@@ -731,7 +731,7 @@ class _AddDishScreenState extends State<AddDishScreen> {
       steps: listStepsModel,
       ingredients: ingredientsList,
       cookingTime: _cookingTimeController.text,
-      ownerId: userId,
+      owner: user,
     );
     final response = await DishService.addDish(dish);
     if (response) {

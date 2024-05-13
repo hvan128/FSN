@@ -154,7 +154,6 @@ Feedback.getByDishId = (dishId, page, pageSize, result) => {
 
         Promise.all(promises)
           .then(() => {
-            console.log("feedbacks", feedbacks);
             result(null, { total: totalCount, data: feedbacks });
           })
           .catch((err) => {
