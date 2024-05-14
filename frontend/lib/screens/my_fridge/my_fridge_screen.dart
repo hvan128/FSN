@@ -1,7 +1,8 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/components/item/item_category.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
+import 'package:frontend/components/modals/modal_classify.dart';
+import 'package:frontend/components/modals/modal_filter.dart';
 import 'package:frontend/components/modals/modal_select.dart';
 import 'package:frontend/config.dart';
 import 'package:frontend/models/category/category.dart';
@@ -9,6 +10,7 @@ import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/my_fridge.dart';
 import 'package:frontend/navigation/router/settings.dart';
+import 'package:frontend/provider/category.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/my_fridge/add_category_screen.dart';
 import 'package:frontend/screens/search/search_screen.dart';
@@ -18,6 +20,7 @@ import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/type.dart';
 import 'package:frontend/utils/constants.dart';
+import 'package:frontend/widgets/button_icon.dart';
 import 'package:frontend/widgets/divider.dart';
 import 'package:frontend/widgets/text.dart';
 import 'package:provider/provider.dart';
@@ -39,6 +42,9 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
   List<int> isSelected = [];
   UserModel? user;
   late final TabController tabController;
+  SortType? sortType;
+  ViewType? viewType;
+  bool? classify;
 
   final List<Item> listPositions = [
     Item(
@@ -64,22 +70,17 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
     super.initState();
     user = Provider.of<UserProvider>(context, listen: false).user;
     tabController = TabController(length: 3, vsync: this);
-    // notification();
+    final categoryProvider =
+        Provider.of<CategoryProvider>(context, listen: false);
+    sortType = categoryProvider.sortType;
+    viewType = categoryProvider.viewType;
+    classify = categoryProvider.classify;
   }
 
   @override
   void dispose() {
     tabController.dispose();
     super.dispose();
-  }
-
-  void notification() async {
-    List<NotificationModel> scheduledNotifications =
-        await AwesomeNotifications().listScheduledNotifications();
-    print('scheduledNotifications: ${scheduledNotifications.length}');
-    for (var schedule in scheduledNotifications) {
-      print('schedule: $schedule');
-    }
   }
 
   @override
@@ -202,91 +203,105 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
         alignment: Alignment.topCenter,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Column(
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  isSelecting
-                      ? GestureDetector(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: Image.asset(
-                                'assets/icons/i16/close.png',
-                                width: 24,
-                                height: 24,
-                                color: MyColors.grey['c900']!,
+                  Row(
+                    children: [
+                      isSelecting
+                          ? GestureDetector(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: Image.asset(
+                                    'assets/icons/i16/close.png',
+                                    width: 24,
+                                    height: 24,
+                                    color: MyColors.grey['c900']!,
+                                  ),
+                                ),
+                              ),
+                              onTap: () {
+                                widget.showBottomBar?.call(true);
+                                setState(() {
+                                  isSelecting = !isSelecting;
+                                });
+                                isSelected.clear();
+                              })
+                          : MyIconButton(
+                              onPressed: () {
+                                onTapSetting();
+                              },
+                              icon: Icon(Icons.menu,
+                                  color: MyColors.grey['c900']!),
+                            ),
+                      MyText(
+                        text: isSelecting ? 'Đã chọn ${isSelected.length}' : '',
+                        fontSize: FontSize.z16,
+                        fontWeight: FontWeight.w600,
+                        color: MyColors.grey['c900']!,
+                      ),
+                    ],
+                  ),
+                  !isSelecting
+                      ? Row(children: [
+                          GestureDetector(
+                            onTap: () {
+                              widget.showBottomBar?.call(false);
+                              setState(() {
+                                isSelecting = true;
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: MyColors.grey['c600']!.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: MyText(
+                                  text: 'Chọn',
+                                  fontSize: FontSize.z15,
+                                  fontWeight: FontWeight.w600,
+                                  color: MyColors.white['c900']!),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          PopupMenuButton(
+                            itemBuilder: (context) => [
+                              PopupMenuItem(
+                                value: 1,
+                                onTap: showModalClassify,
+                                child: classifyButton(),
+                              ),
+                              PopupMenuItem(
+                                value: 2,
+                                onTap: showModalFilter,
+                                child: filterButton(),
+                              )
+                            ],
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: MyColors.grey['c600']!.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              padding: const EdgeInsets.all(3),
+                              child: Icon(
+                                Icons.more_vert,
+                                color: MyColors.white['c900']!,
                               ),
                             ),
                           ),
-                          onTap: () {
-                            widget.showBottomBar?.call(true);
-                            setState(() {
-                              isSelecting = !isSelecting;
-                            });
-                            isSelected.clear();
-                          })
+                        ])
                       : const SizedBox(),
-                  MyText(
-                    text: isSelecting
-                        ? 'Đã chọn ${isSelected.length}'
-                        : user != null && user!.displayName != null
-                            ? 'Chào ${user!.displayName}'
-                            : '',
-                    fontSize: FontSize.z16,
-                    fontWeight: FontWeight.w600,
-                    color: MyColors.grey['c900']!,
-                  ),
                 ],
               ),
-              !isSelecting
-                  ? Row(children: [
-                      GestureDetector(
-                        onTap: () {
-                          widget.showBottomBar?.call(false);
-                          setState(() {
-                            isSelecting = true;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 5),
-                          decoration: BoxDecoration(
-                            color: MyColors.grey['c600']!.withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: MyText(
-                              text: 'Chọn',
-                              fontSize: FontSize.z15,
-                              fontWeight: FontWeight.w600,
-                              color: MyColors.white['c900']!),
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          onTapSetting();
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: MyColors.grey['c600']!.withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Image.asset(
-                            'assets/icons/i16/dots-vertical.png',
-                            width: 30,
-                            height: 30,
-                            color: MyColors.white['c900'],
-                          ),
-                        ),
-                      ),
-                    ])
-                  : const SizedBox(),
             ],
           ),
         ),
@@ -344,6 +359,44 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
     ]);
   }
 
+  Widget classifyButton() {
+    return Row(
+      children: [
+        MyText(
+            text: 'Phân loại',
+            fontWeight: FontWeight.w500,
+            color: MyColors.grey['c700']!,
+            fontSize: FontSize.z16),
+        const SizedBox(
+          width: 20,
+        ),
+        MyIconButton(
+          icon: Icon(Icons.filter_list, color: MyColors.grey['c900']!),
+          onPressed: () {},
+        ),
+      ],
+    );
+  }
+
+  Widget filterButton() {
+    return Row(
+      children: [
+        MyText(
+            text: 'Kiểu xem',
+            fontWeight: FontWeight.w500,
+            color: MyColors.grey['c700']!,
+            fontSize: FontSize.z16),
+        const SizedBox(
+          width: 20,
+        ),
+        MyIconButton(
+          icon: Icon(Icons.filter_alt, color: MyColors.grey['c900']!),
+          onPressed: () {},
+        ),
+      ],
+    );
+  }
+
   Widget _buildTabBar() {
     return TabBar(
       controller: tabController,
@@ -377,7 +430,8 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
     }
 
     return FutureBuilder(
-      future: CategoryService().getCategoriesByPosition(positionId: positionId),
+      future: CategoryService()
+          .getCategoriesByPosition(positionId: positionId, sortType: sortType),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           final listCategories = snapshot.data as List<Category>;
@@ -616,5 +670,15 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
 
   void onTapSetting() {
     Navigate.pushNamed(RouterSetting.setting);
+  }
+
+  void showModalClassify() {
+    showDialog(context: context, builder: (context) => const ModalClassify())
+        .then((_) => setState(() {}));
+  }
+
+  void showModalFilter() {
+    showDialog(context: context, builder: (context) => const ModalFilter())
+        .then((_) => setState(() {}));
   }
 }

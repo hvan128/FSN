@@ -123,9 +123,9 @@ Category.findById = (id, result) => {
   });
 };
 
-Category.findByPositionId = ({ positionId, fridgeId }, result) => {
+Category.findByPositionId = ({ positionId, fridgeId, sortBy }, result) => {
   db.query(
-    `SELECT * FROM categories WHERE positionId = ${positionId} AND fridgeId = ${fridgeId} ORDER BY no DESC`,
+    `SELECT * FROM categories WHERE positionId = ${positionId} AND fridgeId = ${fridgeId} ORDER BY ${sortBy} DESC`,
     (err, res) => {
       if (err) {
         console.log(err);

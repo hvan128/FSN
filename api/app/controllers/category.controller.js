@@ -24,7 +24,8 @@ export const getCategoryById = (req, res) => {
 export const getCategoryByPositionId = (req, res, next) => {
   var positionId = req.params.positionId;
   var fridgeId = req.params.fridgeId;
-  Category.findByPositionId({ positionId, fridgeId }, (err, result) => {
+  var sortBy = req.query.sort || "expireDate";
+  Category.findByPositionId({ positionId, fridgeId, sortBy }, (err, result) => {
     if (err) {
       return next(err);
     } else {

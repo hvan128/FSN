@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:api_cache_manager/api_cache_manager.dart';
 import 'package:api_cache_manager/models/cache_db_model.dart';
+import 'package:frontend/components/modals/modal_classify.dart';
 import 'package:frontend/config.dart';
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/models/user/user.dart';
@@ -16,6 +17,7 @@ class CategoryService {
       .user!;
   Future<List<Category>> getCategoriesByPosition({
     required int positionId,
+    SortType? sortType,
   }) async {
     List<Category> categories = [];
     var isCacheExist =
@@ -26,8 +28,11 @@ class CategoryService {
       final data = jsonDecode(cacheData.syncData)['data'];
       return categoryFromJson(data);
     } else {
+      final queryParams = sortType == null ? null : {
+        'sort': sortType.name,
+      };
       await ApiService.get(
-              '${Config.CATEGORIES_API}/position/$positionId/${user.fridgeId}')
+              '${Config.CATEGORIES_API}/position/$positionId/${user.fridgeId}', queryParams: queryParams)
           .then((value) {
         if (value != null) {
           final data = jsonDecode(value.toString())['data'];

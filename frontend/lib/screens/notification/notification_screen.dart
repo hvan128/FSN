@@ -26,8 +26,8 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
   int selectedTabIndex = 0;
-  List<Announcement> listFridgeAnnouncements = [];
-  List<Announcement> listCommunityAnnouncements = [];
+  List<Announcement>? listFridgeAnnouncements;
+  List<Announcement>? listCommunityAnnouncements;
 
   @override
   void initState() {
@@ -45,7 +45,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       DateTime expDate = DateTime(announcement.createdAt!.year,
           announcement.createdAt!.month, announcement.createdAt!.day, 9, 0, 0);
       return expDate.isBefore(now);
-    }).toList(); 
+    }).toList();
     setState(() {
       listFridgeAnnouncements = filteredAnnouncements;
     });
@@ -160,7 +160,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Widget renderTab(int index) {
-    List<Announcement> announcements =
+    List<Announcement>? announcements =
         index == 0 ? listFridgeAnnouncements : listCommunityAnnouncements;
     return Expanded(
       child: Container(
@@ -171,20 +171,25 @@ class _NotificationScreenState extends State<NotificationScreen> {
           decoration: BoxDecoration(
               color: MyColors.white["c900"]!,
               borderRadius: BorderRadius.circular(20)),
-          child: announcements.isEmpty
-              ? Center(
-                  child: MyText(
-                      text: "Không có thông báo",
-                      fontSize: FontSize.z16,
-                      fontWeight: FontWeight.w700,
-                      color: MyColors.grey["c800"]!),
+          child: announcements == null
+              ? const Center(
+                  child: CircularProgressIndicator(),
                 )
-              : SingleChildScrollView(
-                  child: Column(
-                      children: announcements
-                          .map((announcement) => announcementItem(announcement))
-                          .toList()),
-                ),
+              : announcements.isEmpty
+                  ? Center(
+                      child: MyText(
+                          text: "Không có thông báo",
+                          fontSize: FontSize.z16,
+                          fontWeight: FontWeight.w700,
+                          color: MyColors.grey["c800"]!),
+                    )
+                  : SingleChildScrollView(
+                      child: Column(
+                          children: announcements
+                              .map((announcement) =>
+                                  announcementItem(announcement))
+                              .toList()),
+                    ),
         ),
       ),
     );
@@ -205,7 +210,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             : MyColors.grey["c100"],
         child: Column(
           children: [
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -235,7 +240,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           fontSize: FontSize.z13,
                           fontWeight: FontWeight.w500,
                           color: MyColors.grey["c500"]!),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       user != null
                           ? MyText(
                               text:
@@ -251,14 +256,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                   fontWeight: FontWeight.w700,
                                   color: MyColors.grey["c700"]!)
                               : Container(),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       MyText(
                           text:
                               FunctionCore.formatDate(announcement.createdAt!),
                           fontSize: FontSize.z12,
                           fontWeight: FontWeight.w600,
                           color: MyColors.grey["c300"]!),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                     ],
                   ),
                 )
@@ -271,13 +276,25 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   void redirectAnnouncementDetail(Announcement announcement) async {
-    if (announcement.read == false) {
-      await NotificationService.readNotification(id: announcement.id!);
-    }
     if (announcement.type == 'community') {
+      if (announcement.read == false) {
+        readNotification(listCommunityAnnouncements, announcement.id!);
+        await NotificationService.readNotification(id: announcement.id!);
+      }
       Navigate.pushNamed(RouterCommunity.dishDetail,
           arguments: {'dish': announcement.dish});
     }
-    if (announcement.type == 'fridge') {}
+    if (announcement.type == 'fridge') {
+      if (announcement.read == false) {
+        readNotification(listFridgeAnnouncements, announcement.id!);
+        await NotificationService.readNotification(id: announcement.id!);
+      }
+    }
+  }
+
+  void readNotification(List<Announcement>? announcements, int id) {
+    setState(() {
+      announcements!.firstWhere((element) => element.id == id).read = true;
+    });
   }
 }

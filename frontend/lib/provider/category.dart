@@ -1,12 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/types/food.dart';
+import 'package:frontend/components/modals/modal_classify.dart';
+import 'package:frontend/components/modals/modal_filter.dart';
 
 class CategoryProvider extends ChangeNotifier {
-  List<ItemFood>? listFoods;
-  CategoryProvider({this.listFoods}); 
+  SortType sortType;
+  ViewType viewType;
+  bool classify;
+  CategoryProvider(
+      {this.sortType = SortType.expiryDate,
+      this.viewType = ViewType.grid,
+      this.classify = true});
 
-  void setListFoods({required List<ItemFood> listFoods}) async {
-    this.listFoods = listFoods;
-    notifyListeners();
+  void classifyChange({required bool value}) {
+    classify = value;
+  }
+  void viewTypeChange({required ViewType value}) {
+    viewType = value;
+  }
+  void sortTypeChange({required SortType value}) {
+    sortType = value;
   }
 }

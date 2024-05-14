@@ -5,6 +5,7 @@ import 'package:frontend/config.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/introduction.dart';
 import 'package:frontend/navigation/routes.dart';
+import 'package:frontend/provider/category.dart';
 import 'package:frontend/services/notification/firebase_messaging.dart';
 import 'package:frontend/provider/google_sign_in.dart';
 import 'package:frontend/provider/notification.dart';
@@ -53,6 +54,7 @@ class MainApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (context) => GoogleSignInProvider()),
         ChangeNotifierProvider(create: (context) => NotificationProvider()),
+        ChangeNotifierProvider(create: (context) => CategoryProvider()),
       ],
       child: MaterialApp(
         title: Config.APP_NAME,
