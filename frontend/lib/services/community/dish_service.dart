@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:frontend/config.dart';
+import 'package:frontend/models/user/user.dart';
 import 'package:frontend/services/api_service.dart';
 import 'package:frontend/services/auth/shared_service.dart';
 import '../../models/community/dish.dart';
@@ -22,7 +23,7 @@ class DishService {
     request.fields['description'] = dish.description!;
     request.fields['rangeOfPeople'] = dish.rangeOfPeople!;
     request.fields['cookingTime'] = dish.cookingTime!;
-    request.fields['ownerId'] = dish.ownerId!.toString();
+    request.fields['ownerId'] = dish.owner!.id!.toString();
     request.fields['ingredients'] = jsonEncode(ingredients);
     request.fields['steps'] = jsonEncode(steps);
     http.MultipartFile multipartFile = await http.MultipartFile.fromPath(
@@ -59,7 +60,7 @@ class DishService {
     request.headers.addAll(requestHeaders);
     request.fields['fileSelected'] = jsonEncode(fileSelected);
     request.fields['label'] = dish.label!;
-    request.fields['ownerId'] = dish.ownerId!.toString();
+    request.fields['ownerId'] = dish.owner!.id!.toString();
     request.fields['description'] = dish.description!;
     request.fields['rangeOfPeople'] = dish.rangeOfPeople!;
     request.fields['cookingTime'] = dish.cookingTime!;
@@ -75,7 +76,8 @@ class DishService {
       request.fields['image'] = dish.image ?? '';
     }
     dish.steps?.forEach((element) async {
-      if (element.image != null && fileSelected.contains('step_no_${element.no}')) {
+      if (element.image != null &&
+          fileSelected.contains('step_no_${element.no}')) {
         request.files.add(await http.MultipartFile.fromPath(
           'step_no_${element.no}',
           element.image!,
@@ -122,7 +124,7 @@ class DishService {
   }
 
   static Future<Map<String, dynamic>> getDishByOwnerId(
-      int ownerId, int page, int pageSize) async {
+      int? ownerId, int page, int pageSize) async {
     List<Dish> dishes = [];
     int total = 0;
     final queryParams = {
@@ -177,7 +179,7 @@ class DishService {
     });
   }
 
-  static Future<void> addFeel(Feel feel) async {
+  static Future<void> addFeel(Feel feel, [UserModel? owner]) async {
     var model = {
       'type': feel.type,
       'userId': feel.userId,
@@ -185,6 +187,16 @@ class DishService {
       'feedbackId': feel.feedbackId
     };
     await ApiService.post('${Config.DISH_API}/feel', model);
+    if (owner != null && owner.fcmToken != null) {
+      await ApiService.post(Config.SEND_NOTIFICATION_API, {
+        'receiverToken': owner.fcmToken,
+        'title': 'Thông báo',
+        'body': '${owner.displayName} đã bày tỏ cảm xúc vào bài viết của bạn!',
+        'data': {
+          'type': 'category',
+        }
+      });
+    }
   }
 
   static Future<void> deleteFeel(Feel feel) async {

@@ -53,9 +53,12 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
   List<FeedbackModel> listFeedbacks = [];
 
   Future<void> getAllDishes(int page, int pageSize) async {
-    final res = await DishService.getDishByOwnerId(owner!.id!, page, pageSize);
+    final res = await DishService.getDishByOwnerId(owner?.id!, page, pageSize);
     setState(() {
       relatedDishes = res['dishes'];
+      for (Dish dish in relatedDishes) {
+        print(dish.toJson());
+      }
       total = res['total'];
     });
   }
@@ -122,7 +125,7 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
       final arguments = ModalRoute.of(context)?.settings.arguments as Map;
       setState(() {
         dish = arguments['dish'];
-        owner = arguments['owner'];
+        owner = dish!.owner;
         if (arguments['reactions'] != null) {
           listReactions = arguments['reactions'];
         } else {
@@ -137,11 +140,11 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
           checkSaved();
         }
         final Image noImage = Image.asset(
-          "assets/icons/i16/logo.png",
+          "assets/icons/i16/image-default.png",
           width: 70,
           height: 70,
         );
-        final imageUrl = owner!.imageUrl;
+        final imageUrl = owner?.imageUrl;
         image = (imageUrl != null)
             ? Image.network(
                 imageUrl,
@@ -156,7 +159,7 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
             : noImage;
         getAllDishes(1, 4);
         getAllFeedback(1, 4);
-        isMine = dish!.ownerId ==
+        isMine = dish!.owner?.id! ==
             Provider.of<UserProvider>(context, listen: false).user!.id!;
       });
     });
@@ -223,10 +226,11 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
                           ),
                           MenuItemButton(
                             onPressed: () {
-                              Navigate.pushNamed(RouterCommunity.addDish, arguments: {
-                                'dish': dish,
-                                'type': 'edit',
-                              } );
+                              Navigate.pushNamed(RouterCommunity.addDish,
+                                  arguments: {
+                                    'dish': dish,
+                                    'type': 'edit',
+                                  });
                             },
                             child:
                                 const MenuAcceleratorLabel('&Chỉnh sửa món ăn'),
@@ -781,7 +785,7 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
         ClipRRect(borderRadius: BorderRadius.circular(100), child: image),
         const SizedBox(height: 10),
-        owner == UserModel()
+        owner == null
             ? Container()
             : MyText(
                 text: 'Món mới của ${owner!.displayName}',
@@ -916,15 +920,17 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
     if (e.isSelected == false) {
       setSelected(e.type!, true, listReactions);
       incrementQuantity(e.type!, listReactions);
-      await DishService.addFeel(Feel(
-        type: e.type == 'like'
-            ? 1
-            : e.type == 'love'
-                ? 2
-                : 3,
-        userId: Provider.of<UserProvider>(context, listen: false).user!.id,
-        dishId: dish!.id,
-      ));
+      await DishService.addFeel(
+          Feel(
+            type: e.type == 'like'
+                ? 1
+                : e.type == 'love'
+                    ? 2
+                    : 3,
+            userId: Provider.of<UserProvider>(context, listen: false).user!.id,
+            dishId: dish!.id,
+          ),
+          dish!.owner);
     } else {
       setSelected(e.type!, false, listReactions);
       decrementQuantity(e.type!, listReactions);
@@ -958,7 +964,7 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
       );
       incrementQuantity(reaction.name, listReactions);
       setSelected(reaction.name, true, listReactions);
-      await DishService.addFeel(feel);
+      await DishService.addFeel(feel, dish!.owner);
     }
     setState(() {});
   }

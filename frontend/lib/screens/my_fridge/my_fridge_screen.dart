@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/components/item/item_category.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
@@ -18,7 +19,6 @@ import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/type.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:frontend/widgets/divider.dart';
-import 'package:frontend/widgets/tab_button.dart';
 import 'package:frontend/widgets/text.dart';
 import 'package:provider/provider.dart';
 
@@ -64,12 +64,22 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
     super.initState();
     user = Provider.of<UserProvider>(context, listen: false).user;
     tabController = TabController(length: 3, vsync: this);
+    // notification();
   }
 
   @override
   void dispose() {
     tabController.dispose();
     super.dispose();
+  }
+
+  void notification() async {
+    List<NotificationModel> scheduledNotifications =
+        await AwesomeNotifications().listScheduledNotifications();
+    print('scheduledNotifications: ${scheduledNotifications.length}');
+    for (var schedule in scheduledNotifications) {
+      print('schedule: $schedule');
+    }
   }
 
   @override
@@ -344,7 +354,7 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
           icon: Icon(Icons.kitchen),
         ),
         Tab(
-           text: 'Đông',
+          text: 'Đông',
           icon: Icon(Icons.ac_unit),
         ),
         Tab(
@@ -358,13 +368,14 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
   Future? futureCategory;
 
   void clearCache() async {
-    CategoryService().deleteCache();
+    await CategoryService().deleteCache();
   }
 
   Widget _renderTab(int positionId) {
     String getFoodLabel(String value) {
       return foods.firstWhere((element) => element.value == value).label;
     }
+
     return FutureBuilder(
       future: CategoryService().getCategoriesByPosition(positionId: positionId),
       builder: (context, snapshot) {
@@ -377,101 +388,125 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
             }
             groupedCategories[category.type]?.add(category);
           }
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: groupedCategories.entries.map((food) {
-                return Column(
+          return listCategories.isEmpty
+              ? Center(
+                  child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
+                    Image.asset(
+                      'assets/icons/i16/item-food.png',
+                      width: 50,
+                      height: 50,
+                    ),
+                    const SizedBox(height: 20),
+                    Flexible(
+                      child: MyText(
+                        text: 'Thức ăn của bạn đang chờ được cất giữ',
+                        fontSize: FontSize.z18,
+                        fontWeight: FontWeight.w600,
+                        color: MyColors.grey['c900']!,
+                      ),
+                    )
+                  ],
+                ))
+              : SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: groupedCategories.entries.map((food) {
+                      return Column(
+                        children: [
+                          Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                child: MyText(
-                                  text: '${getFoodLabel(food.key)} (${food.value.length})',  
-                                  fontSize: FontSize.z16,
-                                  fontWeight: FontWeight.w600,
-                                  color: MyColors.grey['c900']!,
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              Container(
-                                width: MediaQuery.of(context).size.width,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 10),
-                                decoration: BoxDecoration(
-                                  color: MyColors.grey['c100']!,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Wrap(
-                                  spacing: 14,
-                                  runSpacing: 5,
-                                  children: food.value
-                                      .map((category) => GestureDetector(
-                                          onTap: () {
-                                            if (isSelecting) {
-                                              if (isSelected
-                                                  .contains(category.id)) {
-                                                setState(() {
-                                                  isSelected
-                                                      .remove(category.id);
-                                                });
-                                              } else {
-                                                setState(() {
-                                                  isSelected.add(category.id!);
-                                                });
-                                              }
-                                            } else {
-                                              print(category.toJson());
-                                              Navigator.pushNamed(
-                                                  context,
-                                                  RouterMyFridge
-                                                      .editCategoryDetail,
-                                                  arguments: {
-                                                    'category': category
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      child: MyText(
+                                        text:
+                                            '${getFoodLabel(food.key)} (${food.value.length})',
+                                        fontSize: FontSize.z16,
+                                        fontWeight: FontWeight.w600,
+                                        color: MyColors.grey['c900']!,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 5,
+                                    ),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 10),
+                                      decoration: BoxDecoration(
+                                        color: MyColors.grey['c100']!,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Wrap(
+                                        spacing: 14,
+                                        runSpacing: 5,
+                                        children: food.value
+                                            .map((category) => GestureDetector(
+                                                onTap: () {
+                                                  if (isSelecting) {
+                                                    if (isSelected.contains(
+                                                        category.id)) {
+                                                      setState(() {
+                                                        isSelected.remove(
+                                                            category.id);
+                                                      });
+                                                    } else {
+                                                      setState(() {
+                                                        isSelected
+                                                            .add(category.id!);
+                                                      });
+                                                    }
+                                                  } else {
+                                                    print(category.toJson());
+                                                    Navigator.pushNamed(
+                                                        context,
+                                                        RouterMyFridge
+                                                            .editCategoryDetail,
+                                                        arguments: {
+                                                          'category': category
+                                                        });
+                                                  }
+                                                },
+                                                onLongPress: () {
+                                                  widget.showBottomBar!(false);
+                                                  setState(() {
+                                                    isSelected
+                                                        .add(category.id!);
+                                                    isSelecting = true;
                                                   });
-                                            }
-                                          },
-                                          onLongPress: () {
-                                            widget.showBottomBar!(false);
-                                            setState(() {
-                                              isSelected.add(category.id!);
-                                              isSelecting = true;
-                                            });
-                                          },
-                                          child: CategoryItem(
-                                            category: category,
-                                            isSelected: isSelected
-                                                .contains(category.id!),
-                                          )))
-                                      .toList(),
+                                                },
+                                                child: CategoryItem(
+                                                  category: category,
+                                                  isSelected: isSelected
+                                                      .contains(category.id!),
+                                                )))
+                                            .toList(),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    const MyDivider(),
-                    const SizedBox(
-                      height: 10,
-                    )
-                  ],
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const MyDivider(),
+                          const SizedBox(
+                            height: 10,
+                          )
+                        ],
+                      );
+                    }).toList(),
+                  ),
                 );
-              }).toList(),
-            ),
-          );
         } else if (snapshot.hasError) {
           return Text('${snapshot.error}');
         } else {
@@ -557,6 +592,12 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
   void onTapDelete() {
     for (var element in isSelected) {
       ApiService.delete('${Config.CATEGORIES_API}/$element').then((value) {
+        setState(() {
+          isSelecting = false;
+          isSelected.clear();
+        });
+        clearCache();
+        widget.showBottomBar!(true);
         showDialog(
             context: context,
             builder: (context) {
@@ -569,11 +610,6 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
             });
       });
     }
-    setState(() {
-      isSelecting = false;
-    });
-    widget.showBottomBar!(true);
-    clearCache();
   }
 
   void onTapSignOut() {}

@@ -76,9 +76,15 @@ class CategoryService {
   }
 
   Future deleteCache() async {
-    await APICacheManager().deleteCache('categories_1');
-    await APICacheManager().deleteCache('categories_2');
-    await APICacheManager().deleteCache('categories_3');
+    var isCacheExist1 =
+        await APICacheManager().isAPICacheKeyExist('categories_1');
+    var isCacheExist2 =
+        await APICacheManager().isAPICacheKeyExist('categories_2');
+    var isCacheExist3 =
+        await APICacheManager().isAPICacheKeyExist('categories_3');
+    if (isCacheExist1) await APICacheManager().deleteCache('categories_1');
+    if (isCacheExist2) await APICacheManager().deleteCache('categories_2');
+    if (isCacheExist3) await APICacheManager().deleteCache('categories_3');
   }
 
   Future<List<Category>> getAllCategories() async {

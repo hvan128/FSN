@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/config.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/introduction.dart';
 import 'package:frontend/navigation/routes.dart';
+import 'package:frontend/services/notification/firebase_messaging.dart';
 import 'package:frontend/provider/google_sign_in.dart';
+import 'package:frontend/provider/notification.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/services/auth/shared_service.dart';
 import 'package:frontend/theme/color.dart';
@@ -27,12 +30,21 @@ void main() async {
     });
     _defaultRoute = RouterIntroduction.afterLogin;
   }
+  FirebaseMessagingService.initializeNotification();
+    List<NotificationModel> scheduledNotifications =
+        await AwesomeNotifications().listScheduledNotifications();
+    print('scheduledNotifications: ${scheduledNotifications.length}');
+    for (var schedule in scheduledNotifications) {
+      print('schedule: $schedule');
+    }
   runApp(const MainApp());
 }
+
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
   static final navigate = Navigate();
+  
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +52,7 @@ class MainApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (context) => GoogleSignInProvider()),
+        ChangeNotifierProvider(create: (context) => NotificationProvider()),
       ],
       child: MaterialApp(
         title: Config.APP_NAME,

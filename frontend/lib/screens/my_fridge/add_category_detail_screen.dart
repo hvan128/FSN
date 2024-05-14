@@ -1,11 +1,16 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:convert';
+
 import 'package:api_cache_manager/api_cache_manager.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
 import 'package:frontend/config.dart';
 import 'package:frontend/models/category/category.dart';
+import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/navigation.dart';
+import 'package:frontend/services/notification/local_notification.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/home_screen.dart';
 import 'package:frontend/services/api_service.dart';
@@ -393,10 +398,12 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
   }
 
   void onPressAdd() async {
-    final fridgeId = Provider.of<UserProvider>(
-          Navigate().navigationKey.currentContext!,
-          listen: false)
-      .user!.fridgeId;
+    final currentUser = Provider.of<UserProvider>(
+            Navigate().navigationKey.currentContext!,
+            listen: false)
+        .user!;
+    final fridgeId = currentUser.fridgeId;
+    final users = await getUsers(fridgeId!);
     await ApiService.post(Config.CATEGORIES_API, {
       'label': widget.category!.label,
       'value': widget.category!.value,
@@ -409,10 +416,49 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
       'manufactureDate': manufactureDate!.toIso8601String(),
       'expiryDate': expDate!.toIso8601String(),
       'fridgeId': fridgeId
+    }).then((value) async {
+      Category category =
+          Category.fromJson(jsonDecode(value.toString())['data']);
+      final DateTime expiryDate = category.expiryDate!;
+
+      NotificationService.showNotification(
+        id: category.id!,
+        title: 'Hết hạn',
+        body: '${category.label} cần được tiêu thụ gấp trong hôm nay!',
+        scheduled: true,
+        time: DateTime(
+            expiryDate.year, expiryDate.month, expiryDate.day, 9, 0, 0),
+      );
+      for (var element in users) {
+        if (element.id != currentUser.id && element.fcmToken != null) {
+          ApiService.post(Config.SEND_NOTIFICATION_API, {
+            'receiverToken': element.fcmToken,
+            'title': 'Tủ lạnh',
+            'body': '${element.displayName} đã thêm mới một đồ ăn vào tủ lạnh!',
+            'data': {
+              'type': 'category',
+              'categoryId': category.id.toString(),
+            }
+          });
+          final expiryDate = DateTime(expDate!.year, expDate!.month, expDate!.day, 9, 0, 0);
+          ApiService.post(Config.SEND_NOTIFICATION_API, {
+            'receiverToken': element.fcmToken,
+            'title': 'Hết hạn',
+            'body': '${category.label} cần được tiêu thụ gấp trong hôm nay!',
+            'data': {
+              'type': 'schedule',
+              'id': category.id.toString(),
+              'time': expiryDate.toIso8601String(),
+            }
+          });
+        }
+      }
     });
+
     await APICacheManager().deleteCache('categories_${int.parse(position!)}');
     await APICacheManager().deleteCache('categories');
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const HomeScreen()));
     showDialog(
         context: context,
         builder: (context) {
@@ -424,5 +470,16 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
                 'Thêm đồ ăn ${widget.category!.label} vào $position thành công!',
           );
         });
+  }
+
+  Future<List<UserModel>> getUsers(int? fridgeId) async {
+    List<UserModel> listUsers = [];
+    await ApiService.get('${Config.USER_API}/fridge/$fridgeId').then((value) {
+      if (value != null && value != 'No data') {
+        final data = jsonDecode(value.toString())['data'];
+        listUsers = userFromJson(data);
+      }
+    });
+    return listUsers;
   }
 }

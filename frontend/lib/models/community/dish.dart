@@ -1,3 +1,4 @@
+import 'package:frontend/models/user/user.dart';
 import 'package:frontend/utils/functions_core.dart';
 
 List<Dish> dishFromJson(dynamic str) =>
@@ -5,7 +6,7 @@ List<Dish> dishFromJson(dynamic str) =>
 
 class Dish {
   int? id;
-  int? ownerId;
+  UserModel? owner;
   String? label;
   String? image;
   String? description;
@@ -20,7 +21,7 @@ class Dish {
 
   Dish({
     this.id,
-    this.ownerId,
+    this.owner,
     this.label,
     this.image,
     this.description,
@@ -37,7 +38,7 @@ class Dish {
   factory Dish.fromJson(Map<String, dynamic> json) {
     return Dish(
       id: json['id'],
-      ownerId: json['ownerId'],
+      owner: json['owner'] != null ? UserModel.fromJson(json['owner']) : null,
       label: json['label'],
       image: json['image'],
       description: json['description'],
@@ -67,7 +68,7 @@ class Dish {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'ownerId': ownerId,
+      'ownerId': owner?.id,
       'label': label,
       'image': image,
       'description': description,

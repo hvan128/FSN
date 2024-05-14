@@ -49,10 +49,17 @@ export const getNewCategoryByFridgeId = (req, res, next) => {
   }})
 }
 
-export const addCategory = (req, res) => {
+export const addCategory = (req, res, next) => {
   var data = req.body;
-  Category.create(data, (result) => {
-    res.send(result);
+  Category.create(data, (err, result) => {
+    if (err) {
+      return next(err);
+    } else {
+      return res.status(200).send({
+        message: "Success",
+        data: result,
+      });
+    }
   });
 };
 

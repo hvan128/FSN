@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/components/item/item_category.dart';
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/screens/my_fridge/add_category_detail_screen.dart';
 import 'package:frontend/screens/search/search_screen.dart';

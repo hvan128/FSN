@@ -15,6 +15,8 @@ class UserModel {
   String? gender;
   int? fridgeId;
   String? role;
+  String? deviceId;
+  String? fcmToken;
 
   UserModel(
       {this.imageUrl,
@@ -29,6 +31,8 @@ class UserModel {
       this.fridgeId,
       this.email,
       this.token,
+      this.deviceId,
+      this.fcmToken,
       this.displayName});
 
   UserModel.fromJson(Map<String, dynamic> json) {
@@ -43,6 +47,8 @@ class UserModel {
     phone = json['phone'];
     fridgeId = json['fridgeId'];
     birthday = json['birthday'];
+    deviceId = json['deviceId'];
+    fcmToken = json['fcmToken'];
     gender = json['gender'];
     role = json['role'];
   }
@@ -59,6 +65,8 @@ class UserModel {
     data['imageUrl'] = imageUrl;
     data['address'] = address;
     data['phone'] = phone;
+    data['deviceId'] = deviceId;
+    data['fcmToken'] = fcmToken;
     data['birthday'] = birthday;
     data['gender'] = gender;
     data['role'] = role;

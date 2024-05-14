@@ -25,19 +25,10 @@ class _MyFoodCardState extends State<MyFoodCard> {
   @override
   void initState() {
     super.initState();
-    fetchUser();
+    owner = widget.dish.owner;
   }
 
-  void fetchUser() async {
-    await ApiService.get('${Config.USER_API}/${widget.dish.ownerId}')
-        .then((value) {
-      if (value != null && value.isNotEmpty) {
-        setState(() {
-          owner = UserModel.fromJson(jsonDecode(value)[0]);
-        });
-      }
-    });
-  }
+  
 
   @override
   Widget build(BuildContext context) {

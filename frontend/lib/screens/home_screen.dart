@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/screens/account/account_screen.dart';
 import 'package:frontend/screens/community/community_screen.dart';
 import 'package:frontend/screens/my_fridge/my_fridge_screen.dart';
+import 'package:frontend/screens/notification/notification_screen.dart';
 import 'package:frontend/screens/report/report_screen.dart';
 import 'package:frontend/screens/to_do/shopping_list_screen.dart';
 import 'package:frontend/theme/color.dart';
@@ -104,8 +105,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   BottomNavigationBarItem(
                     icon: _navigateItem(
                         _currentIndex == 4 ? true : false,
-                        'Tài khoản',
-                        Image.asset('assets/icons/i16/account.png',
+                        'Thông báo',
+                        Image.asset('assets/icons/i16/bell.png',
                             width: 25,
                             height: 25,
                             color: _currentIndex == 4
@@ -147,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
           navigateBottomBar: (int index) => handleNavigateBottomBar(index),
         );
       case 4:
-        return const AccountScreen();
+        return const NotificationScreen();
       default:
         return Container();
     }

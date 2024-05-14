@@ -40,7 +40,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
     if (result.isNotEmpty) {
       for (var item in result) {
         listFoods
-            .firstWhere((element) => element.value == item.type)
+            .firstWhere((element) => element.value == item.type, orElse: () => listFoods.last)
             .categories
             .add(item);
       }

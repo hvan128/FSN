@@ -3,6 +3,7 @@ import Step from "../models/step.model.js";
 import Ingredient from "./ingredient.model.js";
 import Feel from "./feel.model.js";
 import Save from "./save.model.js";
+import User from "./user.model.js";
 
 class Dish {
   constructor(
@@ -188,7 +189,14 @@ Dish.findById = (id, result) => {
           result(err, null);
           return;
         }
-        result(null, { ...res0[0], steps, ingredients, feels, saves });
+        User.findById(res0[0].ownerId, (err, [owner]) => {
+          if (err) {
+            console.log(err);
+            result(err, null);
+            return;
+          }
+          result(null, { ...res0[0], steps, ingredients, feels, saves, owner });
+        });
       });
     })
     .catch((err) => {
@@ -263,15 +271,25 @@ Dish.findByOwnerId = (ownerId, page, pageSize, result) => {
                 }
               });
             });
+            var userPromise = new Promise((resolve, reject) => {
+              User.findById(dish.ownerId, (err, [owner]) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve(owner);
+                }
+              });
+            })
 
             Promise.all([
               stepsPromise,
               ingredientsPromise,
               feelsPromise,
               savesPromise,
+              userPromise,
             ])
-              .then(([steps, ingredients, feels, saves]) => {
-                dishes.push({ ...dish, steps, ingredients, feels, saves });
+              .then(([steps, ingredients, feels, saves, owner]) => {
+                dishes.push({ ...dish, steps, ingredients, feels, saves, owner });
 
                 if (dishes.length === res.length) {
                   var response = {
@@ -372,50 +390,22 @@ Dish.getAllDish = (page, pageSize, result) => {
     const totalCount = countResult[0].total;
 
     db.query(
-      `SELECT * FROM dish ORDER BY createdAt DESC LIMIT ${pageSize} OFFSET ${offset}`,
+      `SELECT id FROM dish ORDER BY createdAt DESC LIMIT ${pageSize} OFFSET ${offset}`,
       (err, res) => {
         if (err) {
           console.log(err);
           result(err, null);
           return;
         }
+        console.log(res);
 
-        const promises = res.map((dish) => {
+        var promises = res.map((dishId) => {
           return new Promise((resolve, reject) => {
-            const dishId = dish.id;
-
-            Step.getStepsByDishId(dishId, (err, steps) => {
+            Dish.findById(dishId.id, (err, dishInfo) => {
               if (err) {
                 reject(err);
               } else {
-                Ingredient.getIngredientsByDishId(
-                  dishId,
-                  (err, ingredients) => {
-                    if (err) {
-                      reject(err);
-                    } else {
-                      Feel.findByDishId(dishId, (err, feels) => {
-                        if (err) {
-                          reject(err);
-                        } else {
-                          Save.findByDishId(dishId, (err, saves) => {
-                            if (err) {
-                              reject(err);
-                            } else {
-                              resolve({
-                                ...dish,
-                                steps,
-                                ingredients,
-                                feels,
-                                saves,
-                              });
-                            }
-                          });
-                        }
-                      });
-                    }
-                  }
-                );
+                resolve(dishInfo);
               }
             });
           });

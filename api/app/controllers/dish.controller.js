@@ -64,7 +64,6 @@ export const updateDish = (req, res, next) => {
       var file = req.files;
       var fileSelected = JSON.parse(req.body.fileSelected);
       var id = req.params.id;
-      console.log(body);
       var data = {
         id: id,
         ownerId: body.ownerId,

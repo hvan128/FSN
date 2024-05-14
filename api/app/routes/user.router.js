@@ -2,7 +2,7 @@ import * as UserController from '../controllers/user.controller.js';
 
 export default (router) => {
     router.get('/api/v1/user', function(req, res, next) {
-        UserController.getAllUser(req, res);
+        UserController.getAllUser(req, res, next);
     })
 
     router.get('/api/v1/user/:id', function(req, res, next) {
@@ -21,7 +21,7 @@ export default (router) => {
         UserController.create(req, res);
     })
 
-    router.put('/api/v1/user/', function(req, res, next) {
+    router.put('/api/v1/user', function(req, res) {
         UserController.update(req, res);
     })
 }

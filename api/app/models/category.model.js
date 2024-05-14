@@ -1,4 +1,5 @@
 import db from "../common/connect.js";
+import Notification from "./notification.model.js";
 class Category {
   constructor(
     id,
@@ -43,6 +44,23 @@ Category.create = (data, result) => {
       result(err, null);
       return;
     } else {
+      Notification.create(
+        {
+          fridgeId: data.fridgeId,
+          type: "fridge",
+          action: "expire",
+          createdAt: data.expiryDate,
+          read: 0,
+          categoryId: res.insertId
+        },
+        (err, res) => {
+          if (err) {
+            console.log(err);
+            result(err, null);
+            return;
+          }
+        }
+      );
       result(null, { id: res.insertId, ...data });
     }
   });
@@ -55,6 +73,22 @@ Category.createNewCategory = (data, result) => {
       result(err, null);
       return;
     } else {
+      Notification.create(
+        {
+          fridgeId: data.fridgeId,
+          type: "fridge",
+          action: "newCategory",
+          read: 0,
+          categoryId: res.insertId
+        },
+        (err, res) => {
+          if (err) {
+            console.log(err);
+            result(err, null);
+            return;
+          }
+        }
+      );
       result(null, { id: res.insertId, ...data });
     }
   });
