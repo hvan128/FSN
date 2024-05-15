@@ -498,7 +498,7 @@ class FunctionCore {
   }
 
   static DateTime convertTime(String time) {
-    DateTime date = DateFormat("yyyy-MM-ddTHH:mm:ss.SSS'Z'").parseUtc(time);
+    DateTime date = DateFormat("yyyy-MM-ddTHH:mm:ss.SSS'Z'").parseUtc(time).add(const Duration(hours: 7));
     return date;
   }
 
@@ -509,13 +509,21 @@ class FunctionCore {
   static String calculateDuration(DateTime date) {
     final difference = DateTime.now().difference(date);
     if (difference.inDays > 0) {
-      return '${difference.inDays} ngày trước';
+      if (difference.inDays == 1) {
+        return 'Hôm qua';
+      } else {
+        return '${difference.inDays} ngày trước';
+      }
     } else if (difference.inHours > 0) {
       return '${difference.inHours} giờ trước';
     } else if (difference.inMinutes > 0) {
       return '${difference.inMinutes} phút trước';
     } else {
-      return '${difference.inSeconds} giây trước';
+      if (difference.inSeconds < 30) {
+        return 'Vừa xong';
+      } else {
+        return '${difference.inSeconds} giây trước';
+      }
     }
   }
 }

@@ -45,6 +45,7 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
   SortType? sortType;
   ViewType? viewType;
   bool? classify;
+  Map<String, List<Category>> categoryMap = {};
 
   final List<Item> listPositions = [
     Item(
@@ -75,6 +76,20 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
     sortType = categoryProvider.sortType;
     viewType = categoryProvider.viewType;
     classify = categoryProvider.classify;
+    fetchCategories();
+  }
+
+  Future<void> fetchCategories() async {
+    for (var element in listPositions) {
+      await CategoryService()
+          .getCategoriesByPosition(
+              positionId: int.parse(element.value),
+              sortType: sortType,
+              sort: Sort.asc)
+          .then((value) => setState(() {
+                categoryMap[element.value] = value;
+              }));
+    }
   }
 
   @override
@@ -273,6 +288,19 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
                           const SizedBox(
                             width: 10,
                           ),
+                          Container(
+                              decoration: BoxDecoration(
+                                color: MyColors.grey['c600']!.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              padding: const EdgeInsets.all(3),
+                              child: Icon(
+                                Icons.bubble_chart,
+                                color: MyColors.white['c900'],
+                              )),
+                          const SizedBox(
+                            width: 10,
+                          ),
                           PopupMenuButton(
                             itemBuilder: (context) => [
                               PopupMenuItem(
@@ -401,7 +429,7 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
     return TabBar(
       controller: tabController,
       dividerColor: Colors.transparent,
-      tabs: [
+      tabs: const [
         Tab(
           text: 'Lạnh',
           icon: Icon(Icons.kitchen),
@@ -420,7 +448,7 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
 
   Future? futureCategory;
 
-  void clearCache() async {
+  Future<void> clearCache() async {
     await CategoryService().deleteCache();
   }
 
@@ -429,145 +457,195 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
       return foods.firstWhere((element) => element.value == value).label;
     }
 
-    return FutureBuilder(
-      future: CategoryService()
-          .getCategoriesByPosition(positionId: positionId, sortType: sortType),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          final listCategories = snapshot.data as List<Category>;
-          Map<String, List<Category>> groupedCategories = {};
-          for (var category in listCategories) {
-            if (!groupedCategories.containsKey(category.type)) {
-              groupedCategories[category.type!] = [];
-            }
-            groupedCategories[category.type]?.add(category);
-          }
-          return listCategories.isEmpty
-              ? Center(
-                  child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/icons/i16/item-food.png',
-                      width: 50,
-                      height: 50,
-                    ),
-                    const SizedBox(height: 20),
-                    Flexible(
-                      child: MyText(
-                        text: 'Thức ăn của bạn đang chờ được cất giữ',
-                        fontSize: FontSize.z18,
-                        fontWeight: FontWeight.w600,
-                        color: MyColors.grey['c900']!,
-                      ),
-                    )
-                  ],
-                ))
-              : SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: groupedCategories.entries.map((food) {
-                      return Column(
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      child: MyText(
-                                        text:
-                                            '${getFoodLabel(food.key)} (${food.value.length})',
-                                        fontSize: FontSize.z16,
-                                        fontWeight: FontWeight.w600,
-                                        color: MyColors.grey['c900']!,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    Container(
-                                      width: MediaQuery.of(context).size.width,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 10),
-                                      decoration: BoxDecoration(
-                                        color: MyColors.grey['c100']!,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: Wrap(
-                                        spacing: 14,
-                                        runSpacing: 5,
-                                        children: food.value
-                                            .map((category) => GestureDetector(
-                                                onTap: () {
-                                                  if (isSelecting) {
-                                                    if (isSelected.contains(
-                                                        category.id)) {
-                                                      setState(() {
-                                                        isSelected.remove(
-                                                            category.id);
-                                                      });
-                                                    } else {
-                                                      setState(() {
-                                                        isSelected
-                                                            .add(category.id!);
-                                                      });
-                                                    }
-                                                  } else {
-                                                    print(category.toJson());
-                                                    Navigator.pushNamed(
-                                                        context,
-                                                        RouterMyFridge
-                                                            .editCategoryDetail,
-                                                        arguments: {
-                                                          'category': category
-                                                        });
-                                                  }
-                                                },
-                                                onLongPress: () {
-                                                  widget.showBottomBar!(false);
-                                                  setState(() {
-                                                    isSelected
-                                                        .add(category.id!);
-                                                    isSelecting = true;
-                                                  });
-                                                },
-                                                child: CategoryItem(
-                                                  category: category,
-                                                  isSelected: isSelected
-                                                      .contains(category.id!),
-                                                )))
-                                            .toList(),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          const MyDivider(),
-                          const SizedBox(
-                            height: 10,
-                          )
-                        ],
-                      );
-                    }).toList(),
-                  ),
-                );
-        } else if (snapshot.hasError) {
-          return Text('${snapshot.error}');
-        } else {
-          return const Center(child: CircularProgressIndicator());
+    List<Category>? listCategories = categoryMap[positionId.toString()];
+    Map<String, List<Category>> groupedCategories = {};
+    if (listCategories == null) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    } else {
+      for (var category in listCategories) {
+        if (!groupedCategories.containsKey(category.type)) {
+          groupedCategories[category.type!] = [];
         }
-      },
-    );
+        groupedCategories[category.type]?.add(category);
+      }
+      return listCategories.isEmpty
+          ? Center(
+              child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/icons/i16/item-food.png',
+                  width: 50,
+                  height: 50,
+                ),
+                const SizedBox(height: 20),
+                Flexible(
+                  child: MyText(
+                    text: 'Thức ăn của bạn đang chờ được cất giữ',
+                    fontSize: FontSize.z18,
+                    fontWeight: FontWeight.w600,
+                    color: MyColors.grey['c900']!,
+                  ),
+                )
+              ],
+            ))
+          : SingleChildScrollView(
+              child: classify == true
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: groupedCategories.entries.map((food) {
+                        return Column(
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        child: MyText(
+                                          text:
+                                              '${getFoodLabel(food.key)} (${food.value.length})',
+                                          fontSize: FontSize.z16,
+                                          fontWeight: FontWeight.w600,
+                                          color: MyColors.grey['c900']!,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      Container(
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12, vertical: 10),
+                                        decoration: BoxDecoration(
+                                          color: MyColors.grey['c100']!,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        child: Wrap(
+                                          spacing: 14,
+                                          runSpacing: 5,
+                                          children: food.value
+                                              .map(
+                                                  (category) => GestureDetector(
+                                                      onTap: () {
+                                                        if (isSelecting) {
+                                                          if (isSelected
+                                                              .contains(category
+                                                                  .id)) {
+                                                            setState(() {
+                                                              isSelected.remove(
+                                                                  category.id);
+                                                            });
+                                                          } else {
+                                                            setState(() {
+                                                              isSelected.add(
+                                                                  category.id!);
+                                                            });
+                                                          }
+                                                        } else {
+                                                          print(category
+                                                              .toJson());
+                                                          Navigator.pushNamed(
+                                                              context,
+                                                              RouterMyFridge
+                                                                  .editCategoryDetail,
+                                                              arguments: {
+                                                                'category':
+                                                                    category
+                                                              });
+                                                        }
+                                                      },
+                                                      onLongPress: () {
+                                                        widget.showBottomBar!(
+                                                            false);
+                                                        setState(() {
+                                                          isSelected.add(
+                                                              category.id!);
+                                                          isSelecting = true;
+                                                        });
+                                                      },
+                                                      child: CategoryItem(
+                                                        category: category,
+                                                        viewType: viewType,
+                                                        isSelected:
+                                                            isSelected.contains(
+                                                                category.id!),
+                                                      )))
+                                              .toList(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            const MyDivider(),
+                            const SizedBox(
+                              height: 10,
+                            )
+                          ],
+                        );
+                      }).toList())
+                  : Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: MyColors.grey['c100']!,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Wrap(
+                        spacing: 14,
+                        runSpacing: 5,
+                        children: listCategories
+                            .map((category) => GestureDetector(
+                                onTap: () {
+                                  if (isSelecting) {
+                                    if (isSelected.contains(category.id)) {
+                                      setState(() {
+                                        isSelected.remove(category.id);
+                                      });
+                                    } else {
+                                      setState(() {
+                                        isSelected.add(category.id!);
+                                      });
+                                    }
+                                  } else {
+                                    print(category.toJson());
+                                    Navigator.pushNamed(context,
+                                        RouterMyFridge.editCategoryDetail,
+                                        arguments: {'category': category});
+                                  }
+                                },
+                                onLongPress: () {
+                                  widget.showBottomBar!(false);
+                                  setState(() {
+                                    isSelected.add(category.id!);
+                                    isSelecting = true;
+                                  });
+                                },
+                                child: CategoryItem(
+                                  category: category,
+                                  viewType: viewType,
+                                  isSelected: isSelected.contains(category.id!),
+                                )))
+                            .toList(),
+                      ),
+                    ),
+            );
+    }
   }
 
   Widget _buildOptions() {
@@ -616,16 +694,18 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
           return ModalSelect(
               title: 'Di chuyển tới',
               options: listPositions,
-              onSelectItem: (value) {
+              onSelectItem: (value) async {
                 for (var element in isSelected) {
                   ApiService.put('${Config.CATEGORIES_API}/position',
                       {'id': element, 'positionId': value.value});
                 }
-                clearCache();
+                final isSelectedLength = isSelected.length;
                 setState(() {
                   isSelecting = false;
                   isSelected.clear();
                 });
+                await clearCache();
+                await fetchCategories();
                 widget.showBottomBar!(true);
                 Navigator.of(context).pop();
                 showDialog(
@@ -636,7 +716,7 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
                         position: AlertPosition.topCenter,
                         title: 'Thành công',
                         description:
-                            'Đã di chuyển ${isSelected.length} đồ ăn tới ${value.label}!',
+                            'Đã di chuyển $isSelectedLength đồ ăn tới ${value.label}!',
                       );
                     });
               });
@@ -645,12 +725,16 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
 
   void onTapDelete() {
     for (var element in isSelected) {
-      ApiService.delete('${Config.CATEGORIES_API}/$element').then((value) {
+      ApiService.delete('${Config.CATEGORIES_API}/$element')
+          .then((value) async {
+        final isSelectedLength = isSelected.length;
+
         setState(() {
           isSelecting = false;
           isSelected.clear();
         });
-        clearCache();
+        await clearCache();
+        await fetchCategories();
         widget.showBottomBar!(true);
         showDialog(
             context: context,
@@ -659,14 +743,12 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
                 alertType: AlertType.success,
                 position: AlertPosition.topCenter,
                 title: 'Thành công',
-                description: 'Xóa ${isSelected.length} đồ ăn khỏi tủ lạnh!',
+                description: 'Xóa $isSelectedLength đồ ăn khỏi tủ lạnh!',
               );
             });
       });
     }
   }
-
-  void onTapSignOut() {}
 
   void onTapSetting() {
     Navigate.pushNamed(RouterSetting.setting);
@@ -674,11 +756,25 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
 
   void showModalClassify() {
     showDialog(context: context, builder: (context) => const ModalClassify())
-        .then((_) => setState(() {}));
+        .then((_) async {
+      setState(() {
+        classify =
+            Provider.of<CategoryProvider>(context, listen: false).classify;
+        sortType =
+            Provider.of<CategoryProvider>(context, listen: false).sortType;
+      });
+      await clearCache();
+      await fetchCategories();
+    });
   }
 
   void showModalFilter() {
     showDialog(context: context, builder: (context) => const ModalFilter())
-        .then((_) => setState(() {}));
+        .then((_) async {
+      setState(() {
+        viewType =
+            Provider.of<CategoryProvider>(context, listen: false).viewType;
+      });
+    });
   }
 }

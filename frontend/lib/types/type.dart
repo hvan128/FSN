@@ -56,3 +56,9 @@ class ModalPosition {
     this.bottom = 0.0,
   });
 }
+
+
+enum Sort {
+  asc,
+  desc,
+}

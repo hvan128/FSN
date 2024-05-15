@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:frontend/components/modals/modal_classify.dart';
+import 'package:frontend/components/modals/modal_filter.dart';
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/models/community/dish.dart';
 import 'package:frontend/models/notification/announcement_model.dart';
 import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/community.dart';
+import 'package:frontend/provider/category.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/community/dish_detail_screen.dart';
+import 'package:frontend/services/category/category_service.dart';
 import 'package:frontend/services/notification/local_notification.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
@@ -15,10 +19,14 @@ import 'package:frontend/utils/functions_core.dart';
 import 'package:frontend/widgets/divider.dart';
 import 'package:frontend/widgets/tab_button.dart';
 import 'package:frontend/widgets/text.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class NotificationScreen extends StatefulWidget {
-  const NotificationScreen({super.key});
+  final Function(bool)? showBottomBar;
+  final Function(int)? navigateBottomBar;
+  const NotificationScreen(
+      {super.key, this.showBottomBar, this.navigateBottomBar});
 
   @override
   State<NotificationScreen> createState() => _NotificationScreenState();
@@ -49,6 +57,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
     setState(() {
       listFridgeAnnouncements = filteredAnnouncements;
     });
+    for (Announcement announcement in filteredAnnouncements) {
+      print('announcement: ${announcement.toJson()}');
+    }
   }
 
   void fetchCommunityAnnouncements() async {
@@ -162,10 +173,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget renderTab(int index) {
     List<Announcement>? announcements =
         index == 0 ? listFridgeAnnouncements : listCommunityAnnouncements;
+    Map<String, List<Announcement>> groupedData =
+        groupAnnouncementsByDate(announcements ?? []);
     return Expanded(
       child: Container(
         padding:
-            const EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 55),
+            const EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 10),
         color: MyColors.primary["CulturalYellow"]!["c50"]!,
         child: Container(
           decoration: BoxDecoration(
@@ -185,10 +198,31 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     )
                   : SingleChildScrollView(
                       child: Column(
-                          children: announcements
-                              .map((announcement) =>
-                                  announcementItem(announcement))
-                              .toList()),
+                        children: groupedData.keys.map((date) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 18, vertical: 10),
+                                child: MyText(
+                                  text: date,
+                                  fontSize: FontSize.z18,
+                                  fontWeight: FontWeight.w700,
+                                  color: MyColors.grey["c800"]!,
+                                ),
+                              ),
+                              ...groupedData[date]!.map((announcement) {
+                                return Column(
+                                  children: [
+                                    announcementItem(announcement),
+                                  ],
+                                );
+                              }).toList(),
+                            ],
+                          );
+                        }).toList(),
+                      ),
                     ),
         ),
       ),
@@ -278,16 +312,29 @@ class _NotificationScreenState extends State<NotificationScreen> {
   void redirectAnnouncementDetail(Announcement announcement) async {
     if (announcement.type == 'community') {
       if (announcement.read == false) {
-        readNotification(listCommunityAnnouncements, announcement.id!);
         await NotificationService.readNotification(id: announcement.id!);
+        readNotification(listCommunityAnnouncements, announcement.id!);
       }
       Navigate.pushNamed(RouterCommunity.dishDetail,
           arguments: {'dish': announcement.dish});
     }
     if (announcement.type == 'fridge') {
       if (announcement.read == false) {
-        readNotification(listFridgeAnnouncements, announcement.id!);
         await NotificationService.readNotification(id: announcement.id!);
+        readNotification(listFridgeAnnouncements, announcement.id!);
+      }
+      if (announcement.category!.deleted == false) {
+        await CategoryService().deleteCache();
+        widget.navigateBottomBar!(0);
+        Provider.of<CategoryProvider>(context, listen: false)
+            .sortTypeChange(value: SortType.expiryDate);
+        Provider.of<CategoryProvider>(context, listen: false)
+            .viewTypeChange(value: ViewType.list);
+        Provider.of<CategoryProvider>(context, listen: false)
+            .classifyChange(value: false);
+      } else {
+        FunctionCore.showSnackBar(
+            context, 'Đã xóa ${announcement.category!.label} khỏi tủ lạnh');
       }
     }
   }
@@ -296,5 +343,36 @@ class _NotificationScreenState extends State<NotificationScreen> {
     setState(() {
       announcements!.firstWhere((element) => element.id == id).read = true;
     });
+  }
+
+  Map<String, List<Announcement>> groupAnnouncementsByDate(
+      List<Announcement> announcements) {
+    Map<String, List<Announcement>> groupedData = {};
+
+    for (var announcement in announcements) {
+      String dateKey = formatDate(announcement.createdAt!);
+
+      if (!groupedData.containsKey(dateKey)) {
+        groupedData[dateKey] = [];
+      }
+      groupedData[dateKey]!.add(announcement);
+    }
+
+    return groupedData;
+  }
+
+  String formatDate(DateTime date) {
+    DateTime dateConvert = DateTime(date.year, date.month, date.day);
+    DateTime now = DateTime.now();
+    DateTime today = DateTime(now.year, now.month, now.day);
+    DateTime yesterday = DateTime(now.year, now.month, now.day - 1);
+
+    if (dateConvert.isAtSameMomentAs(today)) {
+      return 'Hôm nay';
+    } else if (dateConvert.isAtSameMomentAs(yesterday)) {
+      return 'Hôm qua';
+    } else {
+      return DateFormat('yyyy-MM-dd').format(date);
+    }
   }
 }

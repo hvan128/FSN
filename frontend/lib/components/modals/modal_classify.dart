@@ -134,7 +134,6 @@ class _ModalClassifyState extends State<ModalClassify> {
     final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
     categoryProvider.sortTypeChange(value: sortType!);
     categoryProvider.classifyChange(value: classify!);
-    CategoryService().deleteCache();
     Navigator.pop(context);
   }
 }

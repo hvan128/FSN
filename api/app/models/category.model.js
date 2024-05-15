@@ -51,7 +51,7 @@ Category.create = (data, result) => {
           action: "expire",
           createdAt: data.expiryDate,
           read: 0,
-          categoryId: res.insertId
+          categoryId: res.insertId,
         },
         (err, res) => {
           if (err) {
@@ -79,7 +79,7 @@ Category.createNewCategory = (data, result) => {
           type: "fridge",
           action: "newCategory",
           read: 0,
-          categoryId: res.insertId
+          categoryId: res.insertId,
         },
         (err, res) => {
           if (err) {
@@ -92,12 +92,12 @@ Category.createNewCategory = (data, result) => {
       result(null, { id: res.insertId, ...data });
     }
   });
-}
+};
 
 /!* Get all Categories */;
 Category.getAllCategoryInFridge = (fridgeId, result) => {
   db.query(
-    "SELECT * FROM categories WHERE fridgeId = ? AND positionId <> 0 ORDER BY manufactureDate DESC",
+    "SELECT * FROM categories WHERE fridgeId = ? AND positionId <> 0 AND deleted = 0 ORDER BY manufactureDate DESC",
     [fridgeId],
     (err, res) => {
       if (err) {
@@ -123,9 +123,12 @@ Category.findById = (id, result) => {
   });
 };
 
-Category.findByPositionId = ({ positionId, fridgeId, sortBy }, result) => {
+Category.findByPositionId = (
+  { positionId, fridgeId, sortBy, sort },
+  result
+) => {
   db.query(
-    `SELECT * FROM categories WHERE positionId = ${positionId} AND fridgeId = ${fridgeId} ORDER BY ${sortBy} DESC`,
+    `SELECT * FROM categories WHERE positionId = ${positionId} AND fridgeId = ${fridgeId} AND deleted = 0 ORDER BY ${sortBy} ${sort}`,
     (err, res) => {
       if (err) {
         console.log(err);
@@ -149,7 +152,7 @@ Category.getNewCategoryByFridgeId = (fridgeId, result) => {
       }
     }
   );
-}
+};
 
 /!* Update Category */;
 Category.update = (data, result) => {
@@ -259,7 +262,7 @@ Category.reOrderCategory = (data, result) => {
           return;
         }
       }
-    )
+    );
   } else {
     const isMoveUp = data.newOrder > data.oldOrder;
     if (isMoveUp) {
@@ -318,7 +321,7 @@ Category.reOrderCategory = (data, result) => {
 
 /!* Delete Category */;
 Category.delete = (id, result) => {
-  db.query(`DELETE FROM categories WHERE id = ${id}`, (err, res) => {
+  db.query("UPDATE categories SET deleted = 1 WHERE id = ?", id, (err, res) => {
     if (err) {
       console.log(err);
       result(err, null);
@@ -330,7 +333,7 @@ Category.delete = (id, result) => {
 
 Category.deleteByFridgeId = (fridgeId, result) => {
   db.query(
-    `DELETE FROM categories WHERE fridgeId = ${fridgeId}`,
+    `UPDATE categories SET deleted = 1 WHERE fridgeId = ${fridgeId}`,
     (err, res) => {
       if (err) {
         console.log(err);
