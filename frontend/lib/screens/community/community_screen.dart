@@ -77,65 +77,66 @@ class _CommunityScreenState extends State<CommunityScreen> {
                     color: MyColors.white['c900']!,
                     child: const MyKitchenDishes()),
                 const SizedBox(height: 10),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  color: MyColors.white['c900']!,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: MyText(
-                                text: 'Công thức nấu ăn gần đây',
-                                fontSize: FontSize.z18,
-                                fontWeight: FontWeight.w600,
-                                color: MyColors.grey['c800']!),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          dishes.isEmpty
-                              ? loading()
-                              : Wrap(
-                                  spacing: 8,
-                                  runSpacing: 16,
-                                  children: [
-                                    ...dishes
-                                        .map((dish) => FoodCard(
-                                              dish: dish,
-                                              type: CardType.small,
-                                            ))
-                                        .toList(),
-                                  ],
-                                ),
-                          const SizedBox(
-                            height: 30,
-                          ),
-                          hasMore
-                              ? const Center(child: CircularProgressIndicator())
-                              : Center(
-                                  child: MyText(
-                                      text: 'Không còn món nào nữa',
-                                      fontSize: FontSize.z18,
-                                      fontWeight: FontWeight.w600,
-                                      color: MyColors.grey['c800']!),
-                                ),
-                          const SizedBox(
-                            height: 30,
-                          )
-                        ]),
-                  ),
-                )
+                recentRecipes()
               ],
             ),
           )
         ],
+      ),
+    );
+  }
+
+  Widget recentRecipes() {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      color: MyColors.white['c900']!,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const SizedBox(
+            height: 10,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: MyText(
+                text: 'Công thức nấu ăn gần đây',
+                fontSize: FontSize.z18,
+                fontWeight: FontWeight.w600,
+                color: MyColors.grey['c800']!),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          dishes.isEmpty
+              ? loading()
+              : Wrap(
+                  spacing: 8,
+                  runSpacing: 16,
+                  children: [
+                    ...dishes
+                        .map((dish) => FoodCard(
+                              dish: dish,
+                              type: CardType.small,
+                            ))
+                        .toList(),
+                  ],
+                ),
+          const SizedBox(
+            height: 30,
+          ),
+          hasMore
+              ? const Center(child: CircularProgressIndicator())
+              : Center(
+                  child: MyText(
+                      text: 'Không còn món nào nữa',
+                      fontSize: FontSize.z18,
+                      fontWeight: FontWeight.w600,
+                      color: MyColors.grey['c800']!),
+                ),
+          const SizedBox(
+            height: 30,
+          )
+        ]),
       ),
     );
   }

@@ -40,8 +40,10 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
   Dish? dish;
   UserModel? owner;
   Image? image;
-  List<Dish> relatedDishes = [];
-  int? total;
+  List<Dish> relatedRecipes = [];
+  List<Dish> relatedTips = [];
+  int? totalRecipes;
+  int? totalTips;
   int? totalFeedback;
   bool isMine = false;
   bool isSaved = false;
@@ -53,13 +55,21 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
   List<FeedbackModel> listFeedbacks = [];
 
   Future<void> getAllDishes(int page, int pageSize) async {
-    final res = await DishService.getDishByOwnerId(owner?.id!, page, pageSize);
+    final res = await DishService.getDishByOwnerId(
+        owner?.id!, page, pageSize, 'recipes');
     setState(() {
-      relatedDishes = res['dishes'];
-      for (Dish dish in relatedDishes) {
-        print(dish.toJson());
-      }
-      total = res['total'];
+      relatedRecipes = res['dishes'];
+      totalRecipes = res['total'];
+    });
+  }
+
+  Future<void> getAllTips(int page, int pageSize) async {
+   final res = await DishService.getDishByOwnerId(
+        dish!.owner!.id!, page, pageSize, 'tips');
+
+    setState(() {
+      relatedTips = res['dishes'];
+      totalTips = res['total'];
     });
   }
 
@@ -159,6 +169,7 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
             : noImage;
         getAllDishes(1, 4);
         getAllFeedback(1, 4);
+        getAllTips(1, 4);
         isMine = dish!.owner?.id! ==
             Provider.of<UserProvider>(context, listen: false).user!.id!;
       });
@@ -329,8 +340,10 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
                             fontWeight: FontWeight.w400,
                             color: MyColors.grey['c800']!,
                           ),
-                    const SizedBox(height: 20),
-                    _buildTime(),
+                    dish!.type != 'recipes'
+                        ? Container()
+                        : const SizedBox(height: 20),
+                    dish!.type != 'recipes' ? Container() : _buildTime(),
                     const SizedBox(height: 20),
                     _buildIngredients(),
                     const SizedBox(height: 20),
@@ -480,25 +493,28 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
               color: MyColors.grey['c900']!,
             ),
             const SizedBox(height: 10),
-            Row(children: [
-              Image.asset(
-                'assets/icons/i16/person.png',
-                width: 22,
-                height: 22,
-              ),
-              const SizedBox(width: 5),
-              dish!.rangeOfPeople == null
-                  ? Container()
-                  : MyText(
-                      text: RegExp(r'^[\d-\s]+$').hasMatch(dish!.rangeOfPeople!)
-                          ? '${dish!.rangeOfPeople} người'
-                          : dish!.rangeOfPeople!,
-                      fontSize: FontSize.z14,
-                      fontWeight: FontWeight.w400,
-                      color: MyColors.grey['c700']!,
-                    )
-            ]),
-            const SizedBox(height: 20),
+            dish!.type != 'recipes'
+                ? Container()
+                : Row(children: [
+                    Image.asset(
+                      'assets/icons/i16/person.png',
+                      width: 22,
+                      height: 22,
+                    ),
+                    const SizedBox(width: 5),
+                    dish!.rangeOfPeople == null
+                        ? Container()
+                        : MyText(
+                            text: RegExp(r'^[\d-\s]+$')
+                                    .hasMatch(dish!.rangeOfPeople!)
+                                ? '${dish!.rangeOfPeople} người'
+                                : dish!.rangeOfPeople!,
+                            fontSize: FontSize.z14,
+                            fontWeight: FontWeight.w400,
+                            color: MyColors.grey['c700']!,
+                          )
+                  ]),
+            dish!.type != 'recipes' ? Container() : const SizedBox(height: 20),
             ...dish!.ingredients!
                 .map((ingredient) => Column(
                       children: [
@@ -573,12 +589,14 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    MyText(
-                                      text: e.description!,
-                                      fontSize: FontSize.z17,
-                                      fontWeight: FontWeight.w400,
-                                      color: MyColors.grey['c900']!,
-                                    ),
+                                    e.description == null
+                                        ? Container()
+                                        : MyText(
+                                            text: e.description!,
+                                            fontSize: FontSize.z17,
+                                            fontWeight: FontWeight.w400,
+                                            color: MyColors.grey['c900']!,
+                                          ),
                                     const SizedBox(height: 10),
                                     e.image == null
                                         ? Container()
@@ -788,7 +806,9 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
         owner == null
             ? Container()
             : MyText(
-                text: 'Món mới của ${owner!.displayName}',
+                text: dish!.type == 'recipes'
+                    ? 'Món mới của ${owner!.displayName}'
+                    : 'Các mẹo khác của ${owner!.displayName}',
                 fontSize: FontSize.z20,
                 fontWeight: FontWeight.w600,
                 color: MyColors.grey['c700']!,
@@ -802,7 +822,7 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
             spacing: 8,
             runSpacing: 16,
             children: [
-              ...relatedDishes
+              ...(dish!.type == 'recipes' ? relatedRecipes : relatedTips)
                   .map((dish) => FoodCard(
                         dish: dish,
                         type: CardType.small,

@@ -26,6 +26,7 @@ class DishService {
     request.fields['ownerId'] = dish.owner!.id!.toString();
     request.fields['ingredients'] = jsonEncode(ingredients);
     request.fields['steps'] = jsonEncode(steps);
+    request.fields['type'] = dish.type!;
     http.MultipartFile multipartFile = await http.MultipartFile.fromPath(
       'image',
       dish.image!,
@@ -64,6 +65,7 @@ class DishService {
     request.fields['description'] = dish.description!;
     request.fields['rangeOfPeople'] = dish.rangeOfPeople!;
     request.fields['cookingTime'] = dish.cookingTime!;
+    request.fields['type'] = dish.type!;
     request.fields['ingredients'] = jsonEncode(ingredients);
     request.fields['steps'] = jsonEncode(steps);
     if (fileSelected.contains('image')) {
@@ -124,12 +126,13 @@ class DishService {
   }
 
   static Future<Map<String, dynamic>> getDishByOwnerId(
-      int? ownerId, int page, int pageSize) async {
+      int? ownerId, int page, int pageSize, String? type) async {
     List<Dish> dishes = [];
     int total = 0;
     final queryParams = {
       'page': page.toString(),
-      'pageSize': pageSize.toString()
+      'pageSize': pageSize.toString(),
+      'type': type
     };
     await ApiService.get('${Config.DISH_API}/owner/$ownerId',
             queryParams: queryParams)
@@ -147,12 +150,13 @@ class DishService {
   }
 
   static Future<Map<String, dynamic>> getSavedDish(
-      int userId, int page, int pageSize) async {
+      int userId, int page, int pageSize, String? type) async {
     List<Dish> dishes = [];
     int total = 0;
     final queryParams = {
       'page': page.toString(),
-      'pageSize': pageSize.toString()
+      'pageSize': pageSize.toString(),
+      'type': type
     };
     await ApiService.get('${Config.DISH_API}/saved/$userId',
             queryParams: queryParams)

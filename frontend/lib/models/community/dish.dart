@@ -18,6 +18,7 @@ class Dish {
   DateTime? updatedAt;
   List<Feel>? feels;
   List<Saved>? saves;
+  String? type;
 
   Dish({
     this.id,
@@ -33,6 +34,7 @@ class Dish {
     this.updatedAt,
     this.feels,
     this.saves,
+    this.type,
   });
 
   factory Dish.fromJson(Map<String, dynamic> json) {
@@ -62,6 +64,7 @@ class Dish {
       updatedAt: json['updatedAt'] != null
           ? FunctionCore.convertTime(json['updatedAt'])
           : null,
+      type: json['type'],
     );
   }
 
@@ -80,6 +83,7 @@ class Dish {
       'saves': saves?.map((e) => e.toJson()).toList(),
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
+      'type': type
     };
   }
 }

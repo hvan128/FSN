@@ -10,7 +10,6 @@ import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/community.dart';
 import 'package:frontend/provider/category.dart';
 import 'package:frontend/provider/user.dart';
-import 'package:frontend/screens/community/dish_detail_screen.dart';
 import 'package:frontend/services/category/category_service.dart';
 import 'package:frontend/services/notification/local_notification.dart';
 import 'package:frontend/theme/color.dart';

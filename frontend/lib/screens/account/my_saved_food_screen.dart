@@ -19,6 +19,7 @@ class _MySavedFoodScreenState extends State<MySavedFoodScreen> {
   List<Dish> dishes = [];
   int? userId;
   int? total;
+  String? type;
   final controller = ScrollController();
   bool hasMore = true;
   bool isLoading = false;
@@ -31,6 +32,7 @@ class _MySavedFoodScreenState extends State<MySavedFoodScreen> {
         final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
         setState(() {
           userId = arguments['userId'];
+          type = arguments['type'];
           getAllDishes(1, 10);
         });
         controller.addListener(() {
@@ -52,9 +54,10 @@ class _MySavedFoodScreenState extends State<MySavedFoodScreen> {
     if (isLoading || !hasMore) {
       return;
     }
-        isLoading = true;
+    isLoading = true;
 
-    final res = await DishService.getSavedDish(userId!, page, pageSize);
+    final res =
+        await DishService.getSavedDish(userId!, page, pageSize, type);
 
     setState(() {
       dishes.addAll(res['dishes']);
@@ -74,7 +77,7 @@ class _MySavedFoodScreenState extends State<MySavedFoodScreen> {
         child: Column(
           children: [
             MyHeader(
-              title: 'Món đã lưu',
+              title: type == 'recipes' ? 'Công thức nấu ăn' : 'Mẹo bếp',
               bgColor: MyColors.white['c900']!,
             ),
             Expanded(
@@ -131,18 +134,18 @@ class _MySavedFoodScreenState extends State<MySavedFoodScreen> {
                                     ],
                                   ))
                               .toList(),
-                              const SizedBox(
+                          const SizedBox(
                             height: 30,
                           ),
                           hasMore
                               ? const Center(child: CircularProgressIndicator())
                               : Center(
-                                child: MyText(
-                                    text: 'Không còn món nào nữa',
-                                    fontSize: FontSize.z18,
-                                    fontWeight: FontWeight.w600,
-                                    color: MyColors.grey['c800']!),
-                              ),
+                                  child: MyText(
+                                      text: 'Không còn món nào nữa',
+                                      fontSize: FontSize.z18,
+                                      fontWeight: FontWeight.w600,
+                                      color: MyColors.grey['c800']!),
+                                ),
                           const SizedBox(
                             height: 30,
                           )

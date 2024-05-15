@@ -13,6 +13,7 @@ class Dish {
     image,
     cookingTime,
     rangeOfPeople,
+    type,
     id
   ) {
     this.ownerId = ownerId;
@@ -21,6 +22,7 @@ class Dish {
     this.image = image;
     this.cookingTime = cookingTime;
     this.rangeOfPeople = rangeOfPeople;
+    this.type = type;
     this.id = id;
   }
 }
@@ -32,6 +34,7 @@ Dish.create = (data, result) => {
     label,
     image,
     description,
+    type,
     ingredients,
     steps,
     rangeOfPeople,
@@ -43,7 +46,8 @@ Dish.create = (data, result) => {
     description,
     image,
     cookingTime,
-    rangeOfPeople
+    rangeOfPeople,
+    type
   );
 
   db.query("INSERT INTO dish SET ?", dish, (err, res) => {
@@ -205,14 +209,14 @@ Dish.findById = (id, result) => {
     });
 };
 
-Dish.findByOwnerId = (ownerId, page, pageSize, result) => {
+Dish.findByOwnerId = (ownerId, page, pageSize, type, result) => {
   var offset = (page - 1) * pageSize;
   var limit = pageSize;
   var totalDishes = 0;
   var dishes = [];
 
   db.query(
-    `SELECT COUNT(*) as total FROM dish WHERE ownerId = ${ownerId}`,
+    `SELECT COUNT(*) as total FROM dish WHERE ownerId = ${ownerId} AND type = '${type}'`,
     (err, countResult) => {
       if (err) {
         console.log(err);
@@ -222,7 +226,7 @@ Dish.findByOwnerId = (ownerId, page, pageSize, result) => {
       totalDishes = countResult[0].total;
 
       db.query(
-        `SELECT * FROM dish WHERE ownerId = ${ownerId} LIMIT ${limit} OFFSET ${offset}`,
+        `SELECT * FROM dish WHERE ownerId = ${ownerId} AND type = '${type}' LIMIT ${limit} OFFSET ${offset}`,
         (err, res) => {
           if (err) {
             console.log(err);
@@ -279,7 +283,7 @@ Dish.findByOwnerId = (ownerId, page, pageSize, result) => {
                   resolve(owner);
                 }
               });
-            })
+            });
 
             Promise.all([
               stepsPromise,
@@ -289,7 +293,14 @@ Dish.findByOwnerId = (ownerId, page, pageSize, result) => {
               userPromise,
             ])
               .then(([steps, ingredients, feels, saves, owner]) => {
-                dishes.push({ ...dish, steps, ingredients, feels, saves, owner });
+                dishes.push({
+                  ...dish,
+                  steps,
+                  ingredients,
+                  feels,
+                  saves,
+                  owner,
+                });
 
                 if (dishes.length === res.length) {
                   var response = {
@@ -377,102 +388,99 @@ Dish.findByIngredients = (ingredient1, ingredient2, page, pageSize, result) => {
   );
 };
 
-Dish.getAllDish = (page, pageSize, result) => {
+Dish.getAllDish = (page, pageSize, type, result) => {
   const offset = (page - 1) * pageSize;
 
-  db.query("SELECT COUNT(*) AS total FROM dish", (err, countResult) => {
-    if (err) {
-      console.log(err);
-      result(err, null);
-      return;
-    }
+  db.query(
+    `SELECT COUNT(*) AS total FROM dish WHERE type = '${type}'`,
+    (err, countResult) => {
+      if (err) {
+        console.log(err);
+        result(err, null);
+        return;
+      }
 
-    const totalCount = countResult[0].total;
+      const totalCount = countResult[0].total;
 
-    db.query(
-      `SELECT id FROM dish ORDER BY createdAt DESC LIMIT ${pageSize} OFFSET ${offset}`,
-      (err, res) => {
-        if (err) {
-          console.log(err);
-          result(err, null);
-          return;
-        }
-        console.log(res);
-
-        var promises = res.map((dishId) => {
-          return new Promise((resolve, reject) => {
-            Dish.findById(dishId.id, (err, dishInfo) => {
-              if (err) {
-                reject(err);
-              } else {
-                resolve(dishInfo);
-              }
-            });
-          });
-        });
-
-        Promise.all(promises)
-          .then((results) => {
-            result(null, { total: totalCount, data: results });
-          })
-          .catch((err) => {
+      db.query(
+        `SELECT id FROM dish WHERE type = '${type}' ORDER BY createdAt DESC LIMIT ${pageSize} OFFSET ${offset}`,
+        (err, res) => {
+          if (err) {
             console.log(err);
             result(err, null);
+            return;
+          }
+          console.log(res);
+
+          var promises = res.map((dishId) => {
+            return new Promise((resolve, reject) => {
+              Dish.findById(dishId.id, (err, dishInfo) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve(dishInfo);
+                }
+              });
+            });
           });
-      }
-    );
-  });
+
+          Promise.all(promises)
+            .then((results) => {
+              result(null, { total: totalCount, data: results });
+            })
+            .catch((err) => {
+              console.log(err);
+              result(err, null);
+            });
+        }
+      );
+    }
+  );
 };
 
-Dish.getSavedDishesByUserId = (userId, page, pageSize, callback) => {
+Dish.getSavedDishesByUserId = (userId, page, pageSize, type, callback) => {
   const offset = (page - 1) * pageSize;
 
-  const countQuery = `SELECT COUNT(*) AS total FROM saved_dish WHERE userId = ${userId}`;
-  db.query(countQuery, (err, countResult) => {
-    if (err) {
-      console.error("Error counting saved dishes:", err);
-      callback(err, null);
-      return;
-    }
+  var totalCount = 0;
 
-    const totalCount = countResult[0].total;
-
-    const query = `
+  const query = `
       SELECT d.id
       FROM saved_dish sd
       JOIN dish d ON sd.dishId = d.id
-      WHERE sd.userId = ${userId}
+      WHERE sd.userId = ${userId} AND d.type = '${type}'
       ORDER BY sd.savedAt DESC
       LIMIT ${pageSize} OFFSET ${offset}
     `;
-    db.query(query, (err, results) => {
-      if (err) {
-        console.error("Error fetching saved dishes:", err);
-        callback(err, null);
-        return;
-      } else {
-        const promises = results.map((dish) => {
-          return new Promise((resolve, reject) => {
-            const dishId = dish.id;
-            Dish.findById(dishId, (err, dishInfo) => {
-              if (err) {
-                reject(err);
-              } else {
-                resolve(dishInfo);
-              }
-            });
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching saved dishes:", err);
+      callback(err, null);
+      return;
+    } else {
+      const promises = results.map((dish) => {
+        return new Promise((resolve, reject) => {
+          const dishId = dish.id;
+          Dish.findById(dishId, (err, dishInfo) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(dishInfo);
+            }
           });
         });
-        Promise.all(promises)
-          .then((results) => {
-            callback(null, { total: totalCount, data: results });
-          })
-          .catch((err) => {
-            console.log(err);
-            callback(err, null);
+      });
+      Promise.all(promises)
+        .then((results) => {
+          results.forEach((dish) => {
+            dish.type === type ? totalCount++ : null;
           });
-      }
-    });
+          callback(null, { total: totalCount, data: results });
+        })
+        .catch((err) => {
+          console.log(err);
+          callback(err, null);
+        });
+    }
   });
 };
 

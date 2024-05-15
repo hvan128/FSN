@@ -1,12 +1,9 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:frontend/config.dart';
 import 'package:frontend/models/community/dish.dart';
 import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/router/community.dart';
-import 'package:frontend/services/api_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/utils/functions_core.dart';
@@ -112,7 +109,7 @@ class _MyFoodCardState extends State<MyFoodCard> {
                       fontFamily: 'Urbanist',
                       color: MyColors.grey['c800']!,
                     ),
-                    maxLines: 3,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.justify,
                   ),

@@ -3,10 +3,8 @@ import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/widgets/text.dart';
 
-enum TextFieldType {
-  normal,
-  border 
-}
+enum TextFieldType { normal, border }
+
 class MyTextField extends StatefulWidget {
   final String? hintText;
   final bool obscureText;
@@ -83,12 +81,14 @@ class _MyTextFieldState extends State<MyTextField> {
               style: TextStyle(
                   color: widget.labelColor ?? MyColors.grey['c900']!,
                   fontSize: widget.fontSize ?? FontSize.z16,
-                  fontWeight: widget.labelFontWeight ?? FontWeight.w900),
+                  fontWeight: widget.labelFontWeight ?? FontWeight.w400),
               onChanged: (value) {
                 setState(() {
                   _controller.text = widget.controller?.text ?? value;
                 });
-                widget.onChange!(value);
+                if (widget.onChange != null) {
+                  widget.onChange!(value);
+                }
               },
               obscureText: widget.obscureText,
               decoration: InputDecoration(

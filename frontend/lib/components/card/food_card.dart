@@ -1,13 +1,9 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/components/item/item_reaction.dart';
-import 'package:frontend/config.dart';
 import 'package:frontend/models/community/dish.dart';
-import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/router/community.dart';
 import 'package:frontend/provider/user.dart';
-import 'package:frontend/services/api_service.dart';
 import 'package:frontend/services/community/dish_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
@@ -298,10 +294,10 @@ class _FoodCardState extends State<FoodCard> {
                                       text: widget.dish.label!,
                                       fontSize: FontSize.z14,
                                       fontWeight: FontWeight.w600,
-                                      color: MyColors.grey['c900']!,
+                                      color: MyColors.grey['c800']!,
                                     ),
                                   ),
-                                  const SizedBox(height: 20),
+                                  const SizedBox(height: 5),
                                   widget.dish.createdAt == null
                                       ? Container()
                                       : MyText(
