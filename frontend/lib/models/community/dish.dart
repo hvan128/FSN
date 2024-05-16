@@ -120,7 +120,7 @@ class Saved {
 
 class Feel {
   int? id;
-  int? type;
+  String? type;
   int? userId;
   int? dishId;
   int? feedbackId;

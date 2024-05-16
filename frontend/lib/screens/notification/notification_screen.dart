@@ -47,10 +47,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
     final user = Provider.of<UserProvider>(context, listen: false).user;
     final data = await NotificationService.getFridgeNotifications(
         fridgeId: user!.fridgeId!);
-    DateTime now = DateTime.now();
+   
+    final now = DateTime.now();
     List<Announcement> filteredAnnouncements = data.where((announcement) {
-      DateTime expDate = DateTime(announcement.createdAt!.year,
-          announcement.createdAt!.month, announcement.createdAt!.day, 9, 0, 0);
+      print('announcement: ${announcement.createdAt}');
+      var expDate = announcement.createdAt != null ? DateTime(announcement.createdAt!.year,
+          announcement.createdAt!.month, announcement.createdAt!.day, 9, 0, 0) : now;
       return expDate.isBefore(now);
     }).toList();
     setState(() {
@@ -333,7 +335,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             .classifyChange(value: false);
       } else {
         FunctionCore.showSnackBar(
-            context, 'Đã xóa ${announcement.category!.label} khỏi tủ lạnh');
+            context, '${announcement.category!.label} đã bị xóa khỏi tủ lạnh');
       }
     }
   }

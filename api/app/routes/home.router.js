@@ -32,15 +32,15 @@ export default (router) => {
 
     //! POST home page
     router.post('/api/v1/category', function(req, res, next) {
-        categoryController.addCategory(req, res);
+        categoryController.addCategory(req, res, next);
     })
 
     router.post('/api/v1/category/new', function(req, res, next) {
-        categoryController.addNewCategory(req, res);
+        categoryController.addNewCategory(req, res, next);
     })
 
     router.post('/api/v1/position', function(req, res, next) {
-        positionController.addPosition(req, res);
+        positionController.addPosition(req, res, next);
     })
 
     router.post('/api/v1/sub-position', function(req, res, next) {

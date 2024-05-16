@@ -113,7 +113,7 @@ class DishService {
   }
 
   static Future<List<Dish>> getDishByIngredient(
-      String ingredient1, String ingredient2, int page, int pageSize) async {
+      String? ingredient1, String? ingredient2, int page, int pageSize) async {
     List<Dish> dishes = [];
     await ApiService.post('${Config.DISH_API}/ingredient',
         {'ingredient1': ingredient1, 'ingredient2': ingredient2}).then((value) {
@@ -203,8 +203,20 @@ class DishService {
     }
   }
 
-  static Future<void> deleteFeel(Feel feel) async {
-    await ApiService.delete('${Config.DISH_API}/feel/${feel.id}');
+  static Future<void> deleteFeel(Feel feel, String feelTo) async {
+    final queryParams = {
+      'type': feel.type,
+      'userId': feel.userId.toString(),
+      'dishId': feel.dishId.toString(),
+      'feedbackId': feel.feedbackId.toString()
+    };
+    if (feelTo == 'dish') {
+      await ApiService.delete('${Config.DISH_API}/feel',
+          queryParams: queryParams);
+    } else if (feelTo == 'feedback') {
+      await ApiService.delete('${Config.DISH_API}/feedback/feel',
+          queryParams: queryParams);
+    }
   }
 
   static Future<void> saveDish(Saved saved) async {

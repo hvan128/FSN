@@ -1,8 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:frontend/components/item/item_reaction.dart';
 import 'package:frontend/config.dart';
 import 'package:frontend/models/community/dish.dart';
@@ -51,6 +49,9 @@ class _FeedbackCardState extends State<FeedbackCard> {
   void initState() {
     super.initState();
     fetchUser();
+    widget.feedbackModel.feels?.forEach((element) {
+      print(element.toJson());
+    });
     processFeels(
         widget.feedbackModel.feels!,
         Provider.of<UserProvider>(context, listen: false).user!.id!,
@@ -68,32 +69,14 @@ class _FeedbackCardState extends State<FeedbackCard> {
     });
   }
 
-  void processFeels(List<Feel> feels, int userId, List<Reaction> reactions) {
+   void processFeels(List<Feel> feels, int userId, List<Reaction> reactions) {
     for (Feel feel in feels) {
-      switch (feel.type) {
-        case 1:
-          incrementQuantity('like', reactions);
-          break;
-        case 2:
-          incrementQuantity('love', reactions);
-          break;
-        case 3:
-          incrementQuantity('delicious', reactions);
-          break;
-      }
-
+      incrementQuantity(feel.type!, reactions);
+    }
+    for(Feel feel in feels) {
       if (feel.userId == userId) {
-        switch (feel.type) {
-          case 1:
-            setSelected('like', true, reactions);
-            break;
-          case 2:
-            setSelected('love', true, reactions);
-            break;
-          case 3:
-            setSelected('delicious', true, reactions);
-            break;
-        }
+        setSelected(feel.type!, true, reactions);
+        break;
       }
     }
   }
@@ -167,7 +150,8 @@ class _FeedbackCardState extends State<FeedbackCard> {
               Navigator.pushNamed(context, RouterCommunity.feedbackDetail,
                   arguments: {
                     'feedbackModel': widget.feedbackModel,
-                    'user': user
+                    'user': user,
+                    'reactions': listReactions
                   }).then((_) => setState(() {}));
             },
             child: Container(
@@ -263,7 +247,6 @@ class _FeedbackCardState extends State<FeedbackCard> {
                             const SizedBox(height: 15),
                           ],
                         ),
-                        
                         Row(
                           children: [
                             Row(children: [
@@ -306,9 +289,17 @@ class _FeedbackCardState extends State<FeedbackCard> {
                                 : const SizedBox(),
                           ],
                         ),
-                        widget.type == FeedbackCardType.small ? Container() : const SizedBox(height: 20),
-                        widget.type == FeedbackCardType.small ? Container() : const MyDivider(type: Type.solid, ),
-                        widget.type == FeedbackCardType.small ? Container() : const SizedBox(height: 10),
+                        widget.type == FeedbackCardType.small
+                            ? Container()
+                            : const SizedBox(height: 20),
+                        widget.type == FeedbackCardType.small
+                            ? Container()
+                            : const MyDivider(
+                                type: Type.solid,
+                              ),
+                        widget.type == FeedbackCardType.small
+                            ? Container()
+                            : const SizedBox(height: 10),
                         widget.type == FeedbackCardType.small
                             ? Container()
                             : originalDish(),
@@ -347,8 +338,11 @@ class _FeedbackCardState extends State<FeedbackCard> {
           Row(children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(100),
-              child: widget.feedbackModel.ownerDishImage != null ? Image.network(widget.feedbackModel.ownerDishImage!,
-                  width: 20, height: 20) : Image.asset('assets/icons/i16/image-default.png', width: 20, height: 20),
+              child: widget.feedbackModel.ownerDishImage != null
+                  ? Image.network(widget.feedbackModel.ownerDishImage!,
+                      width: 20, height: 20)
+                  : Image.asset('assets/icons/i16/image-default.png',
+                      width: 20, height: 20),
             ),
             const SizedBox(width: 10),
             Column(
@@ -367,29 +361,19 @@ class _FeedbackCardState extends State<FeedbackCard> {
     );
   }
 
-  EReaction? getFakeInitialReaction(int index) {
-    if (index % 5 == 0) {
-      return EReaction.like;
-    } else if (index % 7 == 0) {
-      return EReaction.love;
-    } else if (index % 9 == 0) {
-      return EReaction.delicious;
-    }
-    return null;
-  }
 
   void onReactionChanged(EReaction reaction) async {
+    print(reaction.name);
+    print(listReactions
+            .firstWhere((element) => element.type == reaction.name,
+                orElse: () => Reaction()).isSelected);
     if (listReactions
             .firstWhere((element) => element.type == reaction.name,
                 orElse: () => Reaction())
             .isSelected ==
         false) {
       final Feel feel = Feel(
-        type: reaction.name == 'like'
-            ? 1
-            : reaction.name == 'love'
-                ? 2
-                : 3,
+        type: reaction.name,
         userId: Provider.of<UserProvider>(context, listen: false).user!.id,
         feedbackId: widget.feedbackModel.id,
       );
@@ -405,36 +389,27 @@ class _FeedbackCardState extends State<FeedbackCard> {
       setSelected(e.type!, true, listReactions);
       incrementQuantity(e.type!, listReactions);
       await DishService.addFeel(Feel(
-        type: e.type == 'like'
-            ? 1
-            : e.type == 'love'
-                ? 2
-                : 3,
+        type: e.type,
         userId: Provider.of<UserProvider>(context, listen: false).user!.id,
         dishId: widget.feedbackModel.id,
       ));
     } else {
       setSelected(e.type!, false, listReactions);
       decrementQuantity(e.type!, listReactions);
-      final feel = widget.feedbackModel.feels!.firstWhere((element) =>
-          element.userId ==
-              Provider.of<UserProvider>(context, listen: false).user!.id &&
-          element.type ==
-              (e.type == 'like'
-                  ? 1
-                  : e.type == 'love'
-                      ? 2
-                      : 3));
-      await DishService.deleteFeel(feel);
+      final feel = Feel(
+        feedbackId: widget.feedbackModel.id,
+        type: e.type,
+        userId: Provider.of<UserProvider>(context, listen: false).user!.id,
+      );
+      await DishService.deleteFeel(feel, 'feedback');
     }
     setState(() {});
   }
 
   void navigateToOriginalDish() async {
-    final Dish dish = await DishService.getDishById(id: widget.feedbackModel.dishId!);
-    
+    final Dish dish =
+        await DishService.getDishById(id: widget.feedbackModel.dishId!);
 
-    Navigate.pushNamed(RouterCommunity.dishDetail,
-        arguments: {'dish': dish});
+    Navigate.pushNamed(RouterCommunity.dishDetail, arguments: {'dish': dish});
   }
 }

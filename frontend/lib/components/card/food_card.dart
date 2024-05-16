@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:frontend/components/item/item_reaction.dart';
 import 'package:frontend/models/community/dish.dart';
@@ -60,34 +59,14 @@ class _FoodCardState extends State<FoodCard> {
     }
   }
 
-
-
-  void processFeels(List<Feel> feels, int ownerId, List<Reaction> reactions) {
+  void processFeels(List<Feel> feels, int userId, List<Reaction> reactions) {
     for (Feel feel in feels) {
-      switch (feel.type) {
-        case 1:
-          incrementQuantity('like', reactions);
-          break;
-        case 2:
-          incrementQuantity('love', reactions);
-          break;
-        case 3:
-          incrementQuantity('delicious', reactions);
-          break;
-      }
-
-      if (feel.userId == ownerId) {
-        switch (feel.type) {
-          case 1:
-            setSelected('like', true, reactions);
-            break;
-          case 2:
-            setSelected('love', true, reactions);
-            break;
-          case 3:
-            setSelected('delicious', true, reactions);
-            break;
-        }
+      incrementQuantity(feel.type!, reactions);
+    }
+    for(Feel feel in feels) {
+      if (feel.userId == userId) {
+        setSelected(feel.type!, true, reactions);
+        break;
       }
     }
   }
@@ -407,15 +386,12 @@ class _FoodCardState extends State<FoodCard> {
 
   void onReactionChanged(EReaction reaction) async {
     if (listReactions
-            .firstWhere((element) => element.type == reaction.name, orElse: () => Reaction())
+            .firstWhere((element) => element.type == reaction.name,
+                orElse: () => Reaction())
             .isSelected ==
         false) {
       final Feel feel = Feel(
-        type: reaction.name == 'like'
-            ? 1
-            : reaction.name == 'love'
-                ? 2
-                : 3,
+        type: reaction.name,
         userId: Provider.of<UserProvider>(context, listen: false).user!.id,
         dishId: widget.dish.id,
       );
@@ -450,28 +426,22 @@ class _FoodCardState extends State<FoodCard> {
     if (e.isSelected == false) {
       setSelected(e.type!, true, listReactions);
       incrementQuantity(e.type!, listReactions);
-      await DishService.addFeel(Feel(
-        type: e.type == 'like'
-            ? 1
-            : e.type == 'love'
-                ? 2
-                : 3,
-        userId: Provider.of<UserProvider>(context, listen: false).user!.id,
-        dishId: widget.dish.id,
-      ), widget.dish.owner);
+      await DishService.addFeel(
+          Feel(
+            type: e.type,
+            userId: Provider.of<UserProvider>(context, listen: false).user!.id,
+            dishId: widget.dish.id,
+          ),
+          widget.dish.owner);
     } else {
       setSelected(e.type!, false, listReactions);
       decrementQuantity(e.type!, listReactions);
-      final feel = widget.dish.feels!.firstWhere((element) =>
-          element.userId ==
-              Provider.of<UserProvider>(context, listen: false).user!.id &&
-          element.type ==
-              (e.type == 'like'
-                  ? 1
-                  : e.type == 'love'
-                      ? 2
-                      : 3));
-      await DishService.deleteFeel(feel);
+      final feel = Feel(
+        dishId: widget.dish.id,
+        type: e.type,
+        userId: Provider.of<UserProvider>(context, listen: false).user!.id,
+      );
+      await DishService.deleteFeel(feel, 'dish');
     }
     setState(() {});
   }

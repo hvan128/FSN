@@ -6,9 +6,11 @@ class CategoryProvider extends ChangeNotifier {
   SortType sortType;
   ViewType viewType;
   bool classify;
+  int positionTab;
   CategoryProvider(
       {this.sortType = SortType.expiryDate,
       this.viewType = ViewType.grid,
+      this.positionTab = 1,
       this.classify = true});
 
   void classifyChange({required bool value}) {
@@ -19,5 +21,9 @@ class CategoryProvider extends ChangeNotifier {
   }
   void sortTypeChange({required SortType value}) {
     sortType = value;
+  }
+  void positionTabChange({required int value}) {
+    positionTab = value;
+    print(positionTab);
   }
 }

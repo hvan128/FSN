@@ -1,9 +1,12 @@
 import 'package:api_cache_manager/api_cache_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
+import 'package:frontend/components/modals/modal_classify.dart';
 import 'package:frontend/config.dart';
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/navigation/navigation.dart';
+import 'package:frontend/navigation/router/my_fridge.dart';
+import 'package:frontend/provider/category.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/home_screen.dart';
 import 'package:frontend/services/api_service.dart';
@@ -87,13 +90,13 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
           category = arguments['category'];
           id = category!.id;
           _controller.text = category!.label ?? '';
-          icon = category!.icon ?? 'assets/icons/i16/logo.png';
+          icon = category!.icon ?? 'assets/icons/i16/image-default.png';
           type = category!.type ?? '';
           position = '${category!.positionId}';
           label = category!.label ?? '';
           unit = category!.unit;
           value = category!.value;
-          subPosition = '${category!.subPositionId}';
+          subPosition = '${category!.subPositionId ?? 0}';
           manufactureDate = category!.manufactureDate;
           expiryDate = category!.expiryDate;
           quantity = category!.quantity ?? 1;
@@ -457,8 +460,17 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
     });
     await CategoryService().deleteCache();
     await APICacheManager().deleteCache('categories');
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+    final categoryProvider =
+        Provider.of<CategoryProvider>(context, listen: false);
+    categoryProvider.positionTabChange(value: int.parse(position!));
+    categoryProvider.sortTypeChange(value: SortType.manufactureDate);
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+            builder: (context) => const HomeScreen(
+                  tabIndex: 0,
+                )),
+        ModalRoute.withName(RouterMyFridge.editCategoryDetail));
     showDialog(
         context: context,
         builder: (context) {
@@ -466,8 +478,7 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
             alertType: AlertType.success,
             position: AlertPosition.topCenter,
             title: 'Thành công',
-            description:
-                'Thêm đồ ăn ${category!.label} vào $position thành công!',
+            description: 'Chỉnh sửa đồ ăn thành công!',
           );
         });
   }

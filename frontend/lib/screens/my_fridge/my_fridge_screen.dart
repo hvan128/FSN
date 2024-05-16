@@ -45,6 +45,7 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
   SortType? sortType;
   ViewType? viewType;
   bool? classify;
+  int initialIndex = 1;
   Map<String, List<Category>> categoryMap = {};
 
   final List<Item> listPositions = [
@@ -70,12 +71,14 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
   void initState() {
     super.initState();
     user = Provider.of<UserProvider>(context, listen: false).user;
-    tabController = TabController(length: 3, vsync: this);
     final categoryProvider =
         Provider.of<CategoryProvider>(context, listen: false);
     sortType = categoryProvider.sortType;
     viewType = categoryProvider.viewType;
     classify = categoryProvider.classify;
+    initialIndex = categoryProvider.positionTab;
+    print('initialIndex: $initialIndex');
+    tabController = TabController(length: 3, vsync: this, initialIndex: initialIndex - 1);
     fetchCategories();
   }
 
@@ -86,9 +89,13 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
               positionId: int.parse(element.value),
               sortType: sortType,
               sort: Sort.asc)
-          .then((value) => setState(() {
-                categoryMap[element.value] = value;
-              }));
+          .then((value) {
+        if (mounted) {
+          setState(() {
+            categoryMap[element.value] = value;
+          });
+        }
+      });
     }
   }
 
@@ -552,8 +559,7 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
                                                             });
                                                           }
                                                         } else {
-                                                          print(category
-                                                              .toJson());
+                                                          
                                                           Navigator.pushNamed(
                                                               context,
                                                               RouterMyFridge
@@ -701,9 +707,11 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
                 }
                 final isSelectedLength = isSelected.length;
                 setState(() {
+                  categoryMap.clear();
                   isSelecting = false;
                   isSelected.clear();
                 });
+
                 await clearCache();
                 await fetchCategories();
                 widget.showBottomBar!(true);
@@ -723,31 +731,29 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
         });
   }
 
-  void onTapDelete() {
+  void onTapDelete() async {
     for (var element in isSelected) {
-      ApiService.delete('${Config.CATEGORIES_API}/$element')
-          .then((value) async {
-        final isSelectedLength = isSelected.length;
-
-        setState(() {
-          isSelecting = false;
-          isSelected.clear();
-        });
-        await clearCache();
-        await fetchCategories();
-        widget.showBottomBar!(true);
-        showDialog(
-            context: context,
-            builder: (context) {
-              return MyAlert(
-                alertType: AlertType.success,
-                position: AlertPosition.topCenter,
-                title: 'Thành công',
-                description: 'Xóa $isSelectedLength đồ ăn khỏi tủ lạnh!',
-              );
-            });
-      });
+      categoryMap.clear();
+      ApiService.delete('${Config.CATEGORIES_API}/$element');
     }
+    final isSelectedLength = isSelected.length;
+    setState(() {
+      isSelecting = false;
+      isSelected.clear();
+    });
+    await clearCache();
+    await fetchCategories();
+    widget.showBottomBar!(true);
+    showDialog(
+        context: context,
+        builder: (context) {
+          return MyAlert(
+            alertType: AlertType.success,
+            position: AlertPosition.topCenter,
+            title: 'Thành công',
+            description: 'Xóa $isSelectedLength đồ ăn khỏi tủ lạnh!',
+          );
+        });
   }
 
   void onTapSetting() {

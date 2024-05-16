@@ -95,8 +95,7 @@ class _ReportScreenState extends State<ReportScreen> {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 10),
                                     child: MyText(
-                                      text:
-                                          '${e.key} (${e.value.length})',
+                                      text: '${e.key} (${e.value.length})',
                                       fontSize: FontSize.z16,
                                       fontWeight: FontWeight.w600,
                                       color: MyColors.grey['c900']!,
@@ -190,6 +189,7 @@ class _ReportScreenState extends State<ReportScreen> {
           'manufactureDate': DateTime.now().toIso8601String(),
           'expiryDate': DateTime.now()
               .subtract(const Duration(days: 3))
+              
               .toIso8601String(),
           'positionId': 1,
           'subPositionId': 1,

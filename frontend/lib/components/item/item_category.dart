@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/modals/modal_filter.dart';
 import 'package:frontend/models/category/category.dart';
+import 'package:frontend/navigation/router/my_fridge.dart';
 import 'package:frontend/services/category/category_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
@@ -33,7 +34,7 @@ class _CategoryItemState extends State<CategoryItem> {
   @override
   Widget build(BuildContext context) {
     final duration = category!.expiryDate!.difference(DateTime.now()).inDays;
-    final icon = category!.icon ?? 'assets/icons/i16/logo.png';
+    final icon = category!.icon ?? 'assets/icons/i16/image-default.png';
     return Stack(children: [
       Padding(
         padding: const EdgeInsets.all(2.0),
@@ -289,17 +290,57 @@ class _CategoryItemState extends State<CategoryItem> {
         setState(() {
           category!.quantity = category!.quantity! - 1;
         });
-        await CategoryService().changeQuantity(category!, category!.quantity!);
+        await CategoryService()
+            .changeQuantity(category!, category!.quantity!)
+            .then((value) => CategoryService().deleteCache());
       } else {}
     }
   }
 
   void onAddQuantity() {
     if (category!.quantity != null) {
+      if (category!.quantity! == 0) {
+        showDialog(context: context, builder: changeDataDialog);
+      }
       setState(() {
         category!.quantity = category!.quantity! + 1;
       });
-      CategoryService().changeQuantity(category!, category!.quantity!);
+      CategoryService()
+          .changeQuantity(category!, category!.quantity!)
+          .then((value) => CategoryService().deleteCache());
     }
+  }
+
+  Widget changeDataDialog(BuildContext context) {
+    return AlertDialog(
+        title: MyText(
+          text: 'Bạn có muốn thay đổi ngày nhập và ngày hết hạn?',
+          fontSize: FontSize.z14,
+          fontWeight: FontWeight.w600,
+          color: MyColors.grey['c900']!,
+        ),
+        actions: [
+          TextButton(
+              onPressed: () {
+                Navigator.pushNamed(context, RouterMyFridge.editCategoryDetail,
+                    arguments: {'category': category});
+              },
+              child: MyText(
+                text: 'Ok',
+                fontSize: FontSize.z14,
+                fontWeight: FontWeight.w600,
+                color: MyColors.grey['c900']!,
+              )),
+          TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: MyText(
+                text: 'Hủy',
+                fontSize: FontSize.z14,
+                fontWeight: FontWeight.w600,
+                color: MyColors.grey['c900']!,
+              )),
+        ]);
   }
 }

@@ -187,20 +187,31 @@ Dish.findById = (id, result) => {
 
   Promise.all([stepsPromise, ingredientsPromise, feelsPromise, savePromise])
     .then(([steps, ingredients, feels, saves]) => {
-      db.query(`SELECT * FROM dish WHERE id = ${id}`, (err, res0) => {
+      db.query(`SELECT * FROM dish WHERE id = ${id}`, (err, [dish]) => {
         if (err) {
           console.log(err);
           result(err, null);
           return;
         }
-        User.findById(res0[0].ownerId, (err, [owner]) => {
-          if (err) {
-            console.log(err);
-            result(err, null);
-            return;
-          }
-          result(null, { ...res0[0], steps, ingredients, feels, saves, owner });
-        });
+        if (dish?.ownerId === undefined) {
+          result(null, { ...dish, steps, ingredients, feels, saves });
+        } else {
+          User.findById(dish.ownerId, (err, [owner]) => {
+            if (err) {
+              console.log(err);
+              result(err, null);
+              return;
+            }
+            result(null, {
+              ...dish,
+              steps,
+              ingredients,
+              feels,
+              saves,
+              owner,
+            });
+          });
+        }
       });
     })
     .catch((err) => {

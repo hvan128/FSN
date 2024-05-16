@@ -58,13 +58,13 @@ class ApiService {
     return response.body;
   }
 
-  static Future<bool> delete(String apiUrl) async {
+  static Future<bool> delete(String apiUrl, {Map<String, dynamic>? queryParams}) async {
     var loginDetails = await SharedService.loginDetails();
     Map<String, String> requestHeaders = {
       'Content-Type': 'application/json',
       'Authorization': loginDetails!.data!.token
     };
-    var url = Uri.http(Config.API_URL, apiUrl);
+    var url = Uri.http(Config.API_URL, apiUrl, queryParams);
     var response = await client.delete(
       url,
       headers: requestHeaders,

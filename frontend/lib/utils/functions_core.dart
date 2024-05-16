@@ -498,7 +498,10 @@ class FunctionCore {
   }
 
   static DateTime convertTime(String time) {
-    DateTime date = DateFormat("yyyy-MM-ddTHH:mm:ss.SSS'Z'").parseUtc(time).add(const Duration(hours: 7));
+    DateTime date = !time.endsWith('Z')
+        ? DateFormat("yyyy-MM-ddTHH:mm:ss.SSS").parseUTC(time).toLocal()
+        : DateFormat("yyyy-MM-ddTHH:mm:ss.SSS'Z'").parseUtc(time).toLocal();
+
     return date;
   }
 
@@ -507,10 +510,13 @@ class FunctionCore {
   }
 
   static String calculateDuration(DateTime date) {
-    final difference = DateTime.now().difference(date);
+    DateTime now = DateTime.now();
+
+    final difference = now.difference(date);
+
     if (difference.inDays > 0) {
-      if (difference.inDays == 1) {
-        return 'Hôm qua';
+      if (difference.inDays > 30) {
+        return '${date.minute}: ${date.hour} ngày ${date.day}/${date.month}/${date.year}';
       } else {
         return '${difference.inDays} ngày trước';
       }
@@ -519,11 +525,7 @@ class FunctionCore {
     } else if (difference.inMinutes > 0) {
       return '${difference.inMinutes} phút trước';
     } else {
-      if (difference.inSeconds < 30) {
-        return 'Vừa xong';
-      } else {
-        return '${difference.inSeconds} giây trước';
-      }
+      return '${difference.inSeconds} giây trước';
     }
   }
 }

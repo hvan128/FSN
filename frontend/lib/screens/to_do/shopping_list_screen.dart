@@ -8,6 +8,7 @@ import 'package:frontend/components/to_do/card_add_categories.dart';
 import 'package:frontend/config.dart';
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/navigation/navigation.dart';
+import 'package:frontend/navigation/router/to_do.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/search/search_screen.dart';
 import 'package:frontend/services/api_service.dart';
@@ -33,7 +34,7 @@ class ShoppingListScreen extends StatefulWidget {
 class _ShoppingListScreenState extends State<ShoppingListScreen> {
   bool isSelecting = false;
   bool isSelectedAll = false;
-  List<Category> allCategories = [];
+  List<Category>? allCategories;
   List<int> selectedListItems = [];
   List<int> completedListItems = [];
 
@@ -45,7 +46,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
 
   bool checkCategoryIsExist(Category category) {
     bool isExist = false;
-    for (var item in allCategories) {
+    for (var item in allCategories!) {
       if (item.value == category.value) {
         isExist = true;
         break;
@@ -104,7 +105,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                 ));
         return;
       } else {
-        allCategories.add(result);
+        allCategories!.add(result);
         final fridgeId =
             Provider.of<UserProvider>(context, listen: false).user!.fridgeId!;
         await ApiService.post(Config.CATEGORIES_API, {
@@ -114,7 +115,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
           'value': result.value,
           'fridgeId': fridgeId,
           'positionId': 0,
-          'no': allCategories.length + 1
+          'no': allCategories!.length + 1
         });
         await APICacheManager().deleteCache('categories_0');
         await APICacheManager().deleteCache('categories');
@@ -132,7 +133,6 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
       for (var element in categories) {
         if (element.completed == 1) {
           completedListItems.add(element.id!);
-          print(element.id);
         }
       }
     });
@@ -176,7 +176,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                 builder: (context) {
                   return MyNotification(
                     description:
-                        'Thêm tất cả các món ăn có số lượng 0 vào danh sách mua sắm. Các món ăn đã có trong danh sách sẽ không được thêm vào.',
+                        'Thêm tất cả các món ăn có số lượng 0 vào danh sách mua sắm và loại bỏ chúng khỏi tủ lạnh. Các món ăn đã có trong danh sách sẽ không được thêm vào.',
                     notificationType: NotificationType.info,
                     title: 'Thêm nhanh',
                     btnList: [
@@ -282,119 +282,123 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
               ],
             )));
     final List<Widget> cards = <Widget>[
-      for (var item in allCategories)
-        Dismissible(
-          key: UniqueKey(),
-          confirmDismiss: (direction) async {
-            if (direction == DismissDirection.endToStart) {
-              return await showDialog(
-                  context: context,
-                  builder: (context) {
-                    return MyNotification(
-                      title: 'Xóa',
-                      description: 'Xóa ${item.label} ?',
-                      notificationType: NotificationType.info,
-                      btnList: [
-                        MyButton(
-                            text: 'Xóa',
-                            onPressed: () {
-                              Navigator.pop(context, true);
-                            }),
-                        MyButton(
-                            text: 'Trở lại danh sách',
-                            onPressed: () {
-                              Navigator.pop(context, false);
-                            })
-                      ],
-                    );
-                  });
-            } else {
-              return await showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  builder: (context) {
-                    return CardAddCategory(category: item);
-                  });
-            }
-          },
-          onDismissed: (direction) => onDismissed(direction, item),
-          background: background,
-          secondaryBackground: secondaryBackground,
-          child: Container(
-            color: MyColors.primary['CulturalYellow']!['c50']!,
-            child: Row(
-              children: [
-                isSelecting
-                    ? Checkbox(
-                        activeColor:
-                            MyColors.primary['CulturalYellow']!['c600']!,
-                        value: selectedListItems.contains(item.id),
-                        onChanged: (bool? value) {
-                          print(selectedListItems.length);
-                          setState(() {
-                            if (value == true &&
-                                selectedListItems.contains(item.id) == false) {
-                              selectedListItems.add(item.id!);
-                            } else if (value == false &&
-                                selectedListItems.contains(item.id) == true) {
-                              selectedListItems.remove(item.id!);
-                            } else {
-                              selectedListItems.remove(item.id!);
-                            }
-                          });
-                        },
-                      )
-                    : Container(),
-                Expanded(
-                  child: ListTile(
-                    leading: Image.asset(
-                      item.icon != null ? item.icon! : 'assets/icons/i16/image-default.png',
-                      width: 40,
-                      height: 40,
-                      color: item.completed! == 1
-                          ? MyColors.grey['c700']!.withOpacity(0.4)
-                          : null,
-                      fit: BoxFit.cover,
+      if (allCategories != null)
+        for (var item in allCategories!)
+          Dismissible(
+            key: UniqueKey(),
+            confirmDismiss: (direction) async {
+              if (direction == DismissDirection.endToStart) {
+                return await showDialog(
+                    context: context,
+                    builder: (context) {
+                      return MyNotification(
+                        title: 'Xóa',
+                        description: 'Xóa ${item.label} ?',
+                        notificationType: NotificationType.info,
+                        btnList: [
+                          MyButton(
+                              text: 'Xóa',
+                              onPressed: () {
+                                Navigator.pop(context, true);
+                              }),
+                          MyButton(
+                              text: 'Trở lại danh sách',
+                              onPressed: () {
+                                Navigator.pop(context, false);
+                              })
+                        ],
+                      );
+                    });
+              } else {
+                return await showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (context) {
+                      return CardAddCategory(category: item);
+                    });
+              }
+            },
+            onDismissed: (direction) => onDismissed(direction, item),
+            background: background,
+            secondaryBackground: secondaryBackground,
+            child: Container(
+              color: MyColors.primary['CulturalYellow']!['c50']!,
+              child: Row(
+                children: [
+                  isSelecting
+                      ? Checkbox(
+                          activeColor:
+                              MyColors.primary['CulturalYellow']!['c600']!,
+                          value: selectedListItems.contains(item.id),
+                          onChanged: (bool? value) {
+                            print(selectedListItems.length);
+                            setState(() {
+                              if (value == true &&
+                                  selectedListItems.contains(item.id) ==
+                                      false) {
+                                selectedListItems.add(item.id!);
+                              } else if (value == false &&
+                                  selectedListItems.contains(item.id) == true) {
+                                selectedListItems.remove(item.id!);
+                              } else {
+                                selectedListItems.remove(item.id!);
+                              }
+                            });
+                          },
+                        )
+                      : Container(),
+                  Expanded(
+                    child: ListTile(
+                      leading: Image.asset(
+                        item.icon != null
+                            ? item.icon!
+                            : 'assets/icons/i16/image-default.png',
+                        width: 40,
+                        height: 40,
+                        color: item.completed! == 1
+                            ? MyColors.grey['c700']!.withOpacity(0.4)
+                            : null,
+                        fit: BoxFit.cover,
+                      ),
+                      title: Text(
+                        item.label!,
+                        style: item.completed! == 1
+                            ? const TextStyle(
+                                // color: MyColors.grey['c500']!,
+                                decoration: TextDecoration.lineThrough,
+                                fontSize: FontSize.z14)
+                            : const TextStyle(
+                                fontSize: FontSize.z14,
+                              ),
+                      ),
+                      onTap: () {
+                        handleTapItem(item);
+                      },
+                      onLongPress: () {
+                        setState(() {
+                          isSelecting = true;
+                          if (selectedListItems.contains(item.id) == false) {
+                            selectedListItems.add(item.id!);
+                          } else {
+                            selectedListItems.remove(item.id);
+                          }
+                        });
+                        widget.showBottomBar?.call(false);
+                      },
                     ),
-                    title: Text(
-                      item.label!,
-                      style: item.completed! == 1
-                          ? const TextStyle(
-                              // color: MyColors.grey['c500']!,
-                              decoration: TextDecoration.lineThrough,
-                              fontSize: FontSize.z14)
-                          : const TextStyle(
-                              fontSize: FontSize.z14,
-                            ),
-                    ),
-                    onTap: () {
-                      handleTapItem(item);
-                    },
-                    onLongPress: () {
-                      setState(() {
-                        isSelecting = true;
-                        if (selectedListItems.contains(item.id) == false) {
-                          selectedListItems.add(item.id!);
-                        } else {
-                          selectedListItems.remove(item.id);
-                        }
-                      });
-                      widget.showBottomBar?.call(false);
-                    },
                   ),
-                ),
-                !isSelecting && item.completed! == 0
-                    ? Container(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: Icon(Icons.menu,
-                            color:
-                                MyColors.primary['CulturalYellow']!['c600']!),
-                      )
-                    : Container(),
-              ],
+                  !isSelecting && item.completed! == 0
+                      ? Container(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: Icon(Icons.menu,
+                              color:
+                                  MyColors.primary['CulturalYellow']!['c600']!),
+                        )
+                      : Container(),
+                ],
+              ),
             ),
-          ),
-        )
+          )
     ];
 
     Widget selectAll = Row(
@@ -410,13 +414,13 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                       setState(() {
                         isSelectedAll = value!;
                         if (isSelectedAll) {
-                          for (var item in allCategories) {
+                          for (var item in allCategories!) {
                             if (!selectedListItems.contains(item.id)) {
                               selectedListItems.add(item.id!);
                             }
                           }
                         } else {
-                          for (var item in allCategories) {
+                          for (var item in allCategories!) {
                             if (selectedListItems.contains(item.id)) {
                               selectedListItems.remove(item.id);
                             }
@@ -437,8 +441,31 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
       ],
     );
 
-    if (allCategories.isEmpty) {
-      return Container();
+    if (allCategories == null) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    } else if (allCategories!.isEmpty) {
+      return Center(
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            'assets/icons/i16/item-shopping-list.png',
+            width: 50,
+            height: 50,
+          ),
+          const SizedBox(height: 20),
+          Flexible(
+            child: MyText(
+              text: 'Thức thực phẩm để mua.',
+              fontSize: FontSize.z18,
+              fontWeight: FontWeight.w600,
+              color: MyColors.grey['c900']!,
+            ),
+          )
+        ],
+      ));
     } else {
       return Column(
         children: [
@@ -448,9 +475,9 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
               onReorder: (int oldIndex, int newIndex) {
                 setState(() {
                   if (oldIndex < newIndex) {
-                    if (allCategories[newIndex - 1].completed! == 1) {
-                      newIndex = allCategories.indexOf(
-                            allCategories.firstWhere(
+                    if (allCategories![newIndex - 1].completed! == 1) {
+                      newIndex = allCategories!.indexOf(
+                            allCategories!.firstWhere(
                                 (element) => element.completed == 1),
                           ) -
                           1;
@@ -458,12 +485,12 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
                       newIndex -= 1;
                     }
                   }
-                  final Category item = allCategories.removeAt(oldIndex);
-                  allCategories.insert(newIndex, item);
+                  final Category item = allCategories!.removeAt(oldIndex);
+                  allCategories!.insert(newIndex, item);
                   ApiService.post(
                       '${Config.CATEGORIES_API}/shoppingList/reorder', {
-                    'oldOrder': allCategories.length - oldIndex,
-                    'newOrder': allCategories.length - newIndex,
+                    'oldOrder': allCategories!.length - oldIndex,
+                    'newOrder': allCategories!.length - newIndex,
                     'id': item.id,
                     'fridgeId': item.fridgeId,
                   });
@@ -497,13 +524,13 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
             'fridgeId': item.fridgeId,
             'completed': 1,
             'no': item.no,
-            'maxNo': allCategories.length
+            'maxNo': allCategories!.length
           });
           APICacheManager().deleteCache('categories_0');
           APICacheManager().deleteCache('categories');
           final Category newItem =
-              allCategories.removeAt(allCategories.indexOf(item));
-          allCategories.add(newItem);
+              allCategories!.removeAt(allCategories!.indexOf(item));
+          allCategories!.add(newItem);
         } else {
           completedListItems.remove(item.id!);
           ApiService.post('${Config.CATEGORIES_API}/completed', {
@@ -511,13 +538,13 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
             'fridgeId': item.fridgeId,
             'completed': 0,
             'no': item.no,
-            'maxNo': allCategories.length
+            'maxNo': allCategories!.length
           });
           APICacheManager().deleteCache('categories_0');
           APICacheManager().deleteCache('categories');
           final Category newItem =
-              allCategories.removeAt(allCategories.indexOf(item));
-          allCategories.insert(0, newItem);
+              allCategories!.removeAt(allCategories!.indexOf(item));
+          allCategories!.insert(0, newItem);
         }
       });
     }
@@ -526,7 +553,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
   onDismissed(DismissDirection direction, Category item) {
     if (direction == DismissDirection.endToStart) {
       setState(() {
-        allCategories.remove(item);
+        allCategories!.remove(item);
         CategoryService().deleteCategory(item.id!);
         ApiService.post('${Config.CATEGORIES_API}/shoppingList/reorder', {
           'oldOrder': item.no,
@@ -538,7 +565,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
       });
     } else {
       setState(() {
-        allCategories.remove(item);
+        allCategories!.remove(item);
         CategoryService().deleteCategory(item.id!);
         ApiService.post('${Config.CATEGORIES_API}/shoppingList/reorder', {
           'oldOrder': item.no,
@@ -563,15 +590,32 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            option('assets/icons/i16/save.png', 'Bảo quản'),
+            GestureDetector(
+                onTap: () {
+                  Navigate.pushNamed(RouterTodo.preservationCategory,
+                      arguments: {
+                        'categories': allCategories!
+                            .where((category) =>
+                                selectedListItems.contains(category.id))
+                            .toList(),
+                      }).then((_) {
+                    widget.showBottomBar!(true);
+                    setState(() {
+                      selectedListItems.clear();
+                      isSelecting = false;
+                      getAllCategories();
+                    });
+                  });
+                },
+                child: option('assets/icons/i16/save.png', 'Bảo quản')),
             GestureDetector(
                 onTap: () async {
                   Loading.showLoading();
                   for (var item in selectedListItems) {
-                    final Category category = allCategories.firstWhere(
+                    final Category category = allCategories!.firstWhere(
                       (element) => element.id == item,
                     );
-                    allCategories.remove(category);
+                    allCategories!.remove(category);
                     await CategoryService().deleteCategory(item);
                     ApiService.post(
                         '${Config.CATEGORIES_API}/shoppingList/reorder', {
@@ -626,6 +670,7 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
         Provider.of<UserProvider>(context, listen: false).user!.fridgeId!;
     for (var item in categories) {
       if (item.quantity == 0 && checkCategoryIsExist(item) == false) {
+        await CategoryService().deleteCategory(item.id!);
         await ApiService.post(Config.CATEGORIES_API, {
           'label': item.label,
           'type': item.type,
@@ -633,11 +678,14 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
           'value': item.value,
           'fridgeId': fridgeId,
           'positionId': 0,
-          'no': allCategories.length + 1
+          'no': allCategories!.length + 1
         });
       }
     }
     await APICacheManager().deleteCache('categories_0');
+    await APICacheManager().deleteCache('categories_1');
+    await APICacheManager().deleteCache('categories_2');
+    await APICacheManager().deleteCache('categories_3');
     await APICacheManager().deleteCache('categories');
     Loading.hideLoading();
     Navigate.pop();

@@ -114,7 +114,10 @@ class _MyFoodFieldState extends State<MyFoodField> {
                               text: 'Viết món mới',
                               onPressed: () {
                                 Navigator.pushNamed(
-                                    context, RouterCommunity.addDish);
+                                    context, RouterCommunity.addDish,
+                                    arguments: {
+                                      'dishType': 'recipes',
+                                    });
                               },
                             ),
                           ],
@@ -183,7 +186,9 @@ class _MyFoodFieldState extends State<MyFoodField> {
                               buttonType: ButtonType.secondary,
                               onPressed: () {
                                 Navigator.pushNamed(
-                                    context, RouterCommunity.addDish);
+                                    context, RouterCommunity.addDish, arguments: {
+                                  'dishType': 'tips',
+                                    });
                               },
                             ),
                           ],
