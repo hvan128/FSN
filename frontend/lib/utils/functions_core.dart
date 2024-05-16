@@ -498,7 +498,10 @@ class FunctionCore {
   }
 
   static DateTime convertTime(String time) {
-    DateTime date = DateFormat("yyyy-MM-ddTHH:mm:ss.SSS'Z'").parseUtc(time);
+    DateTime date = !time.endsWith('Z')
+        ? DateFormat("yyyy-MM-ddTHH:mm:ss.SSS").parseUTC(time).toLocal()
+        : DateFormat("yyyy-MM-ddTHH:mm:ss.SSS'Z'").parseUtc(time).toLocal();
+
     return date;
   }
 
@@ -507,9 +510,16 @@ class FunctionCore {
   }
 
   static String calculateDuration(DateTime date) {
-    final difference = DateTime.now().difference(date);
+    DateTime now = DateTime.now();
+
+    final difference = now.difference(date);
+
     if (difference.inDays > 0) {
-      return '${difference.inDays} ngày trước';
+      if (difference.inDays > 30) {
+        return '${date.minute}: ${date.hour} ngày ${date.day}/${date.month}/${date.year}';
+      } else {
+        return '${difference.inDays} ngày trước';
+      }
     } else if (difference.inHours > 0) {
       return '${difference.inHours} giờ trước';
     } else if (difference.inMinutes > 0) {

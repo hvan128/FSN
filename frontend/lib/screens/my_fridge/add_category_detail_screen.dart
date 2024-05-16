@@ -6,10 +6,13 @@ import 'package:api_cache_manager/api_cache_manager.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
+import 'package:frontend/components/modals/modal_classify.dart';
 import 'package:frontend/config.dart';
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/navigation.dart';
+import 'package:frontend/navigation/router/my_fridge.dart';
+import 'package:frontend/provider/category.dart';
 import 'package:frontend/services/notification/local_notification.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/home_screen.dart';
@@ -417,48 +420,63 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
       'expiryDate': expDate!.toIso8601String(),
       'fridgeId': fridgeId
     }).then((value) async {
-      Category category =
-          Category.fromJson(jsonDecode(value.toString())['data']);
-      final DateTime expiryDate = category.expiryDate!;
+      if (value == null) {
+        return;
+      } else {
+        final data = jsonDecode(value.toString())['data'];
+        Category category = Category.fromJson(data);
+        final DateTime expiryDate = category.expiryDate!;
 
-      NotificationService.showNotification(
-        id: category.id!,
-        title: 'Hết hạn',
-        body: '${category.label} cần được tiêu thụ gấp trong hôm nay!',
-        scheduled: true,
-        time: DateTime(
-            expiryDate.year, expiryDate.month, expiryDate.day, 9, 0, 0),
-      );
-      for (var element in users) {
-        if (element.id != currentUser.id && element.fcmToken != null) {
-          ApiService.post(Config.SEND_NOTIFICATION_API, {
-            'receiverToken': element.fcmToken,
-            'title': 'Tủ lạnh',
-            'body': '${element.displayName} đã thêm mới một đồ ăn vào tủ lạnh!',
-            'data': {
-              'type': 'category',
-              'categoryId': category.id.toString(),
-            }
-          });
-          final expiryDate = DateTime(expDate!.year, expDate!.month, expDate!.day, 9, 0, 0);
-          ApiService.post(Config.SEND_NOTIFICATION_API, {
-            'receiverToken': element.fcmToken,
-            'title': 'Hết hạn',
-            'body': '${category.label} cần được tiêu thụ gấp trong hôm nay!',
-            'data': {
-              'type': 'schedule',
-              'id': category.id.toString(),
-              'time': expiryDate.toIso8601String(),
-            }
-          });
+        NotificationService.showNotification(
+          id: category.id!,
+          title: 'Hết hạn',
+          body: '${category.label} cần được tiêu thụ gấp trong hôm nay!',
+          scheduled: true,
+          time: DateTime(
+              expiryDate.year, expiryDate.month, expiryDate.day, 9, 0, 0),
+        );
+        for (var element in users) {
+          if (element.id != currentUser.id && element.fcmToken != null) {
+            ApiService.post(Config.SEND_NOTIFICATION_API, {
+              'receiverToken': element.fcmToken,
+              'title': 'Tủ lạnh',
+              'body':
+                  '${element.displayName} đã thêm mới một đồ ăn vào tủ lạnh!',
+              'data': {
+                'type': 'category',
+                'categoryId': category.id.toString(),
+              }
+            });
+            final expiryDate =
+                DateTime(expDate!.year, expDate!.month, expDate!.day, 9, 0, 0);
+            ApiService.post(Config.SEND_NOTIFICATION_API, {
+              'receiverToken': element.fcmToken,
+              'title': 'Hết hạn',
+              'body': '${category.label} cần được tiêu thụ gấp trong hôm nay!',
+              'data': {
+                'type': 'schedule',
+                'id': category.id.toString(),
+                'time': expiryDate.toIso8601String(),
+              }
+            });
+          }
         }
       }
     });
 
     await APICacheManager().deleteCache('categories_${int.parse(position!)}');
     await APICacheManager().deleteCache('categories');
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+    final categoryProvider =
+        Provider.of<CategoryProvider>(context, listen: false);
+    categoryProvider.positionTabChange(value: int.parse(position!));
+    categoryProvider.sortTypeChange(value: SortType.manufactureDate);
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+            builder: (context) => const HomeScreen(
+                  tabIndex: 0,
+                )),
+        ModalRoute.withName(RouterMyFridge.addCategory));
     showDialog(
         context: context,
         builder: (context) {

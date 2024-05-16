@@ -1,3 +1,5 @@
+import 'package:frontend/utils/functions_core.dart';
+
 List<Category> categoryFromJson(dynamic str) =>
     List<Category>.from((str).map((x) => Category.fromJson(x)));
 
@@ -17,6 +19,7 @@ class Category {
   int? defaultDuration;
   int? completed;
   int? no;
+  bool? deleted;
 
   Category(
       {this.id,
@@ -33,7 +36,8 @@ class Category {
       this.expiryDate,
       this.defaultDuration,
       this.completed,
-      this.no});
+      this.no,
+      this.deleted});
 
   Category.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -47,13 +51,15 @@ class Category {
     unit = json['unit'];
     manufactureDate = json['manufactureDate'] == null
         ? null
-        : DateTime.parse(json['manufactureDate']);
-    expiryDate =
-        json['expiryDate'] == null ? null : DateTime.parse(json['expiryDate']);
+        : FunctionCore.convertTime(json['manufactureDate']);
+    expiryDate = json['expiryDate'] == null
+        ? null
+        : FunctionCore.convertTime(json['expiryDate']);
     defaultDuration = json['defaultDuration'];
     fridgeId = json['fridgeId'];
     completed = json['completed'];
     no = json['no'];
+    deleted = json['deleted'] == 1 ? true : false;
   }
 
   Map<String, dynamic> toJson() {
@@ -67,12 +73,13 @@ class Category {
     data['subPositionId'] = subPositionId;
     data['quantity'] = quantity;
     data['unit'] = unit;
-    data['manufactureDate'] = manufactureDate;
-    data['expiryDate'] = expiryDate;
+    data['manufactureDate'] = manufactureDate?.toIso8601String();
+    data['expiryDate'] = expiryDate?.toIso8601String();
     data['defaultDuration'] = defaultDuration;
     data['completed'] = completed;
     data['fridgeId'] = fridgeId;
     data['no'] = no;
+    data['deleted'] = deleted == true ? 1 : 0;
     return data;
   }
 }

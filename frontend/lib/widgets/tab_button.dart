@@ -7,12 +7,14 @@ class MyTabButton extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
   final double height;
+  final Widget? icon;
 
   const MyTabButton(
       {super.key,
       required this.title,
       required this.isSelected,
       required this.onTap,
+      this.icon,
       this.height = 36.00});
 
   @override

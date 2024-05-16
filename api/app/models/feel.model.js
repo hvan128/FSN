@@ -80,8 +80,8 @@ Feel.findByFeedbackId = (feedbackId, result) => {
   );
 };
 
-Feel.delete = (id, result) => {
-  db.query("DELETE FROM feel WHERE id = ?", [id], (err, res) => {
+Feel.deleteFeelDish = (userId, dishId, type, result) => {
+  db.query("DELETE FROM feel WHERE userId = ? AND dishId = ? AND type = ?", [userId, dishId, type], (err, res) => {
     if (err) {
       console.log(err);
       result(err, null);
@@ -91,5 +91,17 @@ Feel.delete = (id, result) => {
     }
   });
 };
+
+Feel.deleteFeelFeedback = (userId, feedbackId, type, result) => {
+  db.query("DELETE FROM feel WHERE userId = ? AND feedbackId = ?", [userId, feedbackId, type], (err, res) => {
+    if (err) {
+      console.log(err);
+      result(err, null);
+      return;
+    } else {
+      result(null, res);
+    }
+  });
+}
 
 export default Feel;

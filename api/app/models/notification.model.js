@@ -55,7 +55,7 @@ Notification.getByTargetId = (id, result) => {
 Notification.getFridgeNotification = (fridgeId, result) => {
   var notifications = [];
   db.query(
-    `SELECT * FROM notification WHERE fridgeId = ${fridgeId} AND type = 'fridge' order by createdAt desc`,
+    `SELECT * FROM notification WHERE fridgeId = ${fridgeId} AND type = 'fridge' order by id desc`,
     (err, res) => {
       if (err) {
         console.log(err);
@@ -91,7 +91,7 @@ Notification.getFridgeNotification = (fridgeId, result) => {
 Notification.getCommunityNotification = (targetId, result) => {
   var notifications = [];
   db.query(
-    `SELECT * FROM notification WHERE type = 'community' AND targetId = ${targetId} order by createdAt desc`,
+    `SELECT * FROM notification WHERE type = 'community' AND targetId = ${targetId} order by id desc`,
     (err, res) => {
       if (err) {
         console.log(err);

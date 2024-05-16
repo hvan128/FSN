@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
-import 'package:frontend/utils/icons.dart';
 import 'package:frontend/widgets/text.dart';
 
 class ItemIngredient extends StatelessWidget {
@@ -31,7 +30,7 @@ class ItemIngredient extends StatelessWidget {
                     color: MyColors.white['c900']!,
                     borderRadius: BorderRadius.circular(50),
                   ),
-                  child: Image.asset(category.icon!,
+                  child: Image.asset(category.icon ?? 'assets/icons/i16/image-default.png',
                       width: 20, height: 20))
               : Container(
                   decoration: BoxDecoration(

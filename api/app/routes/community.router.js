@@ -52,7 +52,11 @@ export default (router) => {
     dishController.updateDish(req, res, next);
   });
 
-  router.delete("/api/v1/community/dish/feel/:id", function (req, res, next) {
-    feelController.deleteFeel(req, res, next);
+  router.delete("/api/v1/community/dish/feel", function (req, res, next) {
+    feelController.deleteFeelDish(req, res, next);
   });
+
+  router.delete("/api/v1/community/dish/feedback/feel", function (req, res, next) {
+    feelController.deleteFeelFeedback(req, res, next);
+  })
 };

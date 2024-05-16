@@ -31,6 +31,7 @@ export const createDish = (req, res, next) => {
         image: file.image[0].filename,
         cookingTime: body.cookingTime,
         rangeOfPeople: body.rangeOfPeople,
+        type: body.type,
         ingredients:
           body.ingredients !== "" ? JSON.parse(body.ingredients) : [],
         steps: JSON.parse(body.steps).map((step, index) => {
@@ -69,6 +70,7 @@ export const updateDish = (req, res, next) => {
         ownerId: body.ownerId,
         label: body.label,
         description: body.description,
+        type: body.type,
         image: fileSelected.some((file) => file === "image")
           ? file.image[0].filename
           : body.image,
@@ -112,7 +114,8 @@ export const getDishByOwnerId = (req, res, next) => {
   var ownerId = req.params.id;
   var page = req.query.page || 1;
   var pageSize = req.query.pageSize || 10;
-  Dish.findByOwnerId(ownerId, page, pageSize, (err, result) => {
+  var type = req.query.type || 'recipes';
+  Dish.findByOwnerId(ownerId, page, pageSize, type, (err, result) => {
     if (err) {
       next(err);
     } else {
@@ -144,7 +147,8 @@ export const getDishByIngredient = (req, res, next) => {
 export const getAllDish = (req, res, next) => {
   var page = req.query.page || 1;
   var pageSize = req.query.pageSize || 10;
-  Dish.getAllDish(page, pageSize, (err, result) => {
+  var type = req.query.type || 'recipes';
+  Dish.getAllDish(page, pageSize, type, (err, result) => {
     if (err) {
       next(err);
     } else {
@@ -157,7 +161,8 @@ export const getSavedDishesByUserId = (req, res, next) => {
   var userId = req.params.id;
   var page = req.query.page || 1;
   var pageSize = req.query.pageSize || 10;
-  Dish.getSavedDishesByUserId(userId, page, pageSize, (err, result) => {
+  var type = req.query.type || 'recipes';
+  Dish.getSavedDishesByUserId(userId, page, pageSize, type, (err, result) => {
     if (err) {
       next(err);
     } else {

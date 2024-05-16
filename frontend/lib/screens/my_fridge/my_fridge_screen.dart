@@ -1,7 +1,8 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/components/item/item_category.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
+import 'package:frontend/components/modals/modal_classify.dart';
+import 'package:frontend/components/modals/modal_filter.dart';
 import 'package:frontend/components/modals/modal_select.dart';
 import 'package:frontend/config.dart';
 import 'package:frontend/models/category/category.dart';
@@ -9,6 +10,7 @@ import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/my_fridge.dart';
 import 'package:frontend/navigation/router/settings.dart';
+import 'package:frontend/provider/category.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/my_fridge/add_category_screen.dart';
 import 'package:frontend/screens/search/search_screen.dart';
@@ -18,6 +20,7 @@ import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/types/type.dart';
 import 'package:frontend/utils/constants.dart';
+import 'package:frontend/widgets/button_icon.dart';
 import 'package:frontend/widgets/divider.dart';
 import 'package:frontend/widgets/text.dart';
 import 'package:provider/provider.dart';
@@ -39,6 +42,11 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
   List<int> isSelected = [];
   UserModel? user;
   late final TabController tabController;
+  SortType? sortType;
+  ViewType? viewType;
+  bool? classify;
+  int initialIndex = 1;
+  Map<String, List<Category>> categoryMap = {};
 
   final List<Item> listPositions = [
     Item(
@@ -63,23 +71,38 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
   void initState() {
     super.initState();
     user = Provider.of<UserProvider>(context, listen: false).user;
-    tabController = TabController(length: 3, vsync: this);
-    // notification();
+    final categoryProvider =
+        Provider.of<CategoryProvider>(context, listen: false);
+    sortType = categoryProvider.sortType;
+    viewType = categoryProvider.viewType;
+    classify = categoryProvider.classify;
+    initialIndex = categoryProvider.positionTab;
+    print('initialIndex: $initialIndex');
+    tabController = TabController(length: 3, vsync: this, initialIndex: initialIndex - 1);
+    fetchCategories();
+  }
+
+  Future<void> fetchCategories() async {
+    for (var element in listPositions) {
+      await CategoryService()
+          .getCategoriesByPosition(
+              positionId: int.parse(element.value),
+              sortType: sortType,
+              sort: Sort.asc)
+          .then((value) {
+        if (mounted) {
+          setState(() {
+            categoryMap[element.value] = value;
+          });
+        }
+      });
+    }
   }
 
   @override
   void dispose() {
     tabController.dispose();
     super.dispose();
-  }
-
-  void notification() async {
-    List<NotificationModel> scheduledNotifications =
-        await AwesomeNotifications().listScheduledNotifications();
-    print('scheduledNotifications: ${scheduledNotifications.length}');
-    for (var schedule in scheduledNotifications) {
-      print('schedule: $schedule');
-    }
   }
 
   @override
@@ -202,91 +225,118 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
         alignment: Alignment.topCenter,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Column(
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  isSelecting
-                      ? GestureDetector(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: Image.asset(
-                                'assets/icons/i16/close.png',
-                                width: 24,
-                                height: 24,
-                                color: MyColors.grey['c900']!,
+                  Row(
+                    children: [
+                      isSelecting
+                          ? GestureDetector(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: Image.asset(
+                                    'assets/icons/i16/close.png',
+                                    width: 24,
+                                    height: 24,
+                                    color: MyColors.grey['c900']!,
+                                  ),
+                                ),
+                              ),
+                              onTap: () {
+                                widget.showBottomBar?.call(true);
+                                setState(() {
+                                  isSelecting = !isSelecting;
+                                });
+                                isSelected.clear();
+                              })
+                          : MyIconButton(
+                              onPressed: () {
+                                onTapSetting();
+                              },
+                              icon: Icon(Icons.menu,
+                                  color: MyColors.grey['c900']!),
+                            ),
+                      MyText(
+                        text: isSelecting ? 'Đã chọn ${isSelected.length}' : '',
+                        fontSize: FontSize.z16,
+                        fontWeight: FontWeight.w600,
+                        color: MyColors.grey['c900']!,
+                      ),
+                    ],
+                  ),
+                  !isSelecting
+                      ? Row(children: [
+                          GestureDetector(
+                            onTap: () {
+                              widget.showBottomBar?.call(false);
+                              setState(() {
+                                isSelecting = true;
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: MyColors.grey['c600']!.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: MyText(
+                                  text: 'Chọn',
+                                  fontSize: FontSize.z15,
+                                  fontWeight: FontWeight.w600,
+                                  color: MyColors.white['c900']!),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Container(
+                              decoration: BoxDecoration(
+                                color: MyColors.grey['c600']!.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              padding: const EdgeInsets.all(3),
+                              child: Icon(
+                                Icons.bubble_chart,
+                                color: MyColors.white['c900'],
+                              )),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          PopupMenuButton(
+                            itemBuilder: (context) => [
+                              PopupMenuItem(
+                                value: 1,
+                                onTap: showModalClassify,
+                                child: classifyButton(),
+                              ),
+                              PopupMenuItem(
+                                value: 2,
+                                onTap: showModalFilter,
+                                child: filterButton(),
+                              )
+                            ],
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: MyColors.grey['c600']!.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              padding: const EdgeInsets.all(3),
+                              child: Icon(
+                                Icons.more_vert,
+                                color: MyColors.white['c900']!,
                               ),
                             ),
                           ),
-                          onTap: () {
-                            widget.showBottomBar?.call(true);
-                            setState(() {
-                              isSelecting = !isSelecting;
-                            });
-                            isSelected.clear();
-                          })
+                        ])
                       : const SizedBox(),
-                  MyText(
-                    text: isSelecting
-                        ? 'Đã chọn ${isSelected.length}'
-                        : user != null && user!.displayName != null
-                            ? 'Chào ${user!.displayName}'
-                            : '',
-                    fontSize: FontSize.z16,
-                    fontWeight: FontWeight.w600,
-                    color: MyColors.grey['c900']!,
-                  ),
                 ],
               ),
-              !isSelecting
-                  ? Row(children: [
-                      GestureDetector(
-                        onTap: () {
-                          widget.showBottomBar?.call(false);
-                          setState(() {
-                            isSelecting = true;
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 5),
-                          decoration: BoxDecoration(
-                            color: MyColors.grey['c600']!.withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: MyText(
-                              text: 'Chọn',
-                              fontSize: FontSize.z15,
-                              fontWeight: FontWeight.w600,
-                              color: MyColors.white['c900']!),
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          onTapSetting();
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: MyColors.grey['c600']!.withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Image.asset(
-                            'assets/icons/i16/dots-vertical.png',
-                            width: 30,
-                            height: 30,
-                            color: MyColors.white['c900'],
-                          ),
-                        ),
-                      ),
-                    ])
-                  : const SizedBox(),
             ],
           ),
         ),
@@ -344,11 +394,49 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
     ]);
   }
 
+  Widget classifyButton() {
+    return Row(
+      children: [
+        MyText(
+            text: 'Phân loại',
+            fontWeight: FontWeight.w500,
+            color: MyColors.grey['c700']!,
+            fontSize: FontSize.z16),
+        const SizedBox(
+          width: 20,
+        ),
+        MyIconButton(
+          icon: Icon(Icons.filter_list, color: MyColors.grey['c900']!),
+          onPressed: () {},
+        ),
+      ],
+    );
+  }
+
+  Widget filterButton() {
+    return Row(
+      children: [
+        MyText(
+            text: 'Kiểu xem',
+            fontWeight: FontWeight.w500,
+            color: MyColors.grey['c700']!,
+            fontSize: FontSize.z16),
+        const SizedBox(
+          width: 20,
+        ),
+        MyIconButton(
+          icon: Icon(Icons.filter_alt, color: MyColors.grey['c900']!),
+          onPressed: () {},
+        ),
+      ],
+    );
+  }
+
   Widget _buildTabBar() {
     return TabBar(
       controller: tabController,
       dividerColor: Colors.transparent,
-      tabs: [
+      tabs: const [
         Tab(
           text: 'Lạnh',
           icon: Icon(Icons.kitchen),
@@ -367,7 +455,7 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
 
   Future? futureCategory;
 
-  void clearCache() async {
+  Future<void> clearCache() async {
     await CategoryService().deleteCache();
   }
 
@@ -376,144 +464,194 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
       return foods.firstWhere((element) => element.value == value).label;
     }
 
-    return FutureBuilder(
-      future: CategoryService().getCategoriesByPosition(positionId: positionId),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          final listCategories = snapshot.data as List<Category>;
-          Map<String, List<Category>> groupedCategories = {};
-          for (var category in listCategories) {
-            if (!groupedCategories.containsKey(category.type)) {
-              groupedCategories[category.type!] = [];
-            }
-            groupedCategories[category.type]?.add(category);
-          }
-          return listCategories.isEmpty
-              ? Center(
-                  child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/icons/i16/item-food.png',
-                      width: 50,
-                      height: 50,
-                    ),
-                    const SizedBox(height: 20),
-                    Flexible(
-                      child: MyText(
-                        text: 'Thức ăn của bạn đang chờ được cất giữ',
-                        fontSize: FontSize.z18,
-                        fontWeight: FontWeight.w600,
-                        color: MyColors.grey['c900']!,
-                      ),
-                    )
-                  ],
-                ))
-              : SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: groupedCategories.entries.map((food) {
-                      return Column(
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      child: MyText(
-                                        text:
-                                            '${getFoodLabel(food.key)} (${food.value.length})',
-                                        fontSize: FontSize.z16,
-                                        fontWeight: FontWeight.w600,
-                                        color: MyColors.grey['c900']!,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    Container(
-                                      width: MediaQuery.of(context).size.width,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 10),
-                                      decoration: BoxDecoration(
-                                        color: MyColors.grey['c100']!,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: Wrap(
-                                        spacing: 14,
-                                        runSpacing: 5,
-                                        children: food.value
-                                            .map((category) => GestureDetector(
-                                                onTap: () {
-                                                  if (isSelecting) {
-                                                    if (isSelected.contains(
-                                                        category.id)) {
-                                                      setState(() {
-                                                        isSelected.remove(
-                                                            category.id);
-                                                      });
-                                                    } else {
-                                                      setState(() {
-                                                        isSelected
-                                                            .add(category.id!);
-                                                      });
-                                                    }
-                                                  } else {
-                                                    print(category.toJson());
-                                                    Navigator.pushNamed(
-                                                        context,
-                                                        RouterMyFridge
-                                                            .editCategoryDetail,
-                                                        arguments: {
-                                                          'category': category
-                                                        });
-                                                  }
-                                                },
-                                                onLongPress: () {
-                                                  widget.showBottomBar!(false);
-                                                  setState(() {
-                                                    isSelected
-                                                        .add(category.id!);
-                                                    isSelecting = true;
-                                                  });
-                                                },
-                                                child: CategoryItem(
-                                                  category: category,
-                                                  isSelected: isSelected
-                                                      .contains(category.id!),
-                                                )))
-                                            .toList(),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          const MyDivider(),
-                          const SizedBox(
-                            height: 10,
-                          )
-                        ],
-                      );
-                    }).toList(),
-                  ),
-                );
-        } else if (snapshot.hasError) {
-          return Text('${snapshot.error}');
-        } else {
-          return const Center(child: CircularProgressIndicator());
+    List<Category>? listCategories = categoryMap[positionId.toString()];
+    Map<String, List<Category>> groupedCategories = {};
+    if (listCategories == null) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    } else {
+      for (var category in listCategories) {
+        if (!groupedCategories.containsKey(category.type)) {
+          groupedCategories[category.type!] = [];
         }
-      },
-    );
+        groupedCategories[category.type]?.add(category);
+      }
+      return listCategories.isEmpty
+          ? Center(
+              child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/icons/i16/item-food.png',
+                  width: 50,
+                  height: 50,
+                ),
+                const SizedBox(height: 20),
+                Flexible(
+                  child: MyText(
+                    text: 'Thức ăn của bạn đang chờ được cất giữ',
+                    fontSize: FontSize.z18,
+                    fontWeight: FontWeight.w600,
+                    color: MyColors.grey['c900']!,
+                  ),
+                )
+              ],
+            ))
+          : SingleChildScrollView(
+              child: classify == true
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: groupedCategories.entries.map((food) {
+                        return Column(
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        child: MyText(
+                                          text:
+                                              '${getFoodLabel(food.key)} (${food.value.length})',
+                                          fontSize: FontSize.z16,
+                                          fontWeight: FontWeight.w600,
+                                          color: MyColors.grey['c900']!,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      Container(
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12, vertical: 10),
+                                        decoration: BoxDecoration(
+                                          color: MyColors.grey['c100']!,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        child: Wrap(
+                                          spacing: 14,
+                                          runSpacing: 5,
+                                          children: food.value
+                                              .map(
+                                                  (category) => GestureDetector(
+                                                      onTap: () {
+                                                        if (isSelecting) {
+                                                          if (isSelected
+                                                              .contains(category
+                                                                  .id)) {
+                                                            setState(() {
+                                                              isSelected.remove(
+                                                                  category.id);
+                                                            });
+                                                          } else {
+                                                            setState(() {
+                                                              isSelected.add(
+                                                                  category.id!);
+                                                            });
+                                                          }
+                                                        } else {
+                                                          
+                                                          Navigator.pushNamed(
+                                                              context,
+                                                              RouterMyFridge
+                                                                  .editCategoryDetail,
+                                                              arguments: {
+                                                                'category':
+                                                                    category
+                                                              });
+                                                        }
+                                                      },
+                                                      onLongPress: () {
+                                                        widget.showBottomBar!(
+                                                            false);
+                                                        setState(() {
+                                                          isSelected.add(
+                                                              category.id!);
+                                                          isSelecting = true;
+                                                        });
+                                                      },
+                                                      child: CategoryItem(
+                                                        category: category,
+                                                        viewType: viewType,
+                                                        isSelected:
+                                                            isSelected.contains(
+                                                                category.id!),
+                                                      )))
+                                              .toList(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            const MyDivider(),
+                            const SizedBox(
+                              height: 10,
+                            )
+                          ],
+                        );
+                      }).toList())
+                  : Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: MyColors.grey['c100']!,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Wrap(
+                        spacing: 14,
+                        runSpacing: 5,
+                        children: listCategories
+                            .map((category) => GestureDetector(
+                                onTap: () {
+                                  if (isSelecting) {
+                                    if (isSelected.contains(category.id)) {
+                                      setState(() {
+                                        isSelected.remove(category.id);
+                                      });
+                                    } else {
+                                      setState(() {
+                                        isSelected.add(category.id!);
+                                      });
+                                    }
+                                  } else {
+                                    print(category.toJson());
+                                    Navigator.pushNamed(context,
+                                        RouterMyFridge.editCategoryDetail,
+                                        arguments: {'category': category});
+                                  }
+                                },
+                                onLongPress: () {
+                                  widget.showBottomBar!(false);
+                                  setState(() {
+                                    isSelected.add(category.id!);
+                                    isSelecting = true;
+                                  });
+                                },
+                                child: CategoryItem(
+                                  category: category,
+                                  viewType: viewType,
+                                  isSelected: isSelected.contains(category.id!),
+                                )))
+                            .toList(),
+                      ),
+                    ),
+            );
+    }
   }
 
   Widget _buildOptions() {
@@ -562,16 +700,20 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
           return ModalSelect(
               title: 'Di chuyển tới',
               options: listPositions,
-              onSelectItem: (value) {
+              onSelectItem: (value) async {
                 for (var element in isSelected) {
                   ApiService.put('${Config.CATEGORIES_API}/position',
                       {'id': element, 'positionId': value.value});
                 }
-                clearCache();
+                final isSelectedLength = isSelected.length;
                 setState(() {
+                  categoryMap.clear();
                   isSelecting = false;
                   isSelected.clear();
                 });
+
+                await clearCache();
+                await fetchCategories();
                 widget.showBottomBar!(true);
                 Navigator.of(context).pop();
                 showDialog(
@@ -582,39 +724,63 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
                         position: AlertPosition.topCenter,
                         title: 'Thành công',
                         description:
-                            'Đã di chuyển ${isSelected.length} đồ ăn tới ${value.label}!',
+                            'Đã di chuyển $isSelectedLength đồ ăn tới ${value.label}!',
                       );
                     });
               });
         });
   }
 
-  void onTapDelete() {
+  void onTapDelete() async {
     for (var element in isSelected) {
-      ApiService.delete('${Config.CATEGORIES_API}/$element').then((value) {
-        setState(() {
-          isSelecting = false;
-          isSelected.clear();
-        });
-        clearCache();
-        widget.showBottomBar!(true);
-        showDialog(
-            context: context,
-            builder: (context) {
-              return MyAlert(
-                alertType: AlertType.success,
-                position: AlertPosition.topCenter,
-                title: 'Thành công',
-                description: 'Xóa ${isSelected.length} đồ ăn khỏi tủ lạnh!',
-              );
-            });
-      });
+      categoryMap.clear();
+      ApiService.delete('${Config.CATEGORIES_API}/$element');
     }
+    final isSelectedLength = isSelected.length;
+    setState(() {
+      isSelecting = false;
+      isSelected.clear();
+    });
+    await clearCache();
+    await fetchCategories();
+    widget.showBottomBar!(true);
+    showDialog(
+        context: context,
+        builder: (context) {
+          return MyAlert(
+            alertType: AlertType.success,
+            position: AlertPosition.topCenter,
+            title: 'Thành công',
+            description: 'Xóa $isSelectedLength đồ ăn khỏi tủ lạnh!',
+          );
+        });
   }
-
-  void onTapSignOut() {}
 
   void onTapSetting() {
     Navigate.pushNamed(RouterSetting.setting);
+  }
+
+  void showModalClassify() {
+    showDialog(context: context, builder: (context) => const ModalClassify())
+        .then((_) async {
+      setState(() {
+        classify =
+            Provider.of<CategoryProvider>(context, listen: false).classify;
+        sortType =
+            Provider.of<CategoryProvider>(context, listen: false).sortType;
+      });
+      await clearCache();
+      await fetchCategories();
+    });
+  }
+
+  void showModalFilter() {
+    showDialog(context: context, builder: (context) => const ModalFilter())
+        .then((_) async {
+      setState(() {
+        viewType =
+            Provider.of<CategoryProvider>(context, listen: false).viewType;
+      });
+    });
   }
 }

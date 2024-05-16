@@ -1,18 +1,12 @@
-import 'dart:convert';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:frontend/components/item/item_reaction.dart';
 import 'package:frontend/components/modals/notification_modal.dart';
-import 'package:frontend/config.dart';
 import 'package:frontend/models/community/dish.dart';
 import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/account.dart';
 import 'package:frontend/navigation/router/community.dart';
 import 'package:frontend/provider/user.dart';
-import 'package:frontend/services/api_service.dart';
 import 'package:frontend/services/community/dish_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
@@ -60,43 +54,29 @@ class _FeedbackDetailScreenState extends State<FeedbackDetailScreen> {
         setState(() {
           feedbackModel = arguments['feedbackModel'];
           user = arguments['user'];
+          if (arguments['reactions'] != null) {
+            listReactions = arguments['reactions'];
+          } else {
+            processFeels(
+                feedbackModel!.feels!,
+                Provider.of<UserProvider>(context, listen: false).user!.id!,
+                listReactions);
+          }
           userImage = getImage(user!.imageUrl!);
           ownerImage = getImage(feedbackModel!.ownerDishImage);
-          processFeels(
-              feedbackModel!.feels!,
-              Provider.of<UserProvider>(context, listen: false).user!.id!,
-              listReactions);
         });
       }
     });
   }
 
-  void processFeels(List<Feel> feels, int ownerId, List<Reaction> reactions) {
+  void processFeels(List<Feel> feels, int userId, List<Reaction> reactions) {
     for (Feel feel in feels) {
-      switch (feel.type) {
-        case 1:
-          incrementQuantity('like', reactions);
-          break;
-        case 2:
-          incrementQuantity('love', reactions);
-          break;
-        case 3:
-          incrementQuantity('delicious', reactions);
-          break;
-      }
-
-      if (feel.userId == ownerId) {
-        switch (feel.type) {
-          case 1:
-            setSelected('like', true, reactions);
-            break;
-          case 2:
-            setSelected('love', true, reactions);
-            break;
-          case 3:
-            setSelected('delicious', true, reactions);
-            break;
-        }
+      incrementQuantity(feel.type!, reactions);
+    }
+    for (Feel feel in feels) {
+      if (feel.userId == userId) {
+        setSelected(feel.type!, true, reactions);
+        break;
       }
     }
   }
@@ -386,11 +366,7 @@ class _FeedbackDetailScreenState extends State<FeedbackDetailScreen> {
             .isSelected ==
         false) {
       final Feel feel = Feel(
-        type: reaction.name == 'like'
-            ? 1
-            : reaction.name == 'love'
-                ? 2
-                : 3,
+        type: reaction.name,
         userId: Provider.of<UserProvider>(context, listen: false).user!.id,
         feedbackId: feedbackModel!.id,
       );
@@ -406,27 +382,19 @@ class _FeedbackDetailScreenState extends State<FeedbackDetailScreen> {
       setSelected(e.type!, true, listReactions);
       incrementQuantity(e.type!, listReactions);
       await DishService.addFeel(Feel(
-        type: e.type == 'like'
-            ? 1
-            : e.type == 'love'
-                ? 2
-                : 3,
+        type: e.type,
         userId: Provider.of<UserProvider>(context, listen: false).user!.id,
-        dishId: feedbackModel!.id,
+        feedbackId: feedbackModel!.id,
       ));
     } else {
       setSelected(e.type!, false, listReactions);
       decrementQuantity(e.type!, listReactions);
-      final feel = feedbackModel!.feels!.firstWhere((element) =>
-          element.userId ==
-              Provider.of<UserProvider>(context, listen: false).user!.id &&
-          element.type ==
-              (e.type == 'like'
-                  ? 1
-                  : e.type == 'love'
-                      ? 2
-                      : 3));
-      await DishService.deleteFeel(feel);
+      final feel = Feel(
+        feedbackId: feedbackModel!.id,
+        type: e.type,
+        userId: Provider.of<UserProvider>(context, listen: false).user!.id,
+      );
+      await DishService.deleteFeel(feel, 'feedback');
     }
     setState(() {});
   }
@@ -482,7 +450,7 @@ class _FeedbackDetailScreenState extends State<FeedbackDetailScreen> {
   }
 
   void navigateToOriginalDish() async {
-    UserModel owner = UserModel();
     final Dish dish = await DishService.getDishById(id: feedbackModel!.dishId!);
+    Navigate.pushNamed(RouterCommunity.dishDetail, arguments: {'dish': dish});
   }
 }

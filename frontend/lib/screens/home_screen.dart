@@ -89,33 +89,35 @@ class _HomeScreenState extends State<HomeScreen> {
                                 : MyColors.grey['c500']!)),
                     label: '',
                   ),
+                  
                   BottomNavigationBarItem(
                     icon: _navigateItem(
                         _currentIndex == 3 ? true : false,
-                        'Báo cáo',
-                        Image.asset('assets/icons/i16/chart.png',
+                        'Thông báo',
+                        Image.asset('assets/icons/i16/bell.png',
                             width: 25,
                             height: 25,
                             color: _currentIndex == 3
                                 ? MyColors.primary['CulturalYellow']!['c700']!
                                 : MyColors.grey['c500']!)),
-                    tooltip: "Withdrawal",
+                    tooltip: "More",
                     label: '',
                   ),
                   BottomNavigationBarItem(
                     icon: _navigateItem(
                         _currentIndex == 4 ? true : false,
-                        'Thông báo',
-                        Image.asset('assets/icons/i16/bell.png',
+                        'Báo cáo',
+                        Image.asset('assets/icons/i16/chart.png',
                             width: 25,
                             height: 25,
                             color: _currentIndex == 4
                                 ? MyColors.primary['CulturalYellow']!['c700']!
                                 : MyColors.grey['c500']!)),
-                    tooltip: "More",
+                    tooltip: "Withdrawal",
                     label: '',
-                  )
+                  ),
                 ],
+                
                 selectedLabelStyle: const TextStyle(
                   fontFamily: 'Urbanist',
                   fontSize: FontSize.z12,
@@ -126,6 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 backgroundColor: Colors.white,
                 unselectedItemColor: MyColors.grey['c600']!,
               ),
+              
             ),
     );
   }
@@ -143,12 +146,15 @@ class _HomeScreenState extends State<HomeScreen> {
             showBottomBar: (bool value) => handleShowBottomBar(value),
             navigateBottomBar: (int index) => handleNavigateBottomBar(index));
       case 3:
-        return ReportScreen(
+        return NotificationScreen(
           showBottomBar: (bool value) => handleShowBottomBar(value),
           navigateBottomBar: (int index) => handleNavigateBottomBar(index),
         );
       case 4:
-        return const NotificationScreen();
+        return ReportScreen(
+          showBottomBar: (bool value) => handleShowBottomBar(value),
+          navigateBottomBar: (int index) => handleNavigateBottomBar(index),
+        );
       default:
         return Container();
     }

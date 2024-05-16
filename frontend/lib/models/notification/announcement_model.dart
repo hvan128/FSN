@@ -1,6 +1,7 @@
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/models/community/dish.dart';
 import 'package:frontend/models/user/user.dart';
+import 'package:frontend/utils/functions_core.dart';
 
 List<Announcement> announcementFromJson(dynamic str) =>
   List<Announcement>.from((str).map((x) => Announcement.fromJson(x)));
@@ -29,7 +30,8 @@ class Announcement {
       this.read,
       this.action,
       this.createdAt,
-      this.updatedAt});
+      this.updatedAt,
+     });
 
   Announcement.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -41,12 +43,13 @@ class Announcement {
     category = json['category'] != null ? Category.fromJson(json['category']) : null;
     read = json['read'] == 1 ? true : false;
     action = json['action'];
+
     createdAt = json['createdAt'] != null
-        ? DateTime.parse(json['createdAt'])
-        : null;
+          ? FunctionCore.convertTime(json['createdAt'])
+          : null;
     updatedAt = json['updatedAt'] != null
-        ? DateTime.parse(json['updatedAt'])
-        : null;
+          ? FunctionCore.convertTime(json['updatedAt'])
+          : null;
   }
 
   Map<String, dynamic> toJson() {

@@ -1,6 +1,6 @@
-import 'dart:io';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:frontend/components/community/image_picker.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
 import 'package:frontend/components/modals/notification_modal.dart';
@@ -38,7 +38,8 @@ class _AddDishScreenState extends State<AddDishScreen> {
     StepModel(),
   ];
   String? selectedImagePath;
-  String? type = 'add';
+  String? type;
+  String? dishType;
   Dish? dish;
   List<String> fileSelected = [];
 
@@ -47,6 +48,20 @@ class _AddDishScreenState extends State<AddDishScreen> {
       TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _cookingTimeController = TextEditingController();
+  final labelErrorText = 'Vui lòng nhập tên món ăn';
+  final rangeOfPeopleErrorText = 'Vui lòng nhập số người';
+  final descriptionErrorText = 'Vui lòng nhập mô tả';
+  final cookingTimeErrorText = 'Vui lòng nhập thời gian chế biến';
+  final imageErrorText = 'Vui lòng chọn hình ảnh';
+  final ingredientErrorText = 'Vui lòng thêm nguyên liệu';
+  final stepErrorText = 'Vui lòng thêm bước làm';
+  bool labelHasError = false;
+  bool rangeOfPeopleHasError = false;
+  bool descriptionHasError = false;
+  bool cookingTimeHasError = false;
+  bool imageHasError = false;
+  bool ingredientHasError = false;
+  bool stepHasError = false;
 
   @override
   void initState() {
@@ -55,15 +70,18 @@ class _AddDishScreenState extends State<AddDishScreen> {
       if (ModalRoute.of(context)!.settings.arguments != null) {
         final args = ModalRoute.of(context)!.settings.arguments as Map;
         setState(() {
-          type = args['type'] as String;
-          dish = args['dish'] as Dish;
-          _labelController.text = dish!.label ?? '';
-          _rangeOfPeopleController.text = dish!.rangeOfPeople ?? '';
-          _descriptionController.text = dish!.description ?? '';
-          _cookingTimeController.text = dish!.cookingTime.toString();
-          selectedImagePath = dish!.image;
-          ingredientsList = dish!.ingredients ?? [];
-          listStepsModel = dish!.steps ?? [];
+          type = args['type'] ?? 'add';
+          dish = args['dish'];
+          dishType = args['dishType'] ?? 'recipes';
+          if (dish != null) {
+            _labelController.text = dish!.label ?? '';
+            _rangeOfPeopleController.text = dish!.rangeOfPeople ?? '';
+            _descriptionController.text = dish!.description ?? '';
+            _cookingTimeController.text = dish!.cookingTime.toString();
+            selectedImagePath = dish!.image;
+            ingredientsList = dish!.ingredients ?? [];
+            listStepsModel = dish!.steps ?? [];
+          }
         });
       } else {
         ingredientsList.addAll([
@@ -174,11 +192,31 @@ class _AddDishScreenState extends State<AddDishScreen> {
                 ),
                 const SizedBox(height: 5),
                 MyText(
-                  text: 'Hãy truyền cảm hứng nấu món này tới mọi người',
+                  text: dishType == 'recipes'
+                      ? 'Hãy truyền cảm hứng nấu món này tới mọi người'
+                      : 'Chia sẻ mẹo bếp này với mọi người nhé',
                   fontSize: FontSize.z15,
                   fontWeight: FontWeight.w400,
                   color: MyColors.grey['c600']!,
                 ),
+                imageHasError
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 6),
+                            MyText(
+                              text: imageErrorText,
+                              fontSize: FontSize.z13,
+                              lineHeight: 1.38,
+                              fontWeight: FontWeight.w600,
+                              color: MyColors.support['Error']!['c800']!,
+                            ),
+                          ],
+                        ),
+                      )
+                    : Container(),
               ]),
             ),
           );
@@ -192,61 +230,95 @@ class _AddDishScreenState extends State<AddDishScreen> {
       child: Column(children: [
         MyTextField(
             obscureText: false,
-            hasError: false,
-            hintText: 'Tên món: Món canh bí ngon nhất',
+            hintText: dishType == 'recipes'
+                ? 'Tên món: Món canh bí ngon nhất'
+                : 'Tên mẹo: Mẹo làm mềm ức gà',
             fontSize: FontSize.z20,
             hintFontWeight: FontWeight.w600,
+            labelFontWeight: FontWeight.w700,
+            onChange: (_) => setState(() {
+                  labelHasError = false;
+                }),
+            errorText: labelErrorText,
+            hasError: labelHasError,
             controller: _labelController),
         const SizedBox(height: 10),
         MyTextField(
             obscureText: false,
-            hasError: false,
             multipleLine: true,
-            hintText:
-                'Hãy chia sẻ với mọi người về món này của bạn nhé. Ai hay điều gì đã truyền cảm hứng cho bạn nấu nó? Tại sao nó đặc biệt? Bạn thích thưởng thức nó theo cách nào?',
+            errorText: descriptionErrorText,
+            hasError: descriptionHasError,
+            onChange: (_) => setState(() {
+                  descriptionHasError = false;
+                }),
+            hintText: dishType == 'recipes'
+                ? 'Hãy chia sẻ với mọi người về món này của bạn nhé. Ai hay điều gì đã truyền cảm hứng cho bạn nấu nó? Tại sao nó đặc biệt? Bạn thích thưởng thức nó theo cách nào?'
+                : 'Hãy chia sẻ với mọi người về mẹo này của bạn nhé. Bạn đã phát hiện nó như thế nào? Tại sao nó đặc biệt?',
             fontSize: FontSize.z17,
             controller: _descriptionController),
         const SizedBox(height: 10),
-        Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              MyText(
-                text: 'Khẩu phần',
-                fontSize: FontSize.z17,
-                fontWeight: FontWeight.w400,
-                color: MyColors.grey['c600']!,
-              ),
-              MyTextField(
-                width: 175,
-                obscureText: false,
-                hasError: false,
-                controller: _rangeOfPeopleController,
-                hintText: '2 người',
-                fontSize: FontSize.z17,
-              )
-            ]),
-        Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              MyText(
-                text: 'Thời gian nấu',
-                fontSize: FontSize.z17,
-                fontWeight: FontWeight.w400,
-                color: MyColors.grey['c600']!,
-              ),
-              MyTextField(
-                width: 175,
-                obscureText: false,
-                hasError: false,
-                hintText: '1 tiếng 30 phút',
-                fontSize: FontSize.z17,
-                controller: _cookingTimeController,
-              )
-            ])
+        dishType == 'recipes'
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                    Expanded(
+                      flex: 2,
+                      child: MyText(
+                        text: 'Khẩu phần',
+                        fontSize: FontSize.z17,
+                        fontWeight: FontWeight.w400,
+                        color: MyColors.grey['c600']!,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: MyTextField(
+                        obscureText: false,
+                        errorText: rangeOfPeopleErrorText,
+                        hasError: rangeOfPeopleHasError,
+                        controller: _rangeOfPeopleController,
+                        onChange: (_) => setState(() {
+                          rangeOfPeopleHasError = false;
+                        }),
+                        hintText: '2 người',
+                        fontSize: FontSize.z17,
+                      ),
+                    )
+                  ])
+            : Container(),
+        dishType == 'recipes'
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                    Expanded(
+                      flex: 2,
+                      child: MyText(
+                        text: 'Thời gian nấu',
+                        fontSize: FontSize.z17,
+                        fontWeight: FontWeight.w400,
+                        color: MyColors.grey['c600']!,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: MyTextField(
+                        obscureText: false,
+                        hasError: cookingTimeHasError,
+                        hintText: '1 tiếng 30 phút',
+                        errorText: cookingTimeErrorText,
+                        onChange: (_) => setState(() {
+                          cookingTimeHasError = false;
+                        }),
+                        fontSize: FontSize.z17,
+                        controller: _cookingTimeController,
+                      ),
+                    )
+                  ])
+            : Container()
       ]),
     );
   }
@@ -286,6 +358,29 @@ class _AddDishScreenState extends State<AddDishScreen> {
               }).toList(),
             ],
           ),
+          ingredientHasError
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 6),
+                          MyText(
+                            text: ingredientErrorText,
+                            fontSize: FontSize.z13,
+                            lineHeight: 1.38,
+                            fontWeight: FontWeight.w600,
+                            color: MyColors.support['Error']!['c800']!,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              : Container(),
           GestureDetector(
             onTap: () {
               setState(() {
@@ -340,8 +435,11 @@ class _AddDishScreenState extends State<AddDishScreen> {
           labelColor: MyColors.grey['c700']!,
           hintText: index % 2 == 0 ? '100g' : '200ml',
           controller: TextEditingController(
-              text:
-                  '${ingredientsList[index].quantity} ${ingredientsList[index].unit}'),
+              text: ingredientsList[index].quantity == null
+                  ? null
+                  : ingredientsList[index].unit == null
+                      ? '${ingredientsList[index].quantity}'
+                      : '${ingredientsList[index].quantity} ${ingredientsList[index].unit}'),
           onChange: (value) {
             var input = FunctionCore().parseInput(value);
             ingredientsList[index].quantity =
@@ -377,6 +475,9 @@ class _AddDishScreenState extends State<AddDishScreen> {
                         ingredientsList[index].label = controller.text;
                         ingredientsList[index].value =
                             FunctionCore.convertToSlug(controller.text);
+                        setState(() {
+                          ingredientHasError = false;
+                        });
                       },
                       style: TextStyle(
                           color: MyColors.grey['c600']!,
@@ -496,6 +597,28 @@ class _AddDishScreenState extends State<AddDishScreen> {
             ],
           ),
           const SizedBox(height: 16),
+          stepHasError
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Column(
+                        children: [
+                          const SizedBox(height: 6),
+                          MyText(
+                            text: stepErrorText,
+                            fontSize: FontSize.z13,
+                            lineHeight: 1.38,
+                            fontWeight: FontWeight.w600,
+                            color: MyColors.support['Error']!['c800']!,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              : Container(),
           GestureDetector(
             onTap: () {
               setState(() {
@@ -527,6 +650,9 @@ class _AddDishScreenState extends State<AddDishScreen> {
   }
 
   Widget _itemStep(int index) {
+    TextEditingController controller = TextEditingController(
+      text: listStepsModel[index].description,
+    );
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
@@ -560,8 +686,7 @@ class _AddDishScreenState extends State<AddDishScreen> {
                   hintText: index % 2 == 0
                       ? 'Trộn bột và nước đến khi đặc lại'
                       : 'Đậy kín hỗn hợp lại và để ở nhiệt độ thường',
-                  controller: TextEditingController(
-                      text: listStepsModel[index].description),
+                  controller: controller,
                   onChange: (p0) {
                     listStepsModel[index].description = p0;
                   },
@@ -579,6 +704,7 @@ class _AddDishScreenState extends State<AddDishScreen> {
                         onTap: () {
                           pickerImage((imagePath) {
                             setState(() {
+                              stepHasError = false;
                               listStepsModel[index].image = imagePath;
                               if (!fileSelected
                                   .contains('step_no${index + 1}')) {
@@ -629,33 +755,102 @@ class _AddDishScreenState extends State<AddDishScreen> {
   }
 
   void onAddDish() {
+    List<Ingredient> ingredients = [];
+    List<StepModel> steps = [];
     for (var i = 0; i < listStepsModel.length; i++) {
-      listStepsModel[i].no = i + 1;
+      if (listStepsModel[i].image != null ||
+          listStepsModel[i].description != null) {
+        listStepsModel[i].no = i + 1;
+        steps.add(listStepsModel[i]);
+      }
     }
-    String missField = '';
+    for (var i = 0; i < ingredientsList.length; i++) {
+      if (ingredientsList[i].unit != null ||
+          ingredientsList[i].quantity != null &&
+              ingredientsList[i].label != null) {
+        ingredients.add(ingredientsList[i]);
+      }
+    }
     if (selectedImagePath == null) {
-      missField += 'ảnh đại diện';
+      setState(() {
+        imageHasError = true;
+      });
+    } else {
+      setState(() {
+        imageHasError = false;
+      });
     }
     if (_labelController.text.isEmpty) {
-      missField += ', tên món';
+      setState(() {
+        labelHasError = true;
+      });
+    } else {
+      setState(() {
+        labelHasError = false;
+      });
     }
     if (_descriptionController.text.isEmpty) {
-      missField += ', mô tả món';
+      setState(() {
+        descriptionHasError = true;
+      });
+    } else {
+      setState(() {
+        descriptionHasError = false;
+      });
     }
     if (_rangeOfPeopleController.text.isEmpty) {
-      missField += ', khẩu phần ăn';
+      setState(() {
+        rangeOfPeopleHasError = true;
+      });
+    } else {
+      setState(() {
+        rangeOfPeopleHasError = false;
+      });
     }
     if (_cookingTimeController.text.isEmpty) {
-      missField += ', thời gian nấu';
+      setState(() {
+        cookingTimeHasError = true;
+      });
+    } else {
+      setState(() {
+        cookingTimeHasError = false;
+      });
     }
-    if (missField != '') {
-      showDialog(
-          context: context,
-          builder: (context) => MyAlert(
-                alertType: AlertType.error,
-                title: 'Hãy điền đầy đủ thông tin',
-                description: 'Bạn quên chưa nhập các thông tin sau $missField',
-              ));
+    if (steps.isEmpty) {
+      setState(() {
+        stepHasError = true;
+      });
+    } else {
+      setState(() {
+        stepHasError = false;
+      });
+    }
+    if (ingredients.isEmpty) {
+      setState(() {
+        ingredientHasError = true;
+      });
+    } else {
+      setState(() {
+        ingredientHasError = false;
+      });
+    }
+
+    bool hasError = dishType == 'recipes'
+        ? labelHasError ||
+            descriptionHasError ||
+            rangeOfPeopleHasError ||
+            cookingTimeHasError ||
+            stepHasError ||
+            ingredientHasError ||
+            imageHasError
+        : labelHasError ||
+            descriptionHasError ||
+            stepHasError ||
+            ingredientHasError ||
+            imageHasError;
+
+    if (hasError) {
+      return;
     } else {
       if (type == 'edit') {
         editDish();
@@ -666,13 +861,22 @@ class _AddDishScreenState extends State<AddDishScreen> {
   }
 
   void editDish() async {
-    ingredientsList.forEach((element) {
-      print('element: ${element.toJson()}');
-    });
-    listStepsModel.forEach((element) {
-      print('element: ${element.toJson()}');
-    });
-    print(fileSelected.toString());
+    List<Ingredient> ingredients = [];
+    List<StepModel> steps = [];
+    for (var i = 0; i < listStepsModel.length; i++) {
+      if (listStepsModel[i].image != null ||
+          listStepsModel[i].description != null) {
+        listStepsModel[i].no = i + 1;
+        steps.add(listStepsModel[i]);
+      }
+    }
+    for (var i = 0; i < ingredientsList.length; i++) {
+      if (ingredientsList[i].unit != null ||
+          ingredientsList[i].quantity != null &&
+              ingredientsList[i].label != null) {
+        ingredients.add(ingredientsList[i]);
+      }
+    }
     final user = Provider.of<UserProvider>(context, listen: false).user!;
     final Dish dishModel = Dish(
       id: dish!.id!,
@@ -680,10 +884,11 @@ class _AddDishScreenState extends State<AddDishScreen> {
       description: _descriptionController.text,
       image: selectedImagePath,
       rangeOfPeople: _rangeOfPeopleController.text,
-      steps: listStepsModel,
+      steps: steps,
       owner: user,
-      ingredients: ingredientsList,
+      ingredients: ingredients,
       cookingTime: _cookingTimeController.text,
+      type: dishType,
     );
     final response = await DishService.updateDish(dishModel, fileSelected);
     if (response) {
@@ -722,16 +927,33 @@ class _AddDishScreenState extends State<AddDishScreen> {
   }
 
   void addDish() async {
+    List<Ingredient> ingredients = [];
+    List<StepModel> steps = [];
+    for (var i = 0; i < listStepsModel.length; i++) {
+      if (listStepsModel[i].image != null ||
+          listStepsModel[i].description != null) {
+        listStepsModel[i].no = i + 1;
+        steps.add(listStepsModel[i]);
+      }
+    }
+    for (var i = 0; i < ingredientsList.length; i++) {
+      if (ingredientsList[i].unit != null ||
+          ingredientsList[i].quantity != null &&
+              ingredientsList[i].label != null) {
+        ingredients.add(ingredientsList[i]);
+      }
+    }
     final user = Provider.of<UserProvider>(context, listen: false).user!;
     final Dish dish = Dish(
       label: _labelController.text,
       description: _descriptionController.text,
       image: selectedImagePath,
       rangeOfPeople: _rangeOfPeopleController.text,
-      steps: listStepsModel,
-      ingredients: ingredientsList,
+      steps: steps,
+      ingredients: ingredients,
       cookingTime: _cookingTimeController.text,
       owner: user,
+      type: dishType,
     );
     final response = await DishService.addDish(dish);
     if (response) {

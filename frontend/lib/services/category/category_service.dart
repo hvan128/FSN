@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'package:api_cache_manager/api_cache_manager.dart';
 import 'package:api_cache_manager/models/cache_db_model.dart';
+import 'package:frontend/components/modals/modal_classify.dart';
 import 'package:frontend/config.dart';
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/services/api_service.dart';
+import 'package:frontend/types/type.dart';
 import 'package:provider/provider.dart';
 
 class CategoryService {
@@ -16,6 +18,8 @@ class CategoryService {
       .user!;
   Future<List<Category>> getCategoriesByPosition({
     required int positionId,
+    SortType? sortType,
+    Sort? sort,
   }) async {
     List<Category> categories = [];
     var isCacheExist =
@@ -26,8 +30,25 @@ class CategoryService {
       final data = jsonDecode(cacheData.syncData)['data'];
       return categoryFromJson(data);
     } else {
+      final queryParams = sortType == null && sort == null
+          ? null
+          : sortType != null && sort == null
+              ? {
+                  'sortBy': sortType.name,
+                }
+              : sortType == null && sort != null
+                  ? {
+                      'sort': sort.name,
+                    }
+                  : sortType != null && sort != null
+                      ? {
+                          'sortBy': sortType.name,
+                          'sort': sort.name,
+                        }
+                      : null;
       await ApiService.get(
-              '${Config.CATEGORIES_API}/position/$positionId/${user.fridgeId}')
+              '${Config.CATEGORIES_API}/position/$positionId/${user.fridgeId}',
+              queryParams: queryParams)
           .then((value) {
         if (value != null) {
           final data = jsonDecode(value.toString())['data'];
@@ -99,5 +120,12 @@ class CategoryService {
   Future<void> deleteCategory(int id) async {
     await ApiService.delete('${Config.CATEGORIES_API}/$id');
     await APICacheManager().deleteCache('categories');
+  }
+
+  Future<void> changeQuantity(Category category, int quantity) async {
+    ApiService.put(Config.CATEGORIES_API, {
+      'id': category.id,
+      'quantity': quantity
+    });
   }
 }

@@ -126,7 +126,7 @@ class _ReactionButtonState extends State<ReactionButton> {
           _reactionView = false;
         } else {
           if (_reaction == EReaction.none) {
-            _reaction = EReaction.like;
+            _reaction = EReaction.love;
             if (widget.onReactionChanged != null) {
               widget.onReactionChanged!(_reaction);
             }

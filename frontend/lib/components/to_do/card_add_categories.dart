@@ -1,7 +1,5 @@
 import 'package:api_cache_manager/api_cache_manager.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:frontend/components/item/item_food.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
 import 'package:frontend/components/modals/modal_select.dart';
 import 'package:frontend/config.dart';
@@ -13,7 +11,6 @@ import 'package:frontend/screens/my_fridge/choose_type_screen.dart';
 import 'package:frontend/services/api_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
-import 'package:frontend/types/food.dart';
 import 'package:frontend/types/type.dart';
 import 'package:frontend/utils/constants.dart';
 import 'package:frontend/utils/functions_core.dart';
@@ -123,123 +120,7 @@ class _CardAddCategoryState extends State<CardAddCategory> {
                 const SizedBox(
                   height: 22,
                 ),
-                Row(children: [
-                  GestureDetector(
-                    onTap: () {
-                      chooseIcon();
-                    },
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          color: MyColors.primary['CulturalYellow']!['c100']!,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: MyColors.grey['c300']!,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: MyColors.grey['c300']!,
-                              blurRadius: 2,
-                              offset: const Offset(1, 2),
-                            )
-                          ]),
-                      child: SizedBox(
-                        height: 60,
-                        width: 60,
-                        child: Image.asset(
-                          icon!,
-                          width: 50,
-                          height: 50,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  Expanded(
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: MyColors
-                                      .primary['CulturalYellow']!['c800']!,
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: MyColors
-                                          .primary['CulturalYellow']!['c800']!,
-                                      blurRadius: 4,
-                                      offset: const Offset(1, 2),
-                                    )
-                                  ],
-                                ),
-                                child: GestureDetector(
-                                  onTap: chooseType,
-                                  child: MyText(
-                                    text: labelType!,
-                                    fontSize: FontSize.z16,
-                                    fontWeight: FontWeight.w500,
-                                    color: MyColors.white['c900']!,
-                                  ),
-                                ),
-                              ),
-                              helperText != null
-                                  ? const SizedBox(height: 5)
-                                  : Container(),
-                              helperText != null
-                                  ? Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: MyText(
-                                        text: helperText!,
-                                        fontSize: FontSize.z12,
-                                        fontWeight: FontWeight.w500,
-                                        color:
-                                            MyColors.support['Error']!['c900']!,
-                                      ),
-                                  )
-                                  : Container(),
-                            ],
-                          ),
-                          TextField(
-                            controller: _controller,
-                            onChanged: (value) {
-                              setState(() {
-                                _controller.text = value;
-                              });
-                            },
-                            style: TextStyle(
-                              color: MyColors.grey['c900']!,
-                              fontSize: FontSize.z16,
-                              fontWeight: FontWeight.w700,
-                            ),
-                            decoration: InputDecoration(
-                              contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: MyColors.grey['c500']!),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(
-                                    width: 2,
-                                    color: MyColors
-                                        .primary['CulturalYellow']!['c600']!),
-                              ),
-                            ),
-                          )
-                        ]),
-                  )
-                ]),
+                
                 const SizedBox(
                   height: 20,
                 ),

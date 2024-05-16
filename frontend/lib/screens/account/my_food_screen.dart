@@ -18,6 +18,7 @@ class MyFoodScreen extends StatefulWidget {
 class _MyFoodScreenState extends State<MyFoodScreen> {
   List<Dish> dishes = [];
   int? userId;
+  String? type;
   int? total;
   final controller = ScrollController();
   bool hasMore = true;
@@ -31,6 +32,7 @@ class _MyFoodScreenState extends State<MyFoodScreen> {
         final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
         setState(() {
           userId = arguments['userId'];
+          type = arguments['type'];
           getAllDishes(1, 10);
         });
         controller.addListener(() {
@@ -54,7 +56,7 @@ class _MyFoodScreenState extends State<MyFoodScreen> {
     }
         isLoading = true;
 
-    final res = await DishService.getDishByOwnerId(userId!, page, pageSize);
+    final res = await DishService.getDishByOwnerId(userId!, page, pageSize, type);
 
     setState(() {
       dishes.addAll(res['dishes']);
@@ -74,7 +76,7 @@ class _MyFoodScreenState extends State<MyFoodScreen> {
         child: Column(
           children: [
             MyHeader(
-              title: 'Món của tôi',
+              title: type == 'recipes' ? 'Công thức nấu ăn' : 'Mẹo bếp',
               bgColor: MyColors.white['c900']!,
             ),
             Expanded(
