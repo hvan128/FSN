@@ -96,6 +96,33 @@ class CategoryService {
     return list.length;
   }
 
+  Future<Map<String, dynamic>> getTotalCategory(
+      {required int fridgeId,
+      required DateTime firstDay,
+      required DateTime lastDay,
+      String? sort}) async {
+    Map<String, dynamic> data = {};
+    Map<String, dynamic> model = sort != null
+        ? {
+            'fridgeId': fridgeId,
+            'firstDay': firstDay.toIso8601String(),
+            'lastDay': lastDay.toIso8601String(),
+            'sort': sort
+          }
+        : {
+            'fridgeId': fridgeId,
+            'firstDay': firstDay.toIso8601String(),
+            'lastDay': lastDay.toIso8601String(),
+          };
+    await ApiService.post('${Config.CATEGORIES_API}/report', model)
+        .then((value) {
+      if (value != null) {
+        data = jsonDecode(value.toString())['data'];
+      }
+    });
+    return data;
+  }
+
   Future deleteCache() async {
     var isCacheExist1 =
         await APICacheManager().isAPICacheKeyExist('categories_1');
@@ -123,9 +150,7 @@ class CategoryService {
   }
 
   Future<void> changeQuantity(Category category, int quantity) async {
-    ApiService.put(Config.CATEGORIES_API, {
-      'id': category.id,
-      'quantity': quantity
-    });
+    ApiService.put(
+        Config.CATEGORIES_API, {'id': category.id, 'quantity': quantity});
   }
 }

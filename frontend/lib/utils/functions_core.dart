@@ -8,6 +8,9 @@ import 'package:frontend/utils/constants.dart';
 import 'package:frontend/widgets/loading.dart';
 import 'package:intl/intl.dart';
 
+enum Format { integer, real }
+
+
 class FunctionCore {
   static String convertToSlug(String text) {
     text = text.replaceAll(RegExp(r'[àáạảãâầấậẩẫăằắặẳẵ]'), 'a');
@@ -19,6 +22,74 @@ class FunctionCore {
     text = text.replaceAll(RegExp(r'[đ]'), 'd');
 
     return text.toLowerCase().replaceAll(RegExp(r'[^a-z0-9-]+'), '-');
+  }
+
+  static String shortenNumberValue(double value) {
+    int numberOfDigits = value.toStringAsFixed(0).length;
+
+    late String suffix;
+    double divideNumber = 1;
+
+    if (numberOfDigits <= 4) {
+      suffix = '';
+      divideNumber = 1;
+    } else if (numberOfDigits <= 6) {
+      suffix = 'k';
+      divideNumber = 1000;
+    } else if (numberOfDigits <= 9) {
+      suffix = 'm';
+      divideNumber = 1e6;
+    } else if (numberOfDigits <= 12) {
+      suffix = 'b';
+      divideNumber = 1e9;
+    } else if (numberOfDigits <= 15) {
+      suffix = 't';
+      divideNumber = 1e12;
+    }
+
+    return (value / divideNumber).toStringAsFixed(0) + suffix;
+  }
+
+  static String convertMoneyFormat<T>(T? amount, Format type) {
+    double? doubleAmount;
+
+    if (T is double) {
+      doubleAmount = amount as double;
+    } else {
+      doubleAmount = double.tryParse(amount.toString());
+    }
+
+    if (doubleAmount == null || amount == null) {
+      return '';
+    }
+
+    String format = '';
+
+    int integralPart = doubleAmount.floor();
+    String decimalPart =
+        doubleAmount.toStringAsFixed(2).split('.')[1].isNotEmpty
+            ? doubleAmount.toStringAsFixed(2).split('.')[1]
+            : '.00';
+
+    int count = 0;
+
+    if (integralPart == 0) {
+      format += '0';
+    }
+
+    while (integralPart > 0) {
+      ++count;
+
+      format += (integralPart % 10).toString();
+      integralPart = (integralPart / 10).floor();
+
+      if (count >= 3 && integralPart > 0) {
+        format += ',';
+        count = 0;
+      }
+    }
+
+    return '${format.split('').reversed.join()}${type == Format.integer ? '' : '.$decimalPart'}';
   }
 
   static showSnackBar(BuildContext context, String message) {

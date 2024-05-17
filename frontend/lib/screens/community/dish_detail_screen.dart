@@ -64,7 +64,7 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
   }
 
   Future<void> getAllTips(int page, int pageSize) async {
-   final res = await DishService.getDishByOwnerId(
+    final res = await DishService.getDishByOwnerId(
         dish!.owner!.id!, page, pageSize, 'tips');
 
     setState(() {
@@ -86,7 +86,7 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
     for (Feel feel in feels) {
       incrementQuantity(feel.type!, reactions);
     }
-    for(Feel feel in feels) {
+    for (Feel feel in feels) {
       if (feel.userId == userId) {
         setSelected(feel.type!, true, reactions);
         break;
@@ -160,209 +160,222 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          SliverAppBar(
-              expandedHeight: 300,
-              pinned: true,
-              leading: MyIconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: Image.asset('assets/icons/i16/back.png',
-                      width: 25, height: 25, color: MyColors.grey['c900']!)),
-              actions: [
-                IconButton(
-                  onPressed: () {
-                    showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          return MyNotification(
-                            description:
-                                'Thêm tất cả các nguyên liệu vào danh sách mua sắm. Các món ăn đã có trong danh sách sẽ không được thêm vào.',
-                            notificationType: NotificationType.info,
-                            title: 'Thêm nhanh',
-                            btnList: [
-                              MyButton(
-                                text: 'Đồng ý',
-                                onPressed: () =>
-                                    flashAddToShoppingList(context),
-                              ),
-                              MyButton(
-                                  text: 'Quay lại danh sách',
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  })
-                            ],
-                          );
-                        });
-                  },
-                  icon: Image.asset(
-                    'assets/icons/i16/flash-auto.png',
-                    width: 26,
-                    height: 26,
-                    color: MyColors.grey['c900'],
-                  ),
-                ),
-                IconButton(
-                    onPressed: () {},
-                    icon: Image.asset('assets/icons/i16/camera.png',
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
+        if (didPop) {
+          return;
+        }
+        if (context.mounted) {
+          Navigator.pop(context, isSaved);
+        }
+      },
+      child: Scaffold(
+        body: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverAppBar(
+                expandedHeight: 300,
+                pinned: true,
+                leading: MyIconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Image.asset('assets/icons/i16/back.png',
                         width: 25, height: 25, color: MyColors.grey['c900']!)),
-                isMine
-                    ? SubmenuButton(
-                        menuChildren: <Widget>[
-                          MenuItemButton(
-                            onPressed: () {},
-                            child: const MenuAcceleratorLabel('&Xóa món ăn'),
-                          ),
-                          MenuItemButton(
-                            onPressed: () {
-                              Navigate.pushNamed(RouterCommunity.addDish,
-                                  arguments: {
-                                    'dish': dish,
-                                    'type': 'edit',
-                                  });
-                            },
-                            child:
-                                const MenuAcceleratorLabel('&Chỉnh sửa món ăn'),
-                          ),
-                          MenuItemButton(
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Quit!'),
+                actions: [
+                  IconButton(
+                    onPressed: () {
+                      showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            return MyNotification(
+                              description:
+                                  'Thêm tất cả các nguyên liệu vào danh sách mua sắm. Các món ăn đã có trong danh sách sẽ không được thêm vào.',
+                              notificationType: NotificationType.info,
+                              title: 'Thêm nhanh',
+                              btnList: [
+                                MyButton(
+                                  text: 'Đồng ý',
+                                  onPressed: () =>
+                                      flashAddToShoppingList(context),
                                 ),
-                              );
-                            },
-                            child: const MenuAcceleratorLabel('&Quit'),
+                                MyButton(
+                                    text: 'Quay lại danh sách',
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    })
+                              ],
+                            );
+                          });
+                    },
+                    icon: Image.asset(
+                      'assets/icons/i16/flash-auto.png',
+                      width: 26,
+                      height: 26,
+                      color: MyColors.grey['c900'],
+                    ),
+                  ),
+                  IconButton(
+                      onPressed: () {},
+                      icon: Image.asset('assets/icons/i16/camera.png',
+                          width: 25,
+                          height: 25,
+                          color: MyColors.grey['c900']!)),
+                  isMine
+                      ? SubmenuButton(
+                          menuChildren: <Widget>[
+                            MenuItemButton(
+                              onPressed: () {},
+                              child: const MenuAcceleratorLabel('&Xóa món ăn'),
+                            ),
+                            MenuItemButton(
+                              onPressed: () {
+                                Navigate.pushNamed(RouterCommunity.addDish,
+                                    arguments: {
+                                      'dish': dish,
+                                      'type': 'edit',
+                                    });
+                              },
+                              child: const MenuAcceleratorLabel(
+                                  '&Chỉnh sửa món ăn'),
+                            ),
+                            MenuItemButton(
+                              onPressed: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Quit!'),
+                                  ),
+                                );
+                              },
+                              child: const MenuAcceleratorLabel('&Quit'),
+                            ),
+                          ],
+                          child: Icon(
+                            Icons.more_vert,
+                            color: MyColors.grey['c900']!,
                           ),
-                        ],
-                        child: Icon(
-                          Icons.more_vert,
-                          color: MyColors.grey['c900']!,
-                        ),
-                      )
-                    : IconButton(
-                        onPressed: onSave,
-                        icon: isSaved
-                            ? Image.asset(
-                                'assets/icons/i16/save-book-mark.png',
-                                width: 25,
-                                height: 25,
-                                color: MyColors
-                                    .primary['CulturalYellow']!['c700']!,
-                              )
-                            : Image.asset(
-                                'assets/icons/i16/bookmark-outline.png',
-                                width: 25,
-                                height: 25,
-                                color: MyColors.grey['c900']!)),
-              ],
-              automaticallyImplyLeading: false,
-              backgroundColor: MyColors.white['c900']!,
-              flexibleSpace: FlexibleSpaceBar(
-                background: dish != null && dish!.image != null
-                    ? Image.network(
-                        FunctionCore.convertImageUrl(dish!.image!),
-                        fit: BoxFit.cover,
-                      )
-                    : Container(),
-              )),
-          SliverToBoxAdapter(
-            child: Column(children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        dish!.label == null
-                            ? const SizedBox()
-                            : Flexible(
-                                child: MyText(
-                                  text: dish!.label!,
-                                  fontSize: FontSize.z30,
-                                  fontWeight: FontWeight.w600,
-                                  color: MyColors.grey['c900']!,
-                                ),
-                              ),
-                        GestureDetector(
-                          onTap: onSave,
-                          child: isSaved
+                        )
+                      : IconButton(
+                          onPressed: onSave,
+                          icon: isSaved
                               ? Image.asset(
                                   'assets/icons/i16/save-book-mark.png',
-                                  width: 30,
-                                  height: 30,
+                                  width: 25,
+                                  height: 25,
                                   color: MyColors
                                       .primary['CulturalYellow']!['c700']!,
                                 )
                               : Image.asset(
                                   'assets/icons/i16/bookmark-outline.png',
-                                  width: 30,
-                                  height: 30,
-                                  color: MyColors.grey['c900']!,
+                                  width: 25,
+                                  height: 25,
+                                  color: MyColors.grey['c900']!)),
+                ],
+                automaticallyImplyLeading: false,
+                backgroundColor: MyColors.white['c900']!,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: dish != null && dish!.image != null
+                      ? Image.network(
+                          FunctionCore.convertImageUrl(dish!.image!),
+                          fit: BoxFit.cover,
+                        )
+                      : Container(),
+                )),
+            SliverToBoxAdapter(
+              child: Column(children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          dish!.label == null
+                              ? const SizedBox()
+                              : Flexible(
+                                  child: MyText(
+                                    text: dish!.label!,
+                                    fontSize: FontSize.z30,
+                                    fontWeight: FontWeight.w600,
+                                    color: MyColors.grey['c900']!,
+                                  ),
                                 ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    _buildAccount(),
-                    const SizedBox(height: 10),
-                    dish!.description == null
-                        ? Container()
-                        : MyText(
-                            text: dish!.description!,
-                            fontSize: FontSize.z16,
-                            fontWeight: FontWeight.w400,
-                            color: MyColors.grey['c800']!,
+                          GestureDetector(
+                            onTap: onSave,
+                            child: isSaved
+                                ? Image.asset(
+                                    'assets/icons/i16/save-book-mark.png',
+                                    width: 30,
+                                    height: 30,
+                                    color: MyColors
+                                        .primary['CulturalYellow']!['c700']!,
+                                  )
+                                : Image.asset(
+                                    'assets/icons/i16/bookmark-outline.png',
+                                    width: 30,
+                                    height: 30,
+                                    color: MyColors.grey['c900']!,
+                                  ),
                           ),
-                    dish!.type != 'recipes'
-                        ? Container()
-                        : const SizedBox(height: 20),
-                    dish!.type != 'recipes' ? Container() : _buildTime(),
-                    const SizedBox(height: 20),
-                    _buildIngredients(),
-                    const SizedBox(height: 20),
-                    const MyDivider(
-                      type: Type.solid,
-                    ),
-                    const SizedBox(height: 30),
-                    _buildSteps(),
-                    const MyDivider(
-                      type: Type.solid,
-                    ),
-                    const SizedBox(height: 30),
-                    _buildAccountSign(),
-                    const SizedBox(height: 30),
-                    const MyDivider(
-                      type: Type.solid,
-                    ),
-                    const SizedBox(height: 30),
-                    _buildReactions(),
-                    const SizedBox(height: 30),
-                    const MyDivider(
-                      type: Type.solid,
-                    ),
-                    const SizedBox(height: 30),
-                    _buildFeedback(),
-                    const SizedBox(height: 30),
-                    const MyDivider(
-                      type: Type.solid,
-                    ),
-                    const SizedBox(height: 30),
-                    _buildOwnerRecentDishes(),
-                  ],
-                ),
-              )
-            ]),
-          )
-        ],
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      _buildAccount(),
+                      const SizedBox(height: 10),
+                      dish!.description == null
+                          ? Container()
+                          : MyText(
+                              text: dish!.description!,
+                              fontSize: FontSize.z16,
+                              fontWeight: FontWeight.w400,
+                              color: MyColors.grey['c800']!,
+                            ),
+                      dish!.type != 'recipes'
+                          ? Container()
+                          : const SizedBox(height: 20),
+                      dish!.type != 'recipes' ? Container() : _buildTime(),
+                      const SizedBox(height: 20),
+                      _buildIngredients(),
+                      const SizedBox(height: 20),
+                      const MyDivider(
+                        type: Type.solid,
+                      ),
+                      const SizedBox(height: 30),
+                      _buildSteps(),
+                      const MyDivider(
+                        type: Type.solid,
+                      ),
+                      const SizedBox(height: 30),
+                      _buildAccountSign(),
+                      const SizedBox(height: 30),
+                      const MyDivider(
+                        type: Type.solid,
+                      ),
+                      const SizedBox(height: 30),
+                      _buildReactions(),
+                      const SizedBox(height: 30),
+                      const MyDivider(
+                        type: Type.solid,
+                      ),
+                      const SizedBox(height: 30),
+                      _buildFeedback(),
+                      const SizedBox(height: 30),
+                      const MyDivider(
+                        type: Type.solid,
+                      ),
+                      const SizedBox(height: 30),
+                      _buildOwnerRecentDishes(),
+                    ],
+                  ),
+                )
+              ]),
+            )
+          ],
+        ),
       ),
     );
   }

@@ -66,6 +66,43 @@ Category.create = (data, result) => {
   });
 };
 
+Category.getTotalCategory = (fridgeId, firstDay, lastDay, sort, result) => {
+  var query = `
+  SELECT type, COUNT(*) AS total
+  FROM categories
+  WHERE fridgeId = ? AND manufactureDate BETWEEN ? AND ?
+  GROUP BY type
+`;
+  if (sort) {
+    var validSortValues = ["asc", "desc"];
+    if (!validSortValues.includes(sort.toLowerCase())) {
+      result(new Error('Invalid sort value. Must be "asc" or "desc".'), null);
+      return;
+    }
+    query += ` ORDER BY total ${sort}`;
+  }
+  function capitalizeFirstLetter(str) {
+    if (str.length === 0) {
+      return str;
+    }
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+  db.query(query, [fridgeId, firstDay, lastDay], (err, res) => {
+    if (err) {
+      console.log(err);
+      result(err, null);
+      return;
+    }
+    var totalCategories = {};
+    res.forEach((row) => {
+      totalCategories[`totalCategory${capitalizeFirstLetter(row.type)}`] =
+        row.total;
+    });
+
+    result(null, totalCategories);
+  });
+};
+
 Category.createNewCategory = (data, result) => {
   db.query("INSERT INTO new_category SET ?", data, (err, res) => {
     if (err) {

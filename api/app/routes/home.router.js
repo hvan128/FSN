@@ -35,6 +35,10 @@ export default (router) => {
         categoryController.addCategory(req, res, next);
     })
 
+    router.post('/api/v1/category/report', function(req, res, next) {
+        categoryController.getTotalCategory(req, res, next);
+    })
+
     router.post('/api/v1/category/new', function(req, res, next) {
         categoryController.addNewCategory(req, res, next);
     })
