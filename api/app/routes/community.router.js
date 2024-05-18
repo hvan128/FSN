@@ -28,6 +28,10 @@ export default (router) => {
     feedbackController.getAllFeedback(req, res, next);
   })
 
+  router.post("/api/v1/community/dish/keyword", function (req, res, next) {
+    dishController.getDishByKeyword(req, res, next);
+  })
+
   router.post("/api/v1/community/dish", function (req, res, next) {
     dishController.createDish(req, res, next);
   });

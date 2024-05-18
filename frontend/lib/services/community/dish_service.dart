@@ -68,6 +68,7 @@ class DishService {
     request.fields['type'] = dish.type!;
     request.fields['ingredients'] = jsonEncode(ingredients);
     request.fields['steps'] = jsonEncode(steps);
+    request.fields['id'] = dish.id!.toString();
     if (fileSelected.contains('image')) {
       http.MultipartFile multipartFile = await http.MultipartFile.fromPath(
         'image',
@@ -163,6 +164,30 @@ class DishService {
     await ApiService.get('${Config.DISH_API}/saved/$userId',
             queryParams: queryParams)
         .then((value) {
+      if (value != null) {
+        final data = jsonDecode(value.toString())['data'];
+        total = jsonDecode(value.toString())['total'];
+        dishes = dishFromJson(data);
+      }
+    });
+    return {
+      'dishes': dishes,
+      'total': total,
+    };
+  }
+
+  static Future<Map<String, dynamic>> getDishByKeyword(
+      {required String keyword,
+      required int page,
+      required int pageSize}) async {
+    List<Dish> dishes = [];
+    int total = 0;
+
+    await ApiService.post('${Config.DISH_API}/keyword', {
+      'keyword': keyword,
+      'page': page.toString(),
+      'pageSize': pageSize.toString(),
+    }).then((value) {
       if (value != null) {
         final data = jsonDecode(value.toString())['data'];
         total = jsonDecode(value.toString())['total'];
@@ -293,6 +318,22 @@ class DishService {
       'page': page.toString(),
       'pageSize': pageSize.toString()
     }).then((value) {
+      if (value != null) {
+        final data = jsonDecode(value.toString())['data'];
+        feedbacks = feedbacksFromJson(data);
+      }
+    });
+    return feedbacks;
+  }
+
+  static Future<List<FeedbackModel>> getFeedbackByUserId(
+      int userId, int page, int pageSize) async {
+    List<FeedbackModel> feedbacks = [];
+    await ApiService.get('${Config.COMMUNITY_API}/feedback/user/$userId',
+        queryParams: {
+          'page': page.toString(),
+          'pageSize': pageSize.toString()
+        }).then((value) {
       if (value != null) {
         final data = jsonDecode(value.toString())['data'];
         feedbacks = feedbacksFromJson(data);

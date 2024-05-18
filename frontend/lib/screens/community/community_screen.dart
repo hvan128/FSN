@@ -4,6 +4,8 @@ import 'package:frontend/components/card/food_card.dart';
 import 'package:frontend/components/card/food_card_loading.dart';
 import 'package:frontend/components/community/my_kitchen_dishes.dart';
 import 'package:frontend/models/community/dish.dart';
+import 'package:frontend/navigation/navigation.dart';
+import 'package:frontend/navigation/router/community.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/account/account_screen.dart';
 import 'package:frontend/screens/search/search_screen.dart';
@@ -209,9 +211,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
             padding: const EdgeInsets.only(left: 20, right: 10, top: 10),
             child: GestureDetector(
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return const SearchScreen(type: SearchType.mine);
-                }));
+                Navigate.pushNamed(RouterCommunity.searchDish);
               },
               child: Row(
                 mainAxisSize: MainAxisSize.min,
