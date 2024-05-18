@@ -41,3 +41,15 @@ export const getFeedbackByDishId = (req, res) => {
         }
     })
 }
+
+export const getAllFeedback = (req, res) => {
+    var page = req.query.page || 1;
+    var pageSize = req.query.pageSize || 10;
+    Feedback.getAll(page, pageSize, (err, result) => {
+        if (err) {
+            next(err);
+        } else {
+            res.send(result);
+        }
+    })
+}

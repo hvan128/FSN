@@ -85,19 +85,16 @@ class _MyKitchenDishesState extends State<MyKitchenDishes> {
               const SizedBox(
                 height: 10,
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: MyText(
-                    text: 'Cảm hứng từ nhà bếp của bạn',
-                    fontSize: FontSize.z18,
-                    fontWeight: FontWeight.w600,
-                    color: MyColors.grey['c800']!),
-              ),
+              MyText(
+                  text: 'Cảm hứng từ nhà bếp của bạn',
+                  fontSize: FontSize.z18,
+                  fontWeight: FontWeight.w600,
+                  color: MyColors.grey['c700']!),
               const SizedBox(
                 height: 3,
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 3.0),
                 child: MyText(
                   text: 'Chọn đến 2 nguyên liệu',
                   fontSize: FontSize.z14,

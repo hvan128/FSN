@@ -183,7 +183,7 @@ Dish.findById = (id, result) => {
         resolve(saves);
       }
     });
-  });
+  });  
 
   Promise.all([stepsPromise, ingredientsPromise, feelsPromise, savePromise])
     .then(([steps, ingredients, feels, saves]) => {
@@ -401,6 +401,7 @@ Dish.findByIngredients = (ingredient1, ingredient2, page, pageSize, result) => {
 
 Dish.getAllDish = (page, pageSize, type, result) => {
   const offset = (page - 1) * pageSize;
+  console.log(type)
 
   db.query(
     `SELECT COUNT(*) AS total FROM dish WHERE type = '${type}'`,

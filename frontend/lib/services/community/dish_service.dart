@@ -96,11 +96,13 @@ class DishService {
     }
   }
 
-  static Future<List<Dish>> getAllDish(int page, int pageSize) async {
+  static Future<List<Dish>> getAllDish(
+      int page, int pageSize, String type) async {
     List<Dish> dishes = [];
     final queryParams = {
       'page': page.toString(),
-      'pageSize': pageSize.toString()
+      'pageSize': pageSize.toString(),
+      'type': type
     };
     await ApiService.get(Config.DISH_API, queryParams: queryParams)
         .then((value) {
@@ -282,5 +284,20 @@ class DishService {
       'feedbacks': feedbacks,
       'total': total,
     };
+  }
+
+  static Future<List<FeedbackModel>> getAllFeedback(
+      int page, int pageSize) async {
+    List<FeedbackModel> feedbacks = [];
+    await ApiService.get('${Config.COMMUNITY_API}/feedback', queryParams: {
+      'page': page.toString(),
+      'pageSize': pageSize.toString()
+    }).then((value) {
+      if (value != null) {
+        final data = jsonDecode(value.toString())['data'];
+        feedbacks = feedbacksFromJson(data);
+      }
+    });
+    return feedbacks;
   }
 }

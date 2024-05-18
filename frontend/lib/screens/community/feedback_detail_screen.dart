@@ -151,36 +151,11 @@ class _FeedbackDetailScreenState extends State<FeedbackDetailScreen> {
                                   color: MyColors.grey['c900']!)),
                           Row(
                             children: [
-                              GestureDetector(
-                                onTap: () {
-                                  showModalBottomSheet(
-                                      context: context,
-                                      builder: (context) {
-                                        return MyNotification(
-                                          description:
-                                              'Thêm tất cả các nguyên liệu vào danh sách mua sắm. Các món ăn đã có trong danh sách sẽ không được thêm vào.',
-                                          notificationType:
-                                              NotificationType.info,
-                                          title: 'Thêm nhanh',
-                                          btnList: [
-                                            MyButton(
-                                                text: 'Đồng ý',
-                                                onPressed: () {}),
-                                            MyButton(
-                                                text: 'Quay lại danh sách',
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                })
-                                          ],
-                                        );
-                                      });
-                                },
-                                child: Image.asset(
-                                  'assets/icons/i16/upload.png',
-                                  width: 26,
-                                  height: 26,
-                                  color: MyColors.grey['c900'],
-                                ),
+                              Image.asset(
+                                'assets/icons/i16/upload.png',
+                                width: 26,
+                                height: 26,
+                                color: MyColors.grey['c900'],
                               ),
                               const SizedBox(width: 20),
                               MyIconButton(
@@ -190,7 +165,6 @@ class _FeedbackDetailScreenState extends State<FeedbackDetailScreen> {
                                       width: 25,
                                       height: 25,
                                       color: MyColors.grey['c900']!)),
-                              const SizedBox(width: 20),
                             ],
                           ),
                         ]),
@@ -276,72 +250,62 @@ class _FeedbackDetailScreenState extends State<FeedbackDetailScreen> {
                                                     fontWeight: FontWeight.w400,
                                                     color:
                                                         MyColors.grey['c700']!),
-                                            feedbackModel!.content == null
-                                                ? const SizedBox()
-                                                : MyText(
-                                                    text:
-                                                        feedbackModel!.content!,
-                                                    fontSize: FontSize.z17,
-                                                    fontWeight: FontWeight.w500,
-                                                    color:
-                                                        MyColors.grey['c700']!,
-                                                  ),
-                                            const SizedBox(height: 10),
-                                            Row(
-                                              children: [
-                                                Row(children: [
-                                                  ...listReactions.map((e) {
-                                                    return GestureDetector(
-                                                      onTap: () {
-                                                        onTapReactionItem(e);
-                                                      },
-                                                      child: Row(
-                                                        children: [
-                                                          e.quantity == 0
-                                                              ? Container()
-                                                              : Row(
-                                                                  children: [
-                                                                    ItemReaction(
-                                                                      reaction: reactions.firstWhere((element) =>
-                                                                          element
-                                                                              .value ==
-                                                                          e.type),
-                                                                      quantity: e
-                                                                          .quantity!
-                                                                          .toString(),
-                                                                      isSelected:
-                                                                          e.isSelected,
-                                                                    ),
-                                                                    const SizedBox(
-                                                                        width:
-                                                                            5),
-                                                                  ],
-                                                                ),
-                                                        ],
-                                                      ),
-                                                    );
-                                                  }).toList(),
-                                                ]),
-                                                !listReactions.every(
-                                                        (reaction) =>
-                                                            reaction.quantity! >
-                                                            0)
-                                                    ? ReactionButton(
-                                                        initialReaction:
-                                                            EReaction.none,
-                                                        onReactionChanged:
-                                                            (reaction) {
-                                                          onReactionChanged(
-                                                              reaction);
-                                                        },
-                                                      )
-                                                    : const SizedBox(),
-                                              ],
-                                            ),
                                           ],
                                         )
                                 ]),
-                          )
+                          ),
+                          const SizedBox(height: 10),
+                          feedbackModel!.content == null
+                              ? const SizedBox()
+                              : MyText(
+                                  text: feedbackModel!.content!,
+                                  fontSize: FontSize.z17,
+                                  fontWeight: FontWeight.w400,
+                                  color: MyColors.grey['c800']!,
+                                ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Row(children: [
+                                ...listReactions.map((e) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      onTapReactionItem(e);
+                                    },
+                                    child: Row(
+                                      children: [
+                                        e.quantity == 0
+                                            ? Container()
+                                            : Row(
+                                                children: [
+                                                  ItemReaction(
+                                                    reaction: reactions
+                                                        .firstWhere((element) =>
+                                                            element.value ==
+                                                            e.type),
+                                                    quantity:
+                                                        e.quantity!.toString(),
+                                                    isSelected: e.isSelected,
+                                                  ),
+                                                  const SizedBox(width: 5),
+                                                ],
+                                              ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                              ]),
+                              !listReactions.every(
+                                      (reaction) => reaction.quantity! > 0)
+                                  ? ReactionButton(
+                                      initialReaction: EReaction.none,
+                                      onReactionChanged: (reaction) {
+                                        onReactionChanged(reaction);
+                                      },
+                                    )
+                                  : const SizedBox(),
+                            ],
+                          ),
                         ],
                       ),
                     ),

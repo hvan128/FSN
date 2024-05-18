@@ -15,6 +15,7 @@ class Config {
   static const String FRIDGE_API = "/api/v1/fridge";
   static const String INVITATION_API = "/api/v1/invitation";
   static const String DISH_API = "/api/v1/community/dish";
+  static const String COMMUNITY_API = "/api/v1/community";
   static const String SEND_NOTIFICATION_API = "/api/v1/send-notification";
   static const String NOTIFICATION_API = "/api/v1/notification";
 }
