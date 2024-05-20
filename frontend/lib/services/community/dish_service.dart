@@ -210,6 +210,10 @@ class DishService {
     });
   }
 
+  static Future<void> deleteDish(int id) async {
+    await ApiService.delete('${Config.DISH_API}/$id');
+  }
+
   static Future<void> addFeel(Feel feel, [UserModel? owner]) async {
     var model = {
       'type': feel.type,

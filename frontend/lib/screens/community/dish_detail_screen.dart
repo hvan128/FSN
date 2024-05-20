@@ -25,8 +25,10 @@ import 'package:frontend/utils/functions_core.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_icon.dart';
 import 'package:frontend/widgets/divider.dart';
+import 'package:frontend/widgets/image.dart';
 import 'package:frontend/widgets/reaction_button.dart';
 import 'package:frontend/widgets/text.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 
 class DishDetailScreen extends StatefulWidget {
@@ -240,16 +242,6 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
                               child: const MenuAcceleratorLabel(
                                   '&Chỉnh sửa món ăn'),
                             ),
-                            MenuItemButton(
-                              onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Quit!'),
-                                  ),
-                                );
-                              },
-                              child: const MenuAcceleratorLabel('&Quit'),
-                            ),
                           ],
                           child: Icon(
                             Icons.more_vert,
@@ -276,10 +268,15 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
                 backgroundColor: MyColors.white['c900']!,
                 flexibleSpace: FlexibleSpaceBar(
                   background: dish != null && dish!.image != null
-                      ? Image.network(
-                          FunctionCore.convertImageUrl(dish!.image!),
-                          fit: BoxFit.cover,
-                        )
+                      ? GestureDetector(
+                        onTap: () {
+                          FunctionCore.showImageDetail(context, FunctionCore.convertImageUrl(dish!.image!));
+                        },
+                        child: Image.network(
+                            FunctionCore.convertImageUrl(dish!.image!),
+                            fit: BoxFit.cover,
+                          ),
+                      )
                       : Container(),
                 )),
             SliverToBoxAdapter(

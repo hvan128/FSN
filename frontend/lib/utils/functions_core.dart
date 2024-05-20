@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:frontend/config.dart';
+import 'package:frontend/main.dart';
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/navigation/navigation.dart';
+import 'package:frontend/theme/color.dart';
 import 'package:frontend/types/food.dart';
 import 'package:frontend/types/type.dart';
 import 'package:frontend/utils/constants.dart';
+import 'package:frontend/widgets/button_icon.dart';
 import 'package:frontend/widgets/loading.dart';
 import 'package:intl/intl.dart';
+import 'package:photo_view/photo_view.dart';
 
 enum Format { integer, real }
-
 
 class FunctionCore {
   static String convertToSlug(String text) {
@@ -107,6 +111,39 @@ class FunctionCore {
             curve: Curves.easeInOut),
       ),
     );
+  }
+
+  static showImageDetail(BuildContext context, String url) {
+    showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (context) => SafeArea(
+          child: Stack(
+                children: [
+                  Container(
+                    color: MyColors.primary['CulturalYellow']!['c50']!,
+                    child: PhotoView(imageProvider: NetworkImage(url)),
+                  ),
+                  Positioned(
+                    top: 40,
+                    right: 20,
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100),
+                          color: MyColors.grey['c900']!.withOpacity(0.5),
+                          border: Border.all(
+                            color: MyColors.grey['c300']!,
+                          )),
+                      child: MyIconButton(
+                        icon: Icon(Icons.close,
+                            color: MyColors.white['c900'], size: 15),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+        ));
   }
 
   static List<Item> getUnitList(String? type) {

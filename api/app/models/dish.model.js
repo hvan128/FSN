@@ -415,25 +415,24 @@ Dish.getDishByKeyword = (keyword, type, page, pageSize, result) => {
     .map((word) => `(i.label LIKE ?)`)
     .join(" OR ");
   var labelParams = [keyword];
-  var labelScore = 'WHEN d.label LIKE ? THEN 2';
+  var labelScore = "WHEN d.label LIKE ? THEN 2";
   keywords.forEach((word) => {
-    labelScore += ' WHEN d.label LIKE ? THEN 1';
+    labelScore += " WHEN d.label LIKE ? THEN 1";
     labelParams.push(word);
-  })
+  });
   var descriptionParams = [keyword];
-  var descriptionScore = 'WHEN d.description LIKE ? THEN 1';
+  var descriptionScore = "WHEN d.description LIKE ? THEN 3";
   keywords.forEach((word) => {
-    descriptionScore += ' WHEN d.description LIKE ? THEN 1';
+    descriptionScore += " WHEN d.description LIKE ? THEN 1";
     descriptionParams.push(word);
-  })
+  });
 
   var ingredientParams1 = [keyword];
-  var ingredientScore = 'WHEN i.label LIKE ? THEN 3';
+  var ingredientScore = "WHEN i.label LIKE ? THEN 3";
   keywords.forEach((word) => {
-    ingredientScore += ' WHEN i.label LIKE ? THEN 1';
+    ingredientScore += " WHEN i.label LIKE ? THEN 1";
     ingredientParams1.push(word);
-  })
-  
+  });
 
   const dishParams = [];
   keywords.forEach((word) => {
@@ -445,7 +444,15 @@ Dish.getDishByKeyword = (keyword, type, page, pageSize, result) => {
     ingredientParams.push(word);
   });
 
-  const params = [ ...labelParams, ...descriptionParams, ...ingredientParams1 ,...dishParams, ...ingredientParams, pageSize, offset]; // Thêm các tham số vào params
+  const params = [
+    ...labelParams,
+    ...descriptionParams,
+    ...ingredientParams1,
+    ...dishParams,
+    ...ingredientParams,
+    pageSize,
+    offset,
+  ]; // Thêm các tham số vào params
 
   const query = `
     SELECT d.id,
@@ -520,7 +527,6 @@ Dish.getDishByKeyword = (keyword, type, page, pageSize, result) => {
     });
   });
 };
-
 
 Dish.getAllDish = (page, pageSize, type, result) => {
   const offset = (page - 1) * pageSize;
@@ -616,6 +622,23 @@ Dish.getSavedDishesByUserId = (userId, page, pageSize, type, callback) => {
           callback(err, null);
         });
     }
+  });
+};
+
+Dish.delete = (id, result) => {
+  db.query("DELETE FROM dish WHERE id = ?", [id], (err, res) => {
+    if (err) {
+      console.log(err);
+      result(err, null);
+      return;
+    }
+
+    if (res.affectedRows == 0) {
+      result({ kind: "not_found" }, null);
+      return;
+    }
+
+    result(null, res);
   });
 };
 

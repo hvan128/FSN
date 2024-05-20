@@ -94,35 +94,30 @@ class _SearchFoodCardState extends State<SearchFoodCard> {
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.justify,
+                    textAlign: TextAlign.left,
                   ),
                   listIngredients.isEmpty
                       ? Container()
                       : const SizedBox(
                           height: 5,
                         ),
-                  Wrap(
-                    children: listIngredients
-                        .map((label) => Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                MyText(
-                                  text: label,
-                                  fontSize: FontSize.z15,
-                                  fontWeight:
-                                      shouldBoldLabel(label, widget.keyword!)
-                                          ? FontWeight.w600
-                                          : FontWeight.w400,
-                                  color: MyColors.grey['c700']!,
-                                ),
-                                label == listIngredients.last ? Container() : MyText(
-                                    text: ', ',
-                                    fontSize: FontSize.z15,
-                                    fontWeight: FontWeight.w400,
-                                    color: MyColors.grey['c700']!),
-                              ],
-                            ))
-                        .toList(),
+                  RichText(
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.left,
+                    text: TextSpan(children: [
+                      ...listIngredients
+                          .map((e) => TextSpan(
+                              text: e == listIngredients.last ? e : '$e, ',
+                              style: TextStyle(
+                                fontSize: FontSize.z15,
+                                fontWeight: shouldBoldLabel(e, widget.keyword!)
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                                color: MyColors.grey['c700']!,
+                              )))
+                          .toList(),
+                    ]),
                   ),
                   listIngredients.isEmpty
                       ? Container()
@@ -162,6 +157,4 @@ class _SearchFoodCardState extends State<SearchFoodCard> {
       ),
     );
   }
-
-  
 }
