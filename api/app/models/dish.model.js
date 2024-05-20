@@ -91,6 +91,7 @@ Dish.update = (data, result) => {
     cookingTime,
     label,
     image,
+    type,
     description,
     ingredients,
     steps,
@@ -105,6 +106,7 @@ Dish.update = (data, result) => {
     image,
     cookingTime,
     rangeOfPeople,
+    type,
     id
   );
 
@@ -399,8 +401,136 @@ Dish.findByIngredients = (ingredient1, ingredient2, page, pageSize, result) => {
   );
 };
 
+Dish.getDishByKeyword = (keyword, type, page, pageSize, result) => {
+  const offset = (page - 1) * pageSize;
+  const keywords = keyword
+    .trim()
+    .split(" ")
+    .map((word) => `%${word}%`); // Tạo mảng các từ khóa tìm kiếm
+
+  const dishConditions = keywords
+    .map((word) => `(d.label LIKE ? OR d.description LIKE ?)`)
+    .join(" OR ");
+  const ingredientConditions = keywords
+    .map((word) => `(i.label LIKE ?)`)
+    .join(" OR ");
+  var labelParams = [keyword];
+  var labelScore = "WHEN d.label LIKE ? THEN 2";
+  keywords.forEach((word) => {
+    labelScore += " WHEN d.label LIKE ? THEN 1";
+    labelParams.push(word);
+  });
+  var descriptionParams = [keyword];
+  var descriptionScore = "WHEN d.description LIKE ? THEN 3";
+  keywords.forEach((word) => {
+    descriptionScore += " WHEN d.description LIKE ? THEN 1";
+    descriptionParams.push(word);
+  });
+
+  var ingredientParams1 = [keyword];
+  var ingredientScore = "WHEN i.label LIKE ? THEN 3";
+  keywords.forEach((word) => {
+    ingredientScore += " WHEN i.label LIKE ? THEN 1";
+    ingredientParams1.push(word);
+  });
+
+  const dishParams = [];
+  keywords.forEach((word) => {
+    dishParams.push(word, word);
+  });
+
+  const ingredientParams = [];
+  keywords.forEach((word) => {
+    ingredientParams.push(word);
+  });
+
+  const params = [
+    ...labelParams,
+    ...descriptionParams,
+    ...ingredientParams1,
+    ...dishParams,
+    ...ingredientParams,
+    pageSize,
+    offset,
+  ]; // Thêm các tham số vào params
+
+  const query = `
+    SELECT d.id,
+      (CASE 
+        ${labelScore}
+        ELSE 0 
+      END) AS label_score,
+      (CASE 
+        ${descriptionScore}
+        ELSE 0 
+      END) AS description_score,
+      (CASE 
+        ${ingredientScore}
+        ELSE 0 
+      END) AS ingredient_score
+    FROM dish d
+    LEFT JOIN ingredient i ON d.id = i.dishId
+    WHERE (${dishConditions}) OR (${ingredientConditions})
+    ORDER BY (label_score + description_score + ingredient_score) DESC, d.createdAt DESC
+    LIMIT ? OFFSET ?
+  `;
+
+  console.log(query, params);
+
+  db.query(query, params, (err, res) => {
+    if (err) {
+      console.error("Error searching dishes:", err);
+      result(err, null);
+      return;
+    }
+
+    const countQuery = `
+      SELECT COUNT(DISTINCT d.id) AS total
+      FROM dish d
+      LEFT JOIN ingredient i ON d.id = i.dishId
+      WHERE (${dishConditions}) OR (${ingredientConditions})
+    `;
+    db.query(countQuery, params.slice(0, -2), (err, countResult) => {
+      if (err) {
+        console.error("Error counting search results:", err);
+        result(err, null);
+        return;
+      }
+      const totalCount = countResult[0].total;
+      let uniqueIds = {};
+      let dishes = [];
+      for (let item of res) {
+        if (!uniqueIds[item.id]) {
+          dishes.push(item);
+          uniqueIds[item.id] = true;
+        }
+      }
+      var promises = dishes.map((dish) => {
+        return new Promise((resolve, reject) => {
+          Dish.findById(dish.id, (err, dishInfo) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(dishInfo);
+            }
+          });
+        });
+      });
+      Promise.all(promises)
+        .then((results) => {
+          result(null, { total: totalCount, data: results });
+        })
+        .catch((err) => {
+          console.log(err);
+          result(err, null);
+        });
+    });
+  });
+};
+
 Dish.getAllDish = (page, pageSize, type, result) => {
   const offset = (page - 1) * pageSize;
+  console.log(type);
 
   db.query(
     `SELECT COUNT(*) AS total FROM dish WHERE type = '${type}'`,
@@ -492,6 +622,23 @@ Dish.getSavedDishesByUserId = (userId, page, pageSize, type, callback) => {
           callback(err, null);
         });
     }
+  });
+};
+
+Dish.delete = (id, result) => {
+  db.query("DELETE FROM dish WHERE id = ?", [id], (err, res) => {
+    if (err) {
+      console.log(err);
+      result(err, null);
+      return;
+    }
+
+    if (res.affectedRows == 0) {
+      result({ kind: "not_found" }, null);
+      return;
+    }
+
+    result(null, res);
   });
 };
 

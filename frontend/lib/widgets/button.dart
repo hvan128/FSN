@@ -106,4 +106,152 @@ class MyButton extends StatelessWidget {
   }
 }
 
+class MyButtonFeature extends StatelessWidget {
+  final String text;
+  final VoidCallback? onPressed;
+  final ButtonType buttonType;
+  final double? width;
+  final double? height;
+  final String? startIcon;
+  final String? endIcon;
+  final Size? sizeStartIcon;
+  final Size? sizeEndIcon;
+  final double? fontSize;
+  final double? fontWeight;
+  final Color? textColor;
+  final bool disabled;
+  final double? lineHeight;
+  final bool isFocused;
+  final Color? colorStartIcon;
+  final Color? colorEndIcon;
+
+  const MyButtonFeature({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    this.buttonType = ButtonType.primary,
+    this.width,
+    this.height,
+    this.startIcon,
+    this.endIcon,
+    this.sizeStartIcon,
+    this.sizeEndIcon,
+    this.fontSize,
+    this.fontWeight,
+    this.textColor,
+    this.disabled = false,
+    this.lineHeight,
+    this.isFocused = false,
+    this.colorStartIcon,
+    this.colorEndIcon,
+  })  : assert(
+          (startIcon != null && sizeStartIcon != null) || startIcon == null,
+          "Require sizeStartIcon if startIcon is provided",
+        ),
+        assert(
+          (endIcon != null && sizeEndIcon != null) || endIcon == null,
+          "Require sizeEndIcon if endIcon is provided",
+        );
+
+  @override
+  Widget build(BuildContext context) {
+    Color? bgColor;
+    Color? textColorStyle;
+
+    switch (buttonType) {
+      case ButtonType.primary:
+        bgColor = MyColors.primary['KiduBlue']!['c700']!;
+        textColorStyle = MyColors.whiteOpacity['c900']!;
+        break;
+      case ButtonType.secondary:
+        bgColor = MyColors.primary['KiduBlue']!['c100']!;
+        textColorStyle = MyColors.primary['KiduBlue']!['c700']!;
+        break;
+
+      case ButtonType.yellow:
+        bgColor = MyColors.primary['CulturalYellow']!['c800']!;
+        textColorStyle = MyColors.white['c900'];
+        break;
+
+      case ButtonType.disable:
+        bgColor = MyColors.grey['c100']!;
+        textColorStyle = MyColors.grey['c400']!;
+        break;
+      case ButtonType.delete:
+        bgColor = MyColors.support['Error']!['c400']!;
+        textColorStyle = MyColors.support['Error']!['c900']!;
+        break;
+      case ButtonType.transparent:
+        bgColor = MyColors.white['c900'];
+        textColorStyle = MyColors.grey['c900']!;
+        break;
+      default:
+        bgColor = MyColors.primary['KiduBlue']!['c900']!;
+        textColorStyle = MyColors.whiteOpacity['c900']!;
+    }
+
+    return GestureDetector(
+      onTap: buttonType == ButtonType.disable ? null : onPressed,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+        foregroundDecoration: BoxDecoration(
+          border: Border.all(
+            style: isFocused ? BorderStyle.solid : BorderStyle.none,
+            width: 2,
+            strokeAlign: BorderSide.strokeAlignOutside,
+            color: bgColor!,
+          ),
+          borderRadius: BorderRadius.circular(100),
+        ),
+        decoration: BoxDecoration(
+          color: disabled ? MyColors.grey['c100']! : bgColor,
+          borderRadius: BorderRadius.circular(100),
+          border: Border.all(
+            style: isFocused ? BorderStyle.solid : BorderStyle.none,
+            width: 2,
+            strokeAlign: BorderSide.strokeAlignInside,
+            color: MyColors.white['c900']!,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (startIcon != null) ...[
+              Image(
+                image: AssetImage(startIcon!),
+                width: sizeStartIcon!.width,
+                height: sizeStartIcon!.height,
+                color: colorStartIcon,
+              ),
+              SizedBox(
+                width: 4,
+              )
+            ],
+            MyText(
+              text: text,
+              fontSize: fontSize ?? FontSize.z16,
+              fontWeight: FontWeight.w700,
+              color: textColor ?? textColorStyle!,
+              lineHeight: lineHeight ?? 1.38,
+            ),
+            if (endIcon != null) ...[
+              SizedBox(
+                width: 4,
+              ),
+              Image(
+                image: AssetImage(endIcon!),
+                width: sizeEndIcon!.width,
+                height: sizeEndIcon!.height,
+                color: colorEndIcon,
+              )
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 enum ButtonType { primary, secondary, disable, delete, transparent, yellow }

@@ -24,6 +24,14 @@ export default (router) => {
     feedbackController.getFeedbackByDishId(req, res, next);
   });
 
+  router.get("/api/v1/community/feedback", function (req, res, next) {
+    feedbackController.getAllFeedback(req, res, next);
+  })
+
+  router.post("/api/v1/community/dish/keyword", function (req, res, next) {
+    dishController.getDishByKeyword(req, res, next);
+  })
+
   router.post("/api/v1/community/dish", function (req, res, next) {
     dishController.createDish(req, res, next);
   });

@@ -68,6 +68,7 @@ class DishService {
     request.fields['type'] = dish.type!;
     request.fields['ingredients'] = jsonEncode(ingredients);
     request.fields['steps'] = jsonEncode(steps);
+    request.fields['id'] = dish.id!.toString();
     if (fileSelected.contains('image')) {
       http.MultipartFile multipartFile = await http.MultipartFile.fromPath(
         'image',
@@ -96,11 +97,13 @@ class DishService {
     }
   }
 
-  static Future<List<Dish>> getAllDish(int page, int pageSize) async {
+  static Future<List<Dish>> getAllDish(
+      int page, int pageSize, String type) async {
     List<Dish> dishes = [];
     final queryParams = {
       'page': page.toString(),
-      'pageSize': pageSize.toString()
+      'pageSize': pageSize.toString(),
+      'type': type
     };
     await ApiService.get(Config.DISH_API, queryParams: queryParams)
         .then((value) {
@@ -173,6 +176,30 @@ class DishService {
     };
   }
 
+  static Future<Map<String, dynamic>> getDishByKeyword(
+      {required String keyword,
+      required int page,
+      required int pageSize}) async {
+    List<Dish> dishes = [];
+    int total = 0;
+
+    await ApiService.post('${Config.DISH_API}/keyword', {
+      'keyword': keyword,
+      'page': page.toString(),
+      'pageSize': pageSize.toString(),
+    }).then((value) {
+      if (value != null) {
+        final data = jsonDecode(value.toString())['data'];
+        total = jsonDecode(value.toString())['total'];
+        dishes = dishFromJson(data);
+      }
+    });
+    return {
+      'dishes': dishes,
+      'total': total,
+    };
+  }
+
   static Future<Dish> getDishById({required int id}) async {
     return await ApiService.get('${Config.DISH_API}/$id').then((value) {
       if (value != null) {
@@ -181,6 +208,10 @@ class DishService {
         return Dish();
       }
     });
+  }
+
+  static Future<void> deleteDish(int id) async {
+    await ApiService.delete('${Config.DISH_API}/$id');
   }
 
   static Future<void> addFeel(Feel feel, [UserModel? owner]) async {
@@ -282,5 +313,36 @@ class DishService {
       'feedbacks': feedbacks,
       'total': total,
     };
+  }
+
+  static Future<List<FeedbackModel>> getAllFeedback(
+      int page, int pageSize) async {
+    List<FeedbackModel> feedbacks = [];
+    await ApiService.get('${Config.COMMUNITY_API}/feedback', queryParams: {
+      'page': page.toString(),
+      'pageSize': pageSize.toString()
+    }).then((value) {
+      if (value != null) {
+        final data = jsonDecode(value.toString())['data'];
+        feedbacks = feedbacksFromJson(data);
+      }
+    });
+    return feedbacks;
+  }
+
+  static Future<List<FeedbackModel>> getFeedbackByUserId(
+      int userId, int page, int pageSize) async {
+    List<FeedbackModel> feedbacks = [];
+    await ApiService.get('${Config.COMMUNITY_API}/feedback/user/$userId',
+        queryParams: {
+          'page': page.toString(),
+          'pageSize': pageSize.toString()
+        }).then((value) {
+      if (value != null) {
+        final data = jsonDecode(value.toString())['data'];
+        feedbacks = feedbacksFromJson(data);
+      }
+    });
+    return feedbacks;
   }
 }

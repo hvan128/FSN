@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:frontend/components/item/item_reaction.dart';
 import 'package:frontend/config.dart';
 import 'package:frontend/models/community/dish.dart';
@@ -20,7 +22,7 @@ import 'package:frontend/widgets/reaction_button.dart';
 import 'package:frontend/widgets/text.dart';
 import 'package:provider/provider.dart';
 
-enum FeedbackCardType { normal, small }
+enum FeedbackCardType { normal, small, large }
 
 class FeedbackCard extends StatefulWidget {
   final FeedbackModel feedbackModel;
@@ -30,7 +32,7 @@ class FeedbackCard extends StatefulWidget {
     super.key,
     required this.feedbackModel,
     this.dish,
-    this.type = FeedbackCardType.normal,
+    this.type = FeedbackCardType.large,
   });
 
   @override
@@ -69,11 +71,11 @@ class _FeedbackCardState extends State<FeedbackCard> {
     });
   }
 
-   void processFeels(List<Feel> feels, int userId, List<Reaction> reactions) {
+  void processFeels(List<Feel> feels, int userId, List<Reaction> reactions) {
     for (Feel feel in feels) {
       incrementQuantity(feel.type!, reactions);
     }
-    for(Feel feel in feels) {
+    for (Feel feel in feels) {
       if (feel.userId == userId) {
         setSelected(feel.type!, true, reactions);
         break;
@@ -154,42 +156,48 @@ class _FeedbackCardState extends State<FeedbackCard> {
                     'reactions': listReactions
                   }).then((_) => setState(() {}));
             },
-            child: Container(
-              width: widget.type == FeedbackCardType.small
-                  ? MediaQuery.of(context).size.width * 0.5 - 22
-                  : 300,
-              height: widget.type == FeedbackCardType.small
-                  ? MediaQuery.of(context).size.width * 0.4
-                  : 200,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: ClipRRect(
-                borderRadius: widget.type == FeedbackCardType.small
-                    ? const BorderRadius.only(
-                        topLeft: Radius.circular(8),
-                        topRight: Radius.circular(8),
-                      )
-                    : const BorderRadius.all(Radius.circular(8)),
-                child: widget.feedbackModel.image != null &&
-                        widget.feedbackModel.image!.startsWith('assets') != true
-                    ? Image.network(
-                        FunctionCore.convertImageUrl(
-                            widget.feedbackModel.image!),
-                        fit: BoxFit.cover)
-                    : Image.asset(
-                        widget.feedbackModel.image!,
-                        fit: BoxFit.cover,
-                      ),
-              ),
-            ),
+            child: widget.type == FeedbackCardType.normal
+                ? Container()
+                : Container(
+                    width: widget.type == FeedbackCardType.small
+                        ? MediaQuery.of(context).size.width * 0.5 - 22
+                        : 300,
+                    height: widget.type == FeedbackCardType.small
+                        ? MediaQuery.of(context).size.width * 0.4
+                        : 200,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: widget.type == FeedbackCardType.small
+                          ? const BorderRadius.only(
+                              topLeft: Radius.circular(8),
+                              topRight: Radius.circular(8),
+                            )
+                          : const BorderRadius.all(Radius.circular(8)),
+                      child: widget.feedbackModel.image != null &&
+                              widget.feedbackModel.image!
+                                      .startsWith('assets') !=
+                                  true
+                          ? Image.network(
+                              FunctionCore.convertImageUrl(
+                                  widget.feedbackModel.image!),
+                              fit: BoxFit.cover)
+                          : Image.asset(
+                              widget.feedbackModel.image!,
+                              fit: BoxFit.cover,
+                            ),
+                    ),
+                  ),
           ),
           SizedBox(
             width: widget.type == FeedbackCardType.small
                 ? MediaQuery.of(context).size.width * 0.5 - 22
-                : 300,
+                : widget.type == FeedbackCardType.normal
+                    ? MediaQuery.of(context).size.width * 0.7
+                    : 300,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -197,97 +205,163 @@ class _FeedbackCardState extends State<FeedbackCard> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(100),
-                                child: image,
-                              ),
-                              const SizedBox(width: 10),
-                              user == null
-                                  ? Container()
-                                  : Column(
-                                      children: [
-                                        MyText(
-                                          text: user!.displayName!,
-                                          fontSize: FontSize.z12,
-                                          fontWeight: FontWeight.w400,
-                                          color: MyColors.grey['c700']!,
-                                        ),
-                                        widget.feedbackModel.createdAt ==
-                                                    null ||
-                                                widget.type ==
-                                                    FeedbackCardType.small
-                                            ? Container()
-                                            : MyText(
-                                                text: FunctionCore
-                                                    .calculateDuration(widget
-                                                        .feedbackModel
-                                                        .createdAt!),
-                                                fontSize: FontSize.z12,
-                                                fontWeight: FontWeight.w400,
-                                                color: MyColors.grey['c700']!),
-                                      ],
-                                    )
-                            ]),
-                            const SizedBox(height: 10),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 3),
-                              child: MyText(
-                                text: widget.feedbackModel.content!,
-                                fontSize: FontSize.z14,
-                                fontWeight: FontWeight.w600,
-                                color: MyColors.grey['c900']!,
-                              ),
-                            ),
-                            const SizedBox(height: 15),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Row(children: [
-                              ...listReactions.map((e) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    onTapReactionItem(e);
-                                  },
-                                  child: Row(
-                                    children: [
-                                      e.quantity == 0
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(
+                                context, RouterCommunity.feedbackDetail,
+                                arguments: {
+                                  'feedbackModel': widget.feedbackModel,
+                                  'user': user,
+                                  'reactions': listReactions
+                                }).then((_) => setState(() {}));
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(children: [
+                                      ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(100),
+                                        child: image,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      user == null
                                           ? Container()
-                                          : Row(
+                                          : Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
-                                                ItemReaction(
-                                                  reaction: reactions
-                                                      .firstWhere((element) =>
-                                                          element.value ==
-                                                          e.type),
-                                                  quantity:
-                                                      e.quantity!.toString(),
-                                                  isSelected: e.isSelected,
+                                                MyText(
+                                                  text: user!.displayName!,
+                                                  fontSize: FontSize.z12,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: MyColors.grey['c700']!,
                                                 ),
-                                                const SizedBox(width: 5),
+                                                widget.feedbackModel
+                                                                .createdAt ==
+                                                            null ||
+                                                        widget.type ==
+                                                            FeedbackCardType
+                                                                .small
+                                                    ? Container()
+                                                    : MyText(
+                                                        text: FunctionCore
+                                                            .calculateDuration(
+                                                                widget
+                                                                    .feedbackModel
+                                                                    .createdAt!),
+                                                        fontSize: FontSize.z12,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        color: MyColors
+                                                            .grey['c700']!),
                                               ],
-                                            ),
-                                    ],
-                                  ),
-                                );
-                              }).toList(),
-                            ]),
-                            !listReactions
-                                    .every((reaction) => reaction.quantity! > 0)
-                                ? ReactionButton(
-                                    initialReaction: EReaction.none,
-                                    onReactionChanged: (reaction) {
-                                      onReactionChanged(reaction);
-                                    },
-                                  )
-                                : const SizedBox(),
-                          ],
+                                            )
+                                    ]),
+                                    const SizedBox(height: 10),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 3),
+                                      child: MyText(
+                                        text: widget.feedbackModel.content!,
+                                        fontSize: FontSize.z13,
+                                        fontWeight: FontWeight.w400,
+                                        color: MyColors.grey['c900']!,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 15),
+                                    Row(
+                                      children: [
+                                        Row(children: [
+                                          ...listReactions.map((e) {
+                                            return GestureDetector(
+                                              onTap: () {
+                                                onTapReactionItem(e);
+                                              },
+                                              child: Row(
+                                                children: [
+                                                  e.quantity == 0
+                                                      ? Container()
+                                                      : Row(
+                                                          children: [
+                                                            ItemReaction(
+                                                              reaction: reactions
+                                                                  .firstWhere(
+                                                                      (element) =>
+                                                                          element
+                                                                              .value ==
+                                                                          e.type),
+                                                              quantity: e
+                                                                  .quantity!
+                                                                  .toString(),
+                                                              isSelected:
+                                                                  e.isSelected,
+                                                            ),
+                                                            const SizedBox(
+                                                                width: 5),
+                                                          ],
+                                                        ),
+                                                ],
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ]),
+                                        !listReactions.every((reaction) =>
+                                                reaction.quantity! > 0)
+                                            ? ReactionButton(
+                                                initialReaction: EReaction.none,
+                                                onReactionChanged: (reaction) {
+                                                  onReactionChanged(reaction);
+                                                },
+                                              )
+                                            : const SizedBox(),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 3),
+                              widget.type == FeedbackCardType.normal
+                                  ? Container(
+                                      width: 110,
+                                      height: 110,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: widget.type ==
+                                                FeedbackCardType.small
+                                            ? const BorderRadius.only(
+                                                topLeft: Radius.circular(8),
+                                                topRight: Radius.circular(8),
+                                              )
+                                            : const BorderRadius.all(
+                                                Radius.circular(8)),
+                                        child: widget.feedbackModel.image !=
+                                                    null &&
+                                                widget.feedbackModel.image!
+                                                        .startsWith('assets') !=
+                                                    true
+                                            ? Image.network(
+                                                FunctionCore.convertImageUrl(
+                                                    widget
+                                                        .feedbackModel.image!),
+                                                fit: BoxFit.cover)
+                                            : Image.asset(
+                                                widget.feedbackModel.image!,
+                                                fit: BoxFit.cover,
+                                              ),
+                                      ),
+                                    )
+                                  : Container(),
+                            ],
+                          ),
                         ),
                         widget.type == FeedbackCardType.small
                             ? Container()
@@ -303,7 +377,6 @@ class _FeedbackCardState extends State<FeedbackCard> {
                         widget.type == FeedbackCardType.small
                             ? Container()
                             : originalDish(),
-                        const SizedBox(height: 15),
                       ],
                     ),
                   ),
@@ -361,12 +434,12 @@ class _FeedbackCardState extends State<FeedbackCard> {
     );
   }
 
-
   void onReactionChanged(EReaction reaction) async {
     print(reaction.name);
     print(listReactions
-            .firstWhere((element) => element.type == reaction.name,
-                orElse: () => Reaction()).isSelected);
+        .firstWhere((element) => element.type == reaction.name,
+            orElse: () => Reaction())
+        .isSelected);
     if (listReactions
             .firstWhere((element) => element.type == reaction.name,
                 orElse: () => Reaction())

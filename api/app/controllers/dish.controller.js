@@ -64,7 +64,7 @@ export const updateDish = (req, res, next) => {
       var body = req.body;
       var file = req.files;
       var fileSelected = JSON.parse(req.body.fileSelected);
-      var id = req.params.id;
+      var id = req.params.id || body.id;
       var data = {
         id: id,
         ownerId: body.ownerId,
@@ -142,6 +142,20 @@ export const getDishByIngredient = (req, res, next) => {
       }
     }
   );
+};
+
+export const getDishByKeyword = (req, res, next) => {
+  var keyword = req.body.keyword;
+  var page = req.query.page || 1;
+  var pageSize = req.query.pageSize || 10;
+  var type = req.query.type || 'recipes';
+  Dish.getDishByKeyword(keyword, type, page, pageSize, (err, result) => {
+    if (err) {
+      next(err);
+    } else {
+      res.send(result);
+    }
+  });
 };
 
 export const getAllDish = (req, res, next) => {

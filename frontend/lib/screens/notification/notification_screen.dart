@@ -47,12 +47,19 @@ class _NotificationScreenState extends State<NotificationScreen> {
     final user = Provider.of<UserProvider>(context, listen: false).user;
     final data = await NotificationService.getFridgeNotifications(
         fridgeId: user!.fridgeId!);
-   
+
     final now = DateTime.now();
     List<Announcement> filteredAnnouncements = data.where((announcement) {
       print('announcement: ${announcement.createdAt}');
-      var expDate = announcement.createdAt != null ? DateTime(announcement.createdAt!.year,
-          announcement.createdAt!.month, announcement.createdAt!.day, 9, 0, 0) : now;
+      var expDate = announcement.createdAt != null
+          ? DateTime(
+              announcement.createdAt!.year,
+              announcement.createdAt!.month,
+              announcement.createdAt!.day,
+              9,
+              0,
+              0)
+          : now;
       return expDate.isBefore(now);
     }).toList();
     setState(() {
@@ -333,6 +340,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
             .viewTypeChange(value: ViewType.list);
         Provider.of<CategoryProvider>(context, listen: false)
             .classifyChange(value: false);
+        Provider.of<CategoryProvider>(context, listen: false)
+            .positionTabChange(value: announcement.category!.positionId!);
       } else {
         FunctionCore.showSnackBar(
             context, '${announcement.category!.label} đã bị xóa khỏi tủ lạnh');

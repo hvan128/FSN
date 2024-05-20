@@ -6,6 +6,7 @@ import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/utils/functions_core.dart';
 import 'package:frontend/widgets/button_icon.dart';
 import 'package:frontend/widgets/text.dart';
+import 'package:photo_view/photo_view.dart';
 
 class MyImage extends StatelessWidget {
   final String url;
@@ -17,6 +18,7 @@ class MyImage extends StatelessWidget {
   final Function()? onEdit;
   final BorderRadius? borderRadius;
   final BoxFit? fit;
+  final bool? showImageDetail;
   const MyImage(
       {super.key,
       required this.url,
@@ -26,6 +28,7 @@ class MyImage extends StatelessWidget {
       this.fit = BoxFit.cover,
       this.showCloseIcon = true,
       this.showEdit = true,
+      this.showImageDetail = true,
       this.onClose,
       this.onEdit});
 
@@ -35,69 +38,90 @@ class MyImage extends StatelessWidget {
     bool isFileImage = url.startsWith('/data');
     bool isAssetImage = url.startsWith('assets');
     final image = isNetworkImage
-        ? Image.network(FunctionCore.convertImageUrl(url),)
+        ? Image.network(
+            FunctionCore.convertImageUrl(url),
+          )
         : isFileImage
             ? Image.file(File(url))
             : isAssetImage
                 ? Image.asset(url)
                 : Container(
-                  width: width ?? 250,
-                  height: height ?? 250,
-                  decoration: BoxDecoration(
-                    borderRadius: borderRadius ?? BorderRadius.circular(0),
-                    border: Border.all(
-                      color: MyColors.grey['c400']!,
+                    width: width ?? 250,
+                    height: height ?? 250,
+                    decoration: BoxDecoration(
+                      borderRadius: borderRadius ?? BorderRadius.circular(0),
+                      border: Border.all(
+                        color: MyColors.grey['c400']!,
+                      ),
+                      color: MyColors.grey['c50']!,
                     ),
-                    color: MyColors.grey['c50']!,
-                  ),
-                  child: const Center(child: Icon(Icons.error_outline)));
+                    child: const Center(child: Icon(Icons.error_outline)));
     return Stack(
       children: [
-        ClipRRect(
-            borderRadius: borderRadius ?? BorderRadius.circular(0),
-            child: image),
+        GestureDetector(
+          onTap: () => showImage(context),
+          child: ClipRRect(
+              borderRadius: borderRadius ?? BorderRadius.circular(0),
+              child: image),
+        ),
         Positioned(
           top: 5,
           right: 5,
           child: Row(
             children: [
-              showEdit == true ? GestureDetector(
-                onTap: () => onEdit != null ? onEdit!() : null,
-                child: Container(
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    color: MyColors.grey['c900']!.withOpacity(0.5),
-                    border: Border.all(
-                      color: MyColors.grey['c300']!,
+              showEdit == true
+                  ? GestureDetector(
+                      onTap: () => onEdit != null ? onEdit!() : null,
+                      child: Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(100),
+                              color: MyColors.grey['c900']!.withOpacity(0.5),
+                              border: Border.all(
+                                color: MyColors.grey['c300']!,
+                              )),
+                          child: MyText(
+                            text: 'Chỉnh sửa ảnh',
+                            fontSize: FontSize.z12,
+                            fontWeight: FontWeight.w600,
+                            color: MyColors.white['c900']!,
+                          )),
                     )
-                  ),
-                  child: MyText(
-                    text: 'Chỉnh sửa ảnh',
-                    fontSize: FontSize.z12,
-                    fontWeight: FontWeight.w600,
-                    color: MyColors.white['c900']!,
-                  )
-                ),
-              ) : const SizedBox(),
+                  : const SizedBox(),
               const SizedBox(width: 5),
-              showCloseIcon == true ? Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: MyColors.grey['c900']!.withOpacity(0.5),
-                  border: Border.all(
-                    color: MyColors.grey['c300']!,
-                  )
-                ),
-                child: MyIconButton(
-                  icon: Icon(Icons.close, color: MyColors.white['c900'], size: 15),
-                  onPressed: () => onClose != null ? onClose!() : null,
-                ),
-              ) : const SizedBox(),
+              showCloseIcon == true
+                  ? Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100),
+                          color: MyColors.grey['c900']!.withOpacity(0.5),
+                          border: Border.all(
+                            color: MyColors.grey['c300']!,
+                          )),
+                      child: MyIconButton(
+                        icon: Icon(Icons.close,
+                            color: MyColors.white['c900'], size: 15),
+                        onPressed: () => onClose != null ? onClose!() : null,
+                      ),
+                    )
+                  : const SizedBox(),
             ],
           ),
         )
       ],
     );
+  }
+
+  void showImage(BuildContext context) {
+    if (showImageDetail == true) {
+      showModalBottomSheet(
+          context: context,
+          builder: (context) => Container(
+                height: MediaQuery.of(context).size.height,
+                color: MyColors.primary['CulturalYellow']!['c50']!,
+                child: PhotoView(
+                    imageProvider:
+                        NetworkImage(FunctionCore.convertImageUrl(url))),
+              ));
+    }
   }
 }

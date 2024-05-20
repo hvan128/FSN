@@ -3,13 +3,10 @@ import 'package:frontend/components/account/my_food_field.dart';
 import 'package:frontend/components/account/my_saved_dish.dart';
 import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/navigation.dart';
-import 'package:frontend/navigation/router/community.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
-import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_icon.dart';
-import 'package:frontend/widgets/tab_button.dart';
 import 'package:frontend/widgets/text.dart';
 import 'package:provider/provider.dart';
 

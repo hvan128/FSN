@@ -63,7 +63,7 @@ class _FoodCardState extends State<FoodCard> {
     for (Feel feel in feels) {
       incrementQuantity(feel.type!, reactions);
     }
-    for(Feel feel in feels) {
+    for (Feel feel in feels) {
       if (feel.userId == userId) {
         setSelected(feel.type!, true, reactions);
         break;
@@ -139,7 +139,14 @@ class _FoodCardState extends State<FoodCard> {
                       'dish': widget.dish,
                       'isSaved': isSaved,
                       'reactions': listReactions
-                    }).then((_) => setState(() {}));
+                    }).then((value) {
+                  if (value != null) {
+                    setState(() {
+                      isSaved = value as bool;
+                    });
+                  }
+                  setState(() {});
+                });
               },
               child: Container(
                 width: widget.type == CardType.small
@@ -268,12 +275,13 @@ class _FoodCardState extends State<FoodCard> {
                                             color: MyColors.grey['c700']!,
                                           )
                                   ]),
+                                  const SizedBox(height: 3),
                                   Flexible(
                                     child: MyText(
                                       text: widget.dish.label!,
                                       fontSize: FontSize.z14,
-                                      fontWeight: FontWeight.w600,
-                                      color: MyColors.grey['c800']!,
+                                      fontWeight: FontWeight.w500,
+                                      color: MyColors.grey['c900']!,
                                     ),
                                   ),
                                   const SizedBox(height: 5),

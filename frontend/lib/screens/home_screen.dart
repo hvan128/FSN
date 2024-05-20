@@ -152,8 +152,8 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       case 4:
         return ReportScreen(
-          showBottomBar: (bool value) => handleShowBottomBar(value),
-          navigateBottomBar: (int index) => handleNavigateBottomBar(index),
+          // showBottomBar: (bool value) => handleShowBottomBar(value),
+          // navigateBottomBar: (int index) => handleNavigateBottomBar(index),
         );
       default:
         return Container();

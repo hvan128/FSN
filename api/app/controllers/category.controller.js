@@ -26,8 +26,29 @@ export const getCategoryByPositionId = (req, res, next) => {
   var fridgeId = req.params.fridgeId;
   var sortBy = req.query.sortBy || "expiryDate";
   var sort = req.query.sort || "DESC";
-  Category.findByPositionId({ positionId, fridgeId, sortBy, sort }, (err, result) => {
+  Category.findByPositionId(
+    { positionId, fridgeId, sortBy, sort },
+    (err, result) => {
+      if (err) {
+        return next(err);
+      } else {
+        return res.status(200).send({
+          message: "Success",
+          data: result,
+        });
+      }
+    }
+  );
+};
+
+export const getTotalCategory = (req, res, next) => {
+  var fridgeId = req.body.fridgeId;
+  var firstDay = req.body.firstDay;
+  var lastDay = req.body.lastDay;
+  var sort = req.body.sort;
+  Category.getTotalCategory(fridgeId, firstDay, lastDay, sort, (err, result) => {
     if (err) {
+      console.log(err);
       return next(err);
     } else {
       return res.status(200).send({
@@ -48,8 +69,9 @@ export const getNewCategoryByFridgeId = (req, res, next) => {
         message: "Success",
         data: result,
       });
-  }})
-}
+    }
+  });
+};
 
 export const addCategory = (req, res, next) => {
   var data = req.body;
@@ -70,7 +92,7 @@ export const addNewCategory = (req, res) => {
   Category.createNewCategory(data, (result) => {
     res.send(result);
   });
-}
+};
 
 export const updateCategory = (req, res) => {
   var data = req.body;
@@ -95,7 +117,7 @@ export const completed = (req, res, next) => {
       res.send(result);
     }
   });
-}
+};
 
 export const reOrderCategory = (req, res, next) => {
   var data = req.body;
@@ -106,8 +128,7 @@ export const reOrderCategory = (req, res, next) => {
       res.send(result);
     }
   });
-}
-
+};
 
 export const deleteCategory = (req, res) => {
   var id = req.params.id;
