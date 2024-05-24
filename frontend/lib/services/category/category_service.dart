@@ -46,6 +46,7 @@ class CategoryService {
                           'sort': sort.name,
                         }
                       : null;
+                      print('queryParams: $queryParams');
       await ApiService.get(
               '${Config.CATEGORIES_API}/position/$positionId/${user.fridgeId}',
               queryParams: queryParams)

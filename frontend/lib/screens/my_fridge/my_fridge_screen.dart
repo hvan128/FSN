@@ -78,7 +78,8 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
     classify = categoryProvider.classify;
     initialIndex = categoryProvider.positionTab;
     print('initialIndex: $initialIndex');
-    tabController = TabController(length: 3, vsync: this, initialIndex: initialIndex - 1);
+    tabController =
+        TabController(length: 3, vsync: this, initialIndex: initialIndex - 1);
     fetchCategories();
   }
 
@@ -559,7 +560,6 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
                                                             });
                                                           }
                                                         } else {
-                                                          
                                                           Navigator.pushNamed(
                                                               context,
                                                               RouterMyFridge
@@ -768,7 +768,9 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
             Provider.of<CategoryProvider>(context, listen: false).classify;
         sortType =
             Provider.of<CategoryProvider>(context, listen: false).sortType;
+        categoryMap.clear();
       });
+
       await clearCache();
       await fetchCategories();
     });

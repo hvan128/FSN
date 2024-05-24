@@ -1,3 +1,4 @@
+import 'package:api_cache_manager/api_cache_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/components/item/item_food.dart';
 import 'package:frontend/models/category/category.dart';
@@ -25,7 +26,8 @@ class AddCategoryScreen extends StatefulWidget {
 class _AddCategoryScreenState extends State<AddCategoryScreen> {
   Category? selectedCategory;
   ItemFood? selectedFood;
-  List<ItemFood> listFoods = foods;
+  List<ItemFood>? listFoods;
+  List<Category>? listCategories;
   @override
   void initState() {
     super.initState();
@@ -35,14 +37,22 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
   }
 
   void fetchNewCategory() async {
-    final fridgeId = Provider.of<UserProvider>(context, listen: false).user!.fridgeId!;
+    setState(() {
+      listFoods = foods;
+    });
+    final fridgeId =
+        Provider.of<UserProvider>(context, listen: false).user!.fridgeId!;
     final result = await CategoryService().getNewCategories(fridgeId);
     if (result.isNotEmpty) {
       for (var item in result) {
-        listFoods
-            .firstWhere((element) => element.value == item.type, orElse: () => listFoods.last)
-            .categories
-            .add(item);
+        setState(() {
+          var foodItem = listFoods!.firstWhere(
+              (element) => element.value == item.type,
+              orElse: () => listFoods!.last);
+          if (!foodItem.categories.any((category) => category.id == item.id)) {
+            foodItem.categories.add(item);
+          }
+        });
       }
     }
   }
@@ -93,21 +103,24 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Wrap(spacing: 15, runSpacing: 5, children: [
-                              ...listFoods
-                                  .map((e) => GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            selectedFood = e;
-                                          });
-                                        },
-                                        child: FoodItem(
-                                            label: e.label,
-                                            icon: e.icon,
-                                            isSelected: selectedFood == e),
-                                      ))
-                                  .toList(),
-                            ]),
+                            listFoods == null
+                                ? const SizedBox()
+                                : Wrap(spacing: 15, runSpacing: 5, children: [
+                                    ...listFoods!
+                                        .map((e) => GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  selectedFood = e;
+                                                });
+                                              },
+                                              child: FoodItem(
+                                                  label: e.label,
+                                                  icon: e.icon,
+                                                  isSelected:
+                                                      selectedFood == e),
+                                            ))
+                                        .toList(),
+                                  ]),
                             const SizedBox(height: 10),
                             const MyDivider(),
                             const SizedBox(height: 10),
@@ -128,8 +141,10 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                                                   ));
                                             },
                                             child: FoodItem(
-                                                label: e.label!,
-                                                icon: e.icon!)))
+                                              label: e.label!,
+                                              icon:
+                                                  e.icon ?? selectedFood!.icon,
+                                            )))
                                         .toList(),
                                     GestureDetector(
                                       onTap: () {
@@ -139,7 +154,10 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                                                 builder: (context) =>
                                                     CreateNewCategoryScreen(
                                                       type: selectedFood!.value,
-                                                    )));
+                                                    ))).then((value) {
+                                                      APICacheManager().deleteCache('categories_new');
+                                                      fetchNewCategory();
+                                                    });
                                       },
                                       child: Padding(
                                         padding: const EdgeInsets.only(left: 9),

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:api_cache_manager/api_cache_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/components/modals/notification_modal.dart';
 import 'package:frontend/components/settings/more_info.dart';
@@ -135,8 +136,11 @@ class _FridgeFamilySettingScreenState extends State<FridgeFamilySettingScreen> {
                       ApiService.delete(
                               '${Config.FRIDGE_API}/${user!.fridgeId}')
                           .then((value) {
-                        Provider.of<UserProvider>(context, listen: false)
-                            .deleteFridge();
+                        var userProvider =
+                            Provider.of<UserProvider>(context, listen: false);
+                        userProvider.deleteFridge();
+                        APICacheManager()
+                            .deleteCache('user_${userProvider.user!.id}');
                         CategoryService().deleteCache();
                         Navigate.pushNamedAndRemoveAll(
                             RouterIntroduction.afterLogin);
@@ -167,8 +171,12 @@ class _FridgeFamilySettingScreenState extends State<FridgeFamilySettingScreen> {
                           ApiService.put(
                                   Config.USER_API, userDeleteFridge.toJson())
                               .then((value) {
-                            Provider.of<UserProvider>(context, listen: false)
-                                .deleteFridge();
+                            var userProvider = Provider.of<UserProvider>(
+                                context,
+                                listen: false);
+                            userProvider.deleteFridge();
+                            APICacheManager()
+                                .deleteCache('user_${userProvider.user!.id}');
                             CategoryService().deleteCache();
                             Navigate.pushNamedAndRemoveAll(
                                 RouterIntroduction.afterLogin);
@@ -222,12 +230,14 @@ class _FridgeFamilySettingScreenState extends State<FridgeFamilySettingScreen> {
                             children: [
                               MyProfileContent(
                                 text: isOwner ? 'Chủ sở hữu' : 'Thành viên',
-                                onTap: () {onTapProfileContent(userFridge);},
+                                onTap: () {
+                                  onTapProfileContent(userFridge);
+                                },
                                 name: '${userFridge.displayName} $bonusText',
                                 imageUrl: userFridge.imageUrl,
-                                trailing: !isOwner ? const Icon(
-                                  Icons.more_vert
-                                ) : const SizedBox(),
+                                trailing: !isOwner
+                                    ? const Icon(Icons.more_vert)
+                                    : const SizedBox(),
                               )
                             ],
                           ),
@@ -242,10 +252,8 @@ class _FridgeFamilySettingScreenState extends State<FridgeFamilySettingScreen> {
           }
         });
   }
-  
-  void onTapProfileContent(UserModel userFridge) {
-    
-  }
+
+  void onTapProfileContent(UserModel userFridge) {}
 
   void moreInformation() {
     showDialog(context: context, builder: (context) => const MoreInfo());

@@ -158,6 +158,7 @@ class NotificationService {
         .then((value) {
       if (value != null) {
         final data = jsonDecode(value.toString())['data'];
+        print('data: $data');
         list = announcementFromJson(data);
       }
     });

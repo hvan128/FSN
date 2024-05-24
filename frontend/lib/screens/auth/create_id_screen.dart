@@ -148,6 +148,7 @@ class _CreateIdScreenState extends State<CreateIdScreen> {
       displayName: user!.displayName,
       fcmToken: fcmToken
     );
+    print(registerRequestModel.toJson());
     AuthService.register(registerRequestModel).then((value) async {
       if (value.data != null) {
         Map<String, dynamic>  loginResponse = {

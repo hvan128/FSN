@@ -2,6 +2,8 @@
 
 import 'dart:convert';
 
+import 'package:api_cache_manager/api_cache_manager.dart';
+import 'package:api_cache_manager/models/cache_db_model.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/components/introduction/qr_code_invite.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
@@ -194,10 +196,20 @@ class _CreateFridgeScreenState extends State<CreateFridgeScreen> {
       "ownerId": context.read<UserProvider>().user!.id,
       "usersId": '${context.read<UserProvider>().user!.id}'
     };
-    await ApiService.post(Config.FRIDGE_API, data).then((value) {
+    await ApiService.post(Config.FRIDGE_API, data).then((value) async {
       final fridgeId = jsonDecode(value.toString())['id'];
-      Provider.of<UserProvider>(context, listen: false)
-          .setFridge(fridgeId: fridgeId);
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.setFridge(fridgeId: fridgeId);
+      await ApiService.get('${Config.USER_API}/${userProvider.user!.id}')
+          .then((value) {
+        if (value != null) {
+          APICacheDBModel cacheDBModel = APICacheDBModel(
+            key: 'user_${userProvider.user!.id}',
+            syncData: value.toString(),
+          );
+          APICacheManager().addCacheData(cacheDBModel);
+        }
+      });
     });
     Navigator.pushNamedAndRemoveUntil(context, RouterHome.home, (_) => false);
     showDialog(
@@ -317,8 +329,18 @@ class _CreateFridgeScreenState extends State<CreateFridgeScreen> {
     final acceptInvitation = invitation.acceptInvitation();
     Loading.showLoading();
     await ApiService.put(Config.INVITATION_API, acceptInvitation.toJson());
-    Provider.of<UserProvider>(context, listen: false)
-        .setFridge(fridgeId: invitation.fridgeId!);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.setFridge(fridgeId: invitation.fridgeId!);
+      await ApiService.get('${Config.USER_API}/${userProvider.user!.id}')
+          .then((value) {
+        if (value != null) {
+          APICacheDBModel cacheDBModel = APICacheDBModel(
+            key: 'user_${userProvider.user!.id}',
+            syncData: value.toString(),
+          );
+          APICacheManager().addCacheData(cacheDBModel);
+        }
+      });
     Loading.hideLoading();
     Navigator.pushNamedAndRemoveUntil(context, RouterHome.home, (_) => false);
   }

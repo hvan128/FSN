@@ -2,6 +2,8 @@ import 'package:api_cache_manager/api_cache_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:frontend/config.dart';
+import 'package:frontend/navigation/navigation.dart';
+import 'package:frontend/navigation/router/my_fridge.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/my_fridge/choose_icon_screen.dart';
 import 'package:frontend/services/api_service.dart';
@@ -20,7 +22,8 @@ class CreateNewCategoryScreen extends StatefulWidget {
   const CreateNewCategoryScreen({super.key, this.type});
 
   @override
-  State<CreateNewCategoryScreen> createState() => _CreateNewCategoryScreenState();
+  State<CreateNewCategoryScreen> createState() =>
+      _CreateNewCategoryScreenState();
 }
 
 class _CreateNewCategoryScreenState extends State<CreateNewCategoryScreen> {
@@ -43,7 +46,8 @@ class _CreateNewCategoryScreenState extends State<CreateNewCategoryScreen> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: SafeArea(
           child: ConstrainedBox(
-        constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height),
+        constraints:
+            BoxConstraints(minHeight: MediaQuery.of(context).size.height),
         child: Column(
           children: [
             MyHeader(
@@ -93,7 +97,8 @@ class _CreateNewCategoryScreenState extends State<CreateNewCategoryScreen> {
                                     height: 60,
                                     width: 60,
                                     child: Image.asset(
-                                      icon ?? 'assets/icons/i16/image-default.png',
+                                      icon ??
+                                          'assets/icons/i16/image-default.png',
                                       width: 50,
                                       height: 50,
                                     ),
@@ -245,7 +250,8 @@ class _CreateNewCategoryScreenState extends State<CreateNewCategoryScreen> {
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 20),
-                              child: MyButton(text: 'Thêm', onPressed: createNewCategory),
+                              child: MyButton(
+                                  text: 'Thêm', onPressed: createNewCategory),
                             ),
                             const SizedBox(
                               height: 20,
@@ -260,21 +266,20 @@ class _CreateNewCategoryScreenState extends State<CreateNewCategoryScreen> {
       )),
     ));
   }
- 
 
   void createNewCategory() async {
     if (_nameController.text.isNotEmpty && _dateController.text.isNotEmpty) {
       String label = _nameController.text;
-      int defaultDuration  = int.parse(_dateController.text);
+      int defaultDuration = int.parse(_dateController.text);
       await ApiService.post('${Config.CATEGORIES_API}/new', {
         'label': label,
         'defaultDuration': defaultDuration,
         'value': FunctionCore.convertToSlug(label),
         'icon': icon,
         'type': widget.type,
-        'fridgeId': Provider.of<UserProvider>(context, listen: false).user!.fridgeId
+        'fridgeId':
+            Provider.of<UserProvider>(context, listen: false).user!.fridgeId
       });
-      APICacheManager().deleteCache('categories_new');
       Navigator.pop(context);
     } else {
       FunctionCore.showSnackBar(context, 'Vui lý điền đầy đủ thông tin');
@@ -282,13 +287,16 @@ class _CreateNewCategoryScreenState extends State<CreateNewCategoryScreen> {
   }
 
   void chooseIcon() async {
-    final result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
+    final result =
+        await Navigator.push(context, MaterialPageRoute(builder: (context) {
       return ChooseIconScreen(
         type: widget.type!,
       );
     }));
-    setState(() {
-      icon = result;
-    });
+    if (result != null) {
+      setState(() {
+        icon = result;
+      });
+    }
   }
 }
