@@ -475,8 +475,6 @@ Dish.getDishByKeyword = (keyword, type, page, pageSize, result) => {
     LIMIT ? OFFSET ?
   `;
 
-  console.log(query, params);
-
   db.query(query, params, (err, res) => {
     if (err) {
       console.error("Error searching dishes:", err);

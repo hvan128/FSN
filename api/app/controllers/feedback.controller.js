@@ -3,7 +3,7 @@ import upload from "../middleware/upload.js";
 
 var feedbackUpload = upload.fields([{ name: "image", maxCount: 1 }]);
 
-export const create = (req, res) => {
+export const create = (req, res, next) => {
   feedbackUpload(req, res, (err) => {
     if (err) {
       next(err);
@@ -29,7 +29,7 @@ export const create = (req, res) => {
   });
 };
 
-export const getFeedbackByDishId = (req, res) => {
+export const getFeedbackByDishId = (req, res, next) => {
     var dishId = req.params.id;
     var page = req.query.page || 1;
     var pageSize = req.query.pageSize || 10;
@@ -42,7 +42,7 @@ export const getFeedbackByDishId = (req, res) => {
     })
 }
 
-export const getAllFeedback = (req, res) => {
+export const getAllFeedback = (req, res, next) => {
     var page = req.query.page || 1;
     var pageSize = req.query.pageSize || 10;
     Feedback.getAll(page, pageSize, (err, result) => {

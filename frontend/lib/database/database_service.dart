@@ -1,8 +1,6 @@
 import 'package:frontend/database/category_db.dart';
 import 'package:frontend/database/position_db.dart';
 import 'package:frontend/database/sub_position_db.dart';
-import 'package:frontend/models/position.dart';
-import 'package:frontend/models/sub_position.dart';
 
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';

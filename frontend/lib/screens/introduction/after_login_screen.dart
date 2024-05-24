@@ -26,6 +26,7 @@ class _AfterLoginScreenState extends State<AfterLoginScreen> {
   void initState() {
     super.initState();
     fetchUser();
+    print(user?.toJson());
   }
 
   void fetchUser() async {
@@ -36,6 +37,7 @@ class _AfterLoginScreenState extends State<AfterLoginScreen> {
       print('cache user exist');
       var cacheData =
           await APICacheManager().getCacheData('user_${userLogin.data!.id}');
+          print('cacheData: ${jsonDecode(cacheData.syncData)[0]}');
       setState(() {
         user = UserModel.fromJson(jsonDecode(cacheData.syncData)[0]);
       });

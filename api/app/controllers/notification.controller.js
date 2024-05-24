@@ -1,6 +1,6 @@
 import fcm from "fcm-node";
 import admin from "firebase-admin";
-import serviceAccount from "../../config/push-notification-key.json" assert { type: "json" };
+import serviceAccount from "../../config/push-notification-key.js";
 import Notification from "../models/notification.model.js";
 
 const certPath = admin.credential.cert(serviceAccount);

@@ -3,11 +3,13 @@ import 'package:frontend/components/item/item_search.dart';
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/my_fridge.dart';
+import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/my_fridge/add_category_detail_screen.dart';
 import 'package:frontend/services/category/category_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/utils/constants.dart';
+import 'package:provider/provider.dart';
 import 'package:tiengviet/tiengviet.dart';
 
 enum SearchType {
@@ -27,12 +29,30 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   List<Category>? listCategories = [];
   List<Category>? categories = [];
+  List<Category> all = [];
   TextEditingController searchTextController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    fetchNewCategory();
     setListCategories('');
+  }
+
+   void fetchNewCategory() async {
+      setState(() {
+        all = allCategories;
+      });
+    final fridgeId =
+        Provider.of<UserProvider>(context, listen: false).user!.fridgeId!;
+    final result = await CategoryService().getNewCategories(fridgeId);
+    if (result.isNotEmpty) {
+      for (var item in result) {
+         if (!all.any((category) => category.id == item.id) && widget.type == SearchType.all) {
+            all.add(item);
+          }
+      }
+    }
   }
 
   Future<void> setListCategories(String searchText) async {
@@ -44,7 +64,7 @@ class _SearchScreenState extends State<SearchScreen> {
         });
       } else {
         setState(() {
-          listCategories = allCategories;
+          listCategories = all;
         });
       }
     } else {
