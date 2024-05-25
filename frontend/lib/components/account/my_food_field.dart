@@ -42,9 +42,10 @@ class _MyFoodFieldState extends State<MyFoodField> {
   }
 
   Future<void> getAllTips(int page, int pageSize) async {
+    print('getAllTips');
     final res = await DishService.getDishByOwnerId(
         widget.userId, page, pageSize, 'tips');
-
+    print('res: $res');
     setState(() {
       tips = res['dishes'];
       totalTips = res['total'];
@@ -127,8 +128,7 @@ class _MyFoodFieldState extends State<MyFoodField> {
                   ),
         const SizedBox(height: 10),
         tips == null
-            ? Container()
-            : tips!.isEmpty
+            || tips!.isEmpty
                 ? _buildAddTipsButton()
                 : Container(
                     color: MyColors.white['c900']!,
