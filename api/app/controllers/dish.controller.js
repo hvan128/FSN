@@ -99,6 +99,17 @@ export const updateDish = (req, res, next) => {
   });
 };
 
+export const updateStatus = (req, res, next) => {
+  var id = req.params.id;
+  var status = req.body.status;
+  Dish.updateStatus(id, status, (err, result) => {
+    if (err) {
+      next(err);
+    } else {
+      res.send(result);
+    }
+  });
+}
 export const getDishById = (req, res, next) => {
   var id = req.params.id;
   Dish.findById(id, (err, result) => {
@@ -116,7 +127,9 @@ export const getDishByOwnerId = (req, res, next) => {
   var pageSize = req.query.pageSize || 10;
   var type = req.query.type || 'recipes';
   Dish.findByOwnerId(ownerId, page, pageSize, type, (err, result) => {
+    console.log('abc');  
     if (err) {
+      console.log('error', err);
       next(err);
     } else {
       res.send(result);
@@ -160,9 +173,10 @@ export const getDishByKeyword = (req, res, next) => {
 
 export const getAllDish = (req, res, next) => {
   var page = req.query.page || 1;
-  var pageSize = req.query.pageSize || 10;
+  var pageSize = req.query.pageSize || req.query.perPage || 10;
   var type = req.query.type || 'recipes';
-  Dish.getAllDish(page, pageSize, type, (err, result) => {
+  var status = req.query.status || 'pending';
+  Dish.getAllDish(page, pageSize, type, status, (err, result) => {
     if (err) {
       next(err);
     } else {

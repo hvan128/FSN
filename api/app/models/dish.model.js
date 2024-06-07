@@ -144,6 +144,18 @@ Dish.update = (data, result) => {
       result(null, dish);
     }
   });
+};  
+
+Dish.updateStatus = (id, status, result) => {
+  db.query("UPDATE dish SET status = ? WHERE id = ?", [status, id], (err, res) => {
+    if (err) {
+      console.log(err);
+      result(err, null);
+      return;
+    } else {
+      result(null, res);
+    }
+  });
 };
 
 Dish.findById = (id, result) => {
@@ -526,12 +538,12 @@ Dish.getDishByKeyword = (keyword, type, page, pageSize, result) => {
   });
 };
 
-Dish.getAllDish = (page, pageSize, type, result) => {
+Dish.getAllDish = (page, pageSize, type, status, result) => {
   const offset = (page - 1) * pageSize;
   console.log(type);
 
   db.query(
-    `SELECT COUNT(*) AS total FROM dish WHERE type = '${type}'`,
+    `SELECT COUNT(*) AS total FROM dish WHERE type = '${type}' AND status = '${status}'`,
     (err, countResult) => {
       if (err) {
         console.log(err);
@@ -542,7 +554,7 @@ Dish.getAllDish = (page, pageSize, type, result) => {
       const totalCount = countResult[0].total;
 
       db.query(
-        `SELECT id FROM dish WHERE type = '${type}' ORDER BY createdAt DESC LIMIT ${pageSize} OFFSET ${offset}`,
+        `SELECT id FROM dish WHERE type = '${type}' AND status = '${status}' ORDER BY createdAt DESC LIMIT ${pageSize} OFFSET ${offset}`,
         (err, res) => {
           if (err) {
             console.log(err);

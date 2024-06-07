@@ -12,7 +12,7 @@ class ApiService {
     var loginDetails = await SharedService.loginDetails();
     Map<String, String> requestHeaders = {
       'Content-Type': 'application/json',
-      'Authorization': loginDetails!.data!.token
+      'Authorization': 'Google ${loginDetails!.data!.token}'
     };
     var url = Uri.http(Config.API_URL, apiUrl, queryParams);
     var response = await client.get(url, headers: requestHeaders);
@@ -26,7 +26,7 @@ class ApiService {
     var loginDetails = await SharedService.loginDetails();
     Map<String, String> requestHeaders = {
       'Content-Type': 'application/json',
-      'Authorization': loginDetails!.data!.token
+      'Authorization': 'Google ${loginDetails!.data!.token}'
     };
     var url = Uri.http(Config.API_URL, apiUrl);
     var response = await client.post(
@@ -44,7 +44,7 @@ class ApiService {
     var loginDetails = await SharedService.loginDetails();
     Map<String, String> requestHeaders = {
       'Content-Type': 'application/json',
-      'Authorization': loginDetails!.data!.token
+      'Authorization': 'Google ${loginDetails!.data!.token}'
     };
     var url = Uri.http(Config.API_URL, apiUrl);
     var response = await client.put(
@@ -62,7 +62,7 @@ class ApiService {
     var loginDetails = await SharedService.loginDetails();
     Map<String, String> requestHeaders = {
       'Content-Type': 'application/json',
-      'Authorization': loginDetails!.data!.token
+      'Authorization': 'Google ${loginDetails!.data!.token}'
     };
     var url = Uri.http(Config.API_URL, apiUrl, queryParams);
     var response = await client.delete(

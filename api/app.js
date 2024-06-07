@@ -11,6 +11,7 @@ import * as middleware from "./app/middleware/auth.js";
 import bodyParser from "body-parser";
 import errorHandler from "./app/middleware/errors.js";
 import env from "dotenv";
+import cors from "cors";
 
 env.config();
 
@@ -20,10 +21,24 @@ const port = process.env.PORT || 8000;
 app.use(morgan("combined"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(
+  cors({
+    origin: "*", // or '*' to allow all origins
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders: "Content-Type, Authorization",
+  })
+);
 app.use("/uploads", express.static("./public/uploads"));
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
+app.get(
+  "/",
+  (req, res, next) => {
+    console.log(req.headers);
+    next();
+  },
+  (req, res) => {
+    res.send("Hello World!");
+  }
+);
 authRouter(app);
 // app.use(middleware.isAuthenticated);
 notificationRouter(app);

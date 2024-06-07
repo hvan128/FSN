@@ -20,13 +20,42 @@ User.create = (data, result) => {
   });
 };
 
+User.createUserSystem = (data, result) => {
+  db.query(
+    "SELECT * FROM user_system WHERE username = ? OR email = ?",
+    [data.username, data.email],
+    (err, res) => {
+      if (err) {
+        console.log(err);
+        result(err, null);
+        return;
+      } else {
+        if (res.length) {
+          result({ kind: "exist" }, null);
+          return;
+        } else {
+          db.query("INSERT INTO user_system SET ?", data, (err, res) => {
+            if (err) {
+              console.log(err);
+              result(err, null);
+              return;
+            } else {
+              result(null, { id: res.insertId, ...data });
+            }
+          });
+        }
+      }
+    }
+  );
+};
+
 ///* Get Users */
 User.getAllUser = (result) => {
   db.query("SELECT * FROM users", (err, res) => {
     if (err) {
       console.log(err);
-      result(err, null);  
-    } else {  
+      result(err, null);
+    } else {
       console.log(res);
       result(null, res);
     }
@@ -64,7 +93,63 @@ User.findByFridgeId = (fridgeId, result) => {
       result(null, res);
     }
   });
-}
+};
+
+User.getAllUserSystem = (req, result) => {
+  const { sortOrder = 'ASC', sortField = 'id', page = 1, perPage = 10, username, phone, email } = req.body;
+
+  let query = "SELECT * FROM user_system";
+  let conditions = [];
+  let queryParams = [];
+
+  // Filter conditions
+  if (username) {
+    conditions.push("username LIKE ?");
+    queryParams.push(`%${username}%`);
+  }
+  if (phone) {
+    conditions.push("phone LIKE ?");
+    queryParams.push(`%${phone}%`);
+  }
+  if (email) {
+    conditions.push("email LIKE ?");
+    queryParams.push(`%${email}%`);
+  }
+
+  if (conditions.length > 0) {
+    query += " WHERE " + conditions.join(" AND ");
+  }
+
+  // Ordering
+  query += ` ORDER BY ${sortField} ${sortOrder}`;
+
+  // Pagination
+  const offset = (page - 1) * perPage;
+  query += " LIMIT ? OFFSET ?";
+  queryParams.push(perPage, offset);
+
+  // Execute query
+  db.query(query, queryParams, (err, res) => {
+    if (err) {
+      console.log(err);
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
+};
+
+
+User.getUserSystemById = (id, result) => {
+  db.query(`SELECT * FROM user_system WHERE id = ${id}`, (err, res) => {
+    if (err) {
+      console.log(err);
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
+};
 
 ///* Update User */
 User.update = (data, result) => {
@@ -125,6 +210,31 @@ User.verify = (data, result) => {
       }
     }
   );
+};
+
+User.verifyUserSystem = (data, result) => {
+  db.query(
+    `SELECT * FROM user_system WHERE username = '${data.username}' AND password = '${data.password}'`,
+    (err, res) => {
+      if (err) {
+        console.log(err);
+        result(err, null);
+      } else {
+        result(null, res);
+      }
+    }
+  );
+};
+
+User.deleteUserSystem = (id, result) => {
+  db.query(`DELETE FROM user_system WHERE id = ${id}`, (err, res) => {
+    if (err) {
+      console.log(err);
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
 };
 
 export default User;

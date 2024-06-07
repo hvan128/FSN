@@ -76,7 +76,6 @@ class _FeedbackDetailScreenState extends State<FeedbackDetailScreen> {
     for (Feel feel in feels) {
       if (feel.userId == userId) {
         setSelected(feel.type!, true, reactions);
-        break;
       }
     }
   }

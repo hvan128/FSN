@@ -26,6 +26,32 @@ export const findById = (req, res, next) => {
   });
 };
 
+export const findUserSystemById = (req, res, next) => {
+  User.getUserSystemById(req.params.id, (err, data) => {
+    if (err) {
+      if (err.kind === "not_found") {
+        res.status(404).send({
+          message: `Not found User with id ${req.params.id}.`,
+        });
+      } else {
+        res.status(500).send({
+          message: "Error retrieving User with id " + req.params.id,
+        });
+      }
+    } else res.send(data);
+  });
+}
+
+export const getAllUserSystem = (req, res, next) => {
+  User.getAllUserSystem(req, (err, data) => {
+    if (err) {
+      res.status(500).send({
+        message: err.message || "Some error occurred while retrieving users.",
+      });
+    } else res.send(data);
+  })
+}
+
 export const findByEmail = (req, res) => {
   User.findByEmail(req.body.email, (err, data) => {
     if (err) {
@@ -83,6 +109,14 @@ export const update = (req, res) => {
 
 export const deleteFridge = (req, res, next) => {
   User.deleteFridge(req.params.id, (err, data) => {
+    if (err) {
+      return next(err);
+    } else res.send(data);
+  });
+};
+
+export const deleteUserSystem = (req, res, next) => {
+  User.deleteUserSystem(req.params.id, (err, data) => {
     if (err) {
       return next(err);
     } else res.send(data);

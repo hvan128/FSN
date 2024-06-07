@@ -12,7 +12,7 @@ class DishService {
     var loginDetails = await SharedService.loginDetails();
     Map<String, String> requestHeaders = {
       'Content-Type': 'multipart/form-data',
-      'Authorization': loginDetails!.data!.token
+      'Authorization': 'Google ${loginDetails!.data!.token}'
     };
     var url = Uri.http(Config.API_URL, Config.DISH_API);
     var request = http.MultipartRequest("POST", url);
@@ -52,7 +52,7 @@ class DishService {
     var loginDetails = await SharedService.loginDetails();
     Map<String, String> requestHeaders = {
       'Content-Type': 'multipart/form-data',
-      'Authorization': loginDetails!.data!.token
+      'Authorization': 'Google ${loginDetails!.data!.token}'
     };
     var url = Uri.http(Config.API_URL, '${Config.DISH_API}/${dish.id}');
     var request = http.MultipartRequest("PUT", url);
@@ -270,7 +270,7 @@ class DishService {
     var loginDetails = await SharedService.loginDetails();
     Map<String, String> requestHeaders = {
       'Content-Type': 'multipart/form-data',
-      'Authorization': loginDetails!.data!.token
+      'Authorization': 'Google ${loginDetails!.data!.token}'
     };
     var url = Uri.http(Config.API_URL, '${Config.DISH_API}/feedback');
     var request = http.MultipartRequest("POST", url);

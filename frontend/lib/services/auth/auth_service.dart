@@ -71,7 +71,7 @@ class AuthService {
 
     Map<String, String> requestHeaders = {
       'Content-Type': 'application/json',
-      'Authorization': loginDetails!.data!.token
+      'Authorization': 'Google ${loginDetails!.data!.token}'
     };
 
     var url = Uri.http(Config.API_URL, Config.API_URL + "/users/me");
