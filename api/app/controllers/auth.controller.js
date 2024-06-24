@@ -1,4 +1,4 @@
-import * as JWT from "../common/_JWT.js";
+import * as JWT from "../../common/_JWT.js";
 import User from "../models/user.model.js";
 
 export const login = (req, res) => {
@@ -87,7 +87,8 @@ export const adminLogin = (req, res) => {
             email: data[0].email,
             id: data[0].id,
             role: data[0].role,
-            name: data[0].name,
+            name: data[0].fullName,
+            phone: data[0].phone,
             token: token,
           },
         });

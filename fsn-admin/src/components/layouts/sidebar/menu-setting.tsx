@@ -18,14 +18,6 @@ const settingItem: Array<MenuItemProps> = [
     icon: <SettingsIcon></SettingsIcon>,
     roles: [ROLES.SUPER_ADMIN.CODE, ROLES.ROOT_ROLE.CODE],
   },
-  {
-    id: "app-saving-obnboarding",
-    title: "Onboarding rules",
-    type: "item",
-    url: "/admin/onboarding-rules",
-    icon: <DensitySmallIcon></DensitySmallIcon>,
-    roles: [ROLES.SUPER_ADMIN.CODE, ROLES.ROOT_ROLE.CODE],
-  },
 ];
 const setting: MenuGroupProps = {
   id: "app-setting",
@@ -44,7 +36,7 @@ const manageItem: Array<MenuItemProps> = [
     roles: [ROLES.SUPER_ADMIN.CODE, ROLES.ROOT_ROLE.CODE],
   },
   {
-    id: "app-announment-broadcast",
+    id: "app-announcement-broadcast",
     title: "Announcement",
     type: "item",
     url: "/admin/announcement",
@@ -56,10 +48,10 @@ const manageItem: Array<MenuItemProps> = [
     ],
   },
   {
-    id: "app-customer",
-    title: "Customer",
+    id: "app-request",
+    title: "Request",
     type: "item",
-    url: "/admin/customer",
+    url: "/admin/request",
     icon: <PersonIcon></PersonIcon>,
     roles: [
       ROLES.SUPER_ADMIN.CODE,
@@ -68,10 +60,10 @@ const manageItem: Array<MenuItemProps> = [
     ],
   },
   {
-    id: "app-product",
-    title: "Product",
+    id: "app-community",
+    title: "Community",
     type: "item",
-    url: "/admin/product",
+    url: "/admin/community",
     icon: <CategoryIcon></CategoryIcon>,
     roles: [
       ROLES.SUPER_ADMIN.CODE,
@@ -80,10 +72,10 @@ const manageItem: Array<MenuItemProps> = [
     ],
   },
   {
-    id: 'app-whitelist',
-    title: 'Whitelist',
-    type: 'item',
-    url: '/admin/white-list',
+    id: "app-whitelist",
+    title: "Whitelist",
+    type: "item",
+    url: "/admin/white-list",
     icon: <VerifiedUserIcon></VerifiedUserIcon>,
     roles: [
       ROLES.SUPER_ADMIN.CODE,

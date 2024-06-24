@@ -1,12 +1,13 @@
-import Main from "@/components/customer/main";
+import Main from "@/components/community/main";
 import { Metadata } from "next";
 
+
 export const metadata: Metadata = {
-  title: 'Customer management | DK-Admin',
+  title: 'Production | DK-Admin',
   description: 'Admin portal for DK staff',
 }
 
-export default function Customer() {
+export default function Product() {
   return (
     <Main></Main>
   )

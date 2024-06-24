@@ -1,4 +1,4 @@
-import db from "../common/connect.js";
+import db from "../../common/connect.js";
 class Step {
   constructor(no, description, id, dishId, listImage) {
     this.no = no;

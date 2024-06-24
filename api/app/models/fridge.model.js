@@ -1,4 +1,4 @@
-import db from "../common/connect.js";
+import db from "../../common/connect.js";
 class Fridge {
   constructor(id, name, ownerId, usersId) {
     this.id = id;

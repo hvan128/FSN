@@ -1,4 +1,4 @@
-import db from "../common/connect.js";
+import db from "../../common/connect.js";
 import Category from "./category.model.js";
 import Dish from "./dish.model.js";
 import User from "./user.model.js";
@@ -115,7 +115,7 @@ Notification.getCommunityNotification = (targetId, result) => {
                 resolve(user);
               }
             });
-          })
+          });
           Promise.all([dishPromise, userPromise])
             .then(([dish, [user]]) => {
               notifications.push({ ...notification, dish, user });
@@ -127,21 +127,25 @@ Notification.getCommunityNotification = (targetId, result) => {
               console.log(err);
               result(err, null);
             });
-        })
+        });
       }
     }
   );
 };
 
 Notification.read = (id, result) => {
-  db.query('UPDATE notification SET `read` = 1 WHERE id = ?' , [id], (err, res) => {
-    if (err) {
-      console.log(err);
-      result(err, null);
-    } else {
-      result(null, res);
+  db.query(
+    "UPDATE notification SET `read` = 1 WHERE id = ?",
+    [id],
+    (err, res) => {
+      if (err) {
+        console.log(err);
+        result(err, null);
+      } else {
+        result(null, res);
+      }
     }
-  });
+  );
 };
 
 export default Notification;

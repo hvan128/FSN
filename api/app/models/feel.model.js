@@ -1,4 +1,4 @@
-import db from "../common/connect.js";
+import db from "../../common/connect.js";
 import Dish from "./dish.model.js";
 import Notification from "./notification.model.js";
 class Feel {
@@ -46,7 +46,6 @@ Feel.create = (data, result) => {
           );
         }
       });
-
       result(null, { id: res.insertId, ...data });
     }
   });
@@ -81,27 +80,35 @@ Feel.findByFeedbackId = (feedbackId, result) => {
 };
 
 Feel.deleteFeelDish = (userId, dishId, type, result) => {
-  db.query("DELETE FROM feel WHERE userId = ? AND dishId = ? AND type = ?", [userId, dishId, type], (err, res) => {
-    if (err) {
-      console.log(err);
-      result(err, null);
-      return;
-    } else {
-      result(null, res);
+  db.query(
+    "DELETE FROM feel WHERE userId = ? AND dishId = ? AND type = ?",
+    [userId, dishId, type],
+    (err, res) => {
+      if (err) {
+        console.log(err);
+        result(err, null);
+        return;
+      } else {
+        result(null, res);
+      }
     }
-  });
+  );
 };
 
 Feel.deleteFeelFeedback = (userId, feedbackId, type, result) => {
-  db.query("DELETE FROM feel WHERE userId = ? AND feedbackId = ?", [userId, feedbackId, type], (err, res) => {
-    if (err) {
-      console.log(err);
-      result(err, null);
-      return;
-    } else {
-      result(null, res);
+  db.query(
+    "DELETE FROM feel WHERE userId = ? AND feedbackId = ?",
+    [userId, feedbackId, type],
+    (err, res) => {
+      if (err) {
+        console.log(err);
+        result(err, null);
+        return;
+      } else {
+        result(null, res);
+      }
     }
-  });
-}
+  );
+};
 
 export default Feel;

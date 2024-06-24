@@ -339,7 +339,7 @@ export default function Product({ filter }: Props) {
             >
               <tr className="hover:bg-secondary-c100 hover:text-grey-c700">
                 <th className="pl-3 py-4">No</th>
-                <th className="px-1 py-4">Product name</th>
+                <th className="px-1 py-4">Dish name</th>
                 <th className="px-1 py-4">Description</th>
                 <th className="px-1 py-4">Owner</th>
                 <th className="px-1 py-4">Type</th>

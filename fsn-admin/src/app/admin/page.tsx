@@ -10,33 +10,15 @@ export default function Dashboard() {
   const initRouteByRoles = (role: string) => {
     let route = "/admin";
     switch (role) {
-      // case ROLES.ROOT_ROLE.CODE:
-      //   route = '/admin/app-configuration';
-      //   break;
-      // case ROLES.IT_ADMIN.CODE:
-      //   route = '/admin/app-configuration';
-      //   break;
-      // case ROLES.SUPER_ADMIN.CODE:
-      //   route = '/admin/app-configuration';
-      //   break;
-      // case ROLES.OPERATION_EXEC.CODE:
-      //   route = '/admin/announcement';
-      //   break;
-      // case ROLES.OPERATION_MANAGER.CODE:
-      //   route = '/admin/announcement';
-      //   break;
-      // case ROLES.COMPLIANCE_OFFICER.CODE:
-      //   route = '/admin/announcement';
-      //   break;
-      // case ROLES.COMPLIANCE_MANAGER.CODE:
-      //   route = '/admin/announcement';
-      //   break;
-      // case ROLES.INCIDENT_COMPLIANCE_MANAGER.CODE:
-      //   route = '/admin/logging-ticket';
-      //   break;
-      // case ROLES.INCIDENT_MANAGER_SUPPORT.CODE:
-      //   route = '/admin/logging-ticket';
-      //   break;
+      case ROLES.ROOT_ROLE.CODE:
+        route = '/admin/system-user';
+        break;
+      case ROLES.SUPER_ADMIN.CODE:
+        route = '/admin/system-user';
+        break;
+      case ROLES.OPERATION_MANAGER.CODE:
+        route = '/admin/community';
+        break;
       default:
         route = "/admin";
     }
@@ -49,7 +31,7 @@ export default function Dashboard() {
     if (!userInformation) {
       router.replace("/login");
     } else {
-      let defaultPage = initRouteByRoles(userInformation?.adminRole?.code);
+      let defaultPage = initRouteByRoles(userInformation?.role);
       router.replace(defaultPage);
     }
   }, [router]);

@@ -1,5 +1,5 @@
 import { OAuth2Client } from "google-auth-library";
-import * as JWT from "../common/_JWT.js";
+import * as JWT from "../../common/_JWT.js";
 
 const client = new OAuth2Client();
 async function verifyGoogleToken(token) {

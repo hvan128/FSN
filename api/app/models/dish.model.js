@@ -1,4 +1,4 @@
-import db from "../common/connect.js";
+import db from "../../common/connect.js";
 import Step from "../models/step.model.js";
 import Ingredient from "./ingredient.model.js";
 import Feel from "./feel.model.js";
@@ -144,18 +144,22 @@ Dish.update = (data, result) => {
       result(null, dish);
     }
   });
-};  
+};
 
 Dish.updateStatus = (id, status, result) => {
-  db.query("UPDATE dish SET status = ? WHERE id = ?", [status, id], (err, res) => {
-    if (err) {
-      console.log(err);
-      result(err, null);
-      return;
-    } else {
-      result(null, res);
+  db.query(
+    "UPDATE dish SET status = ? WHERE id = ?",
+    [status, id],
+    (err, res) => {
+      if (err) {
+        console.log(err);
+        result(err, null);
+        return;
+      } else {
+        result(null, res);
+      }
     }
-  });
+  );
 };
 
 Dish.findById = (id, result) => {

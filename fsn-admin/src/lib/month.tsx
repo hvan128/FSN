@@ -3,8 +3,9 @@
 import { BgColor, BorderColor, FontFamily, FontSize, HOVER, TextColor } from '@/enum/setting';
 import React, { useMemo, memo, forwardRef, useState, useRef } from 'react';
 import Typography from './typography';
-import moment from 'moment';
 import Select, { Item } from './select';
+import moment from 'moment';
+
 
 type Props = {
     id?: string

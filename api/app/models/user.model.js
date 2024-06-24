@@ -1,4 +1,4 @@
-import db from "../common/connect.js";
+import db from "../../common/connect.js";
 class User {
   constructor(id, username, password, email) {
     this.id = id;
@@ -96,7 +96,15 @@ User.findByFridgeId = (fridgeId, result) => {
 };
 
 User.getAllUserSystem = (req, result) => {
-  const { sortOrder = 'ASC', sortField = 'id', page = 1, perPage = 10, username, phone, email } = req.body;
+  const {
+    sortOrder = "ASC",
+    sortField = "id",
+    page = 1,
+    perPage = 10,
+    username,
+    phone,
+    email,
+  } = req.body;
 
   let query = "SELECT * FROM user_system";
   let conditions = [];
@@ -138,7 +146,6 @@ User.getAllUserSystem = (req, result) => {
     }
   });
 };
-
 
 User.getUserSystemById = (id, result) => {
   db.query(`SELECT * FROM user_system WHERE id = ${id}`, (err, res) => {

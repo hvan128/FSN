@@ -1,4 +1,4 @@
-import db from "../common/connect.js";
+import db from "../../common/connect.js";
 import Notification from "./notification.model.js";
 class Category {
   constructor(
