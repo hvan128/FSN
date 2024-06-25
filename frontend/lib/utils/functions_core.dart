@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:frontend/config.dart';
-import 'package:frontend/main.dart';
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/theme/color.dart';

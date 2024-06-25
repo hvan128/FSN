@@ -1,5 +1,4 @@
 import 'package:frontend/models/category/category.dart';
-import 'package:frontend/models/community/dish.dart';
 import 'package:frontend/types/food.dart';
 import 'package:frontend/types/type.dart';
 import 'package:frontend/types/user.dart';

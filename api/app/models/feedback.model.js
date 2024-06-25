@@ -1,4 +1,4 @@
-import db from "../common/connect.js";
+import db from "../../common/connect.js";
 class Feedback {
   constructor(userId, dishId, content, image, createdAt, id) {
     this.userId = userId;

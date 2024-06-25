@@ -123,7 +123,7 @@ class _MyTextAreaState extends State<MyTextArea> {
                   ? const SizedBox(width: 6)
                   : const SizedBox(width: 0),
               MyText(
-                text: '$count/${widget.maxLength} characters',
+                text: widget.hasError ? widget.hintText! : '$count/${widget.maxLength} characters',
                 fontSize: FontSize.z13,
                 lineHeight: 1.38,
                 fontWeight: FontWeight.w600,

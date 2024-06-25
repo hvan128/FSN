@@ -91,7 +91,6 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
     for (Feel feel in feels) {
       if (feel.userId == userId) {
         setSelected(feel.type!, true, reactions);
-        break;
       }
     }
   }

@@ -60,6 +60,10 @@ export default (router) => {
     dishController.updateDish(req, res, next);
   });
 
+  router.put("/api/v1/community/dish/status/:id", function (req, res, next) {
+    dishController.updateStatus(req, res, next);
+  })
+
   router.delete("/api/v1/community/dish/feel", function (req, res, next) {
     feelController.deleteFeelDish(req, res, next);
   });

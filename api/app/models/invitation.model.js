@@ -1,4 +1,4 @@
-import db from "../common/connect.js";
+import db from "../../common/connect.js";
 class Invitation {
   constructor(id, senderId, receiverId, fridgeId, createdAt, active) {
     this.id = id;

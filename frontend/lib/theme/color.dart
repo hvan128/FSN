@@ -80,6 +80,33 @@ class MyColors {
     },
   };
 
+  static final green = {
+    'EmeraldGreen': {
+      'c900': const Color(0xFF004D40),
+      'c800': const Color(0xFF00695C),
+      'c700': const Color(0xFF00796B),
+      'c600': const Color(0xFF00897B),
+      'c500': const Color(0xFF009688),
+      'c400': const Color(0xFF26A69A),
+      'c300': const Color(0xFF4DB6AC),
+      'c200': const Color(0xFF80CBC4),
+      'c100': const Color(0xFFB2DFDB),
+      'c50': const Color(0xFFE0F2F1),
+    },
+    'LimeGreen': {
+      'c900': const Color(0xFF827717),
+      'c800': const Color(0xFF9E9D24),
+      'c700': const Color(0xFFAFB42B),
+      'c600': const Color(0xFFC0CA33),
+      'c500': const Color(0xFFCDDC39),
+      'c400': const Color(0xFFD4E157),
+      'c300': const Color(0xFFDCEDC8),
+      'c200': const Color(0xFFE6EE9C),
+      'c100': const Color(0xFFF0F4C3),
+      'c50': const Color(0xFFF9FBE7),
+    },
+  };
+
   static final white = {
     'c900': const Color(0xFFFFFFFF),
   };

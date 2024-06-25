@@ -6,6 +6,7 @@ import 'package:frontend/screens/my_fridge/choose_type_screen.dart';
 import 'package:frontend/screens/my_fridge/create_new_category_screen.dart';
 import 'package:frontend/screens/my_fridge/edit_category_detail_screen.dart';
 import 'package:frontend/screens/my_fridge/message_screen.dart';
+import 'package:frontend/screens/my_fridge/request_new_category.dart';
 
 class RouterMyFridge {
   static const String addCategory = '/add-category';
@@ -16,6 +17,7 @@ class RouterMyFridge {
   static const String chooseIcon = '/choose-icon';
   static const String chooseType = '/choose-type';
   static const String message = '/message';
+  static const String requestNewCategory = '/request-new-category';
 }
 
 Map<String, WidgetBuilder> myFridgeRoutes = {
@@ -28,4 +30,5 @@ Map<String, WidgetBuilder> myFridgeRoutes = {
   RouterMyFridge.chooseIcon: (context) => const ChooseIconScreen(),
   RouterMyFridge.chooseType: (context) => const ChooseTypeScreen(),
   RouterMyFridge.message: (context) => const MessageScreen(),
+  RouterMyFridge.requestNewCategory: (context) => const RequestNewCategoryScreen(),
 };

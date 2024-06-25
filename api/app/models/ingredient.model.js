@@ -1,4 +1,4 @@
-import db from "../common/connect.js";
+import db from "../../common/connect.js";
 class Ingredient {
   constructor(category, quantity, unit, id, dishId) {
     this.category = category;
@@ -27,7 +27,7 @@ Ingredient.deleteIngredientByDishId = (dishId, result) => {
       return;
     }
   });
-}
+};
 
 Ingredient.getIngredientsByDishId = (dishId, result) => {
   db.query(
@@ -35,16 +35,14 @@ Ingredient.getIngredientsByDishId = (dishId, result) => {
     [dishId],
     (err, res) => {
       if (err) {
-        console.log(err);  
+        console.log(err);
         result(err, null);
         return;
       } else {
-        result(null, res);  
+        result(null, res);
       }
     }
-  ); 
+  );
 };
-
-
 
 export default Ingredient;
