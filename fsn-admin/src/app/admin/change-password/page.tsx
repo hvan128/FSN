@@ -1,11 +1,11 @@
+import Main from "@/components/change-password/main";
 import { Metadata } from "next";
-import Main from "@/components/request/main";
 
 export const metadata: Metadata = {
-  title: "Customer management | iFridge-Admin",
+  title: "Change password | iFridge-Admin",
   description: "Admin portal for iFridge staff",
 };
 
-export default function Request() {
+export default function ChangePassword() {
   return <Main></Main>;
 }

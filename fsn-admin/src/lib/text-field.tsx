@@ -14,6 +14,7 @@ type Props = {
     type?: "text" | "password", // input only
     fullWidth?: boolean,
     disabled?: boolean,
+    read?: boolean,
     boxClassName?: string,
     multiline?: boolean,
     error?: boolean,
@@ -45,6 +46,7 @@ const TextField = forwardRef<TextFieldRef, TextFieldProps>(
             boxClassName = '',
             multiline,
             rows,
+            read = false,
             error,
             helperText,
             placeholder,
@@ -78,6 +80,11 @@ const TextField = forwardRef<TextFieldRef, TextFieldProps>(
                 ${TextColor.GREY_900}
                 ${BorderColor.GREY_400}
                 `,
+                'read': `
+                ${BgColor.TRANSPARENT}
+                ${TextColor.PRIMARY_700}
+                ${BorderColor.GREY_200}
+                `,
             }
         }, [])
 
@@ -105,7 +112,7 @@ const TextField = forwardRef<TextFieldRef, TextFieldProps>(
                         py-1 xl:py-1.5
                         ${className}
                     `}
-                    disabled={disabled}
+                    disabled={disabled || read} 
                     value={value}
                     onBlur={() => setFocus(false)}
                     onFocus={() => setFocus(true)}
@@ -177,6 +184,7 @@ const TextField = forwardRef<TextFieldRef, TextFieldProps>(
                         ${!label ? 'pt-2 mt-2.5' : ''}
                         ${disabled ? `${colorAttitude['disable']}` :
                             error ? `${colorAttitude['error']} ${!focus && HOVER.BorderColor.SUPPORT}` :
+                                read ? `${colorAttitude['read']}` :
                                 `${colorAttitude['normal']} ${!focus && HOVER.BorderColor.PRIMARY}`}
                         ${boxClassName}
                     `}

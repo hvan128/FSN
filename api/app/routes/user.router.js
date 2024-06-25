@@ -33,6 +33,10 @@ export default (router) => {
     UserController.update(req, res);
   });
 
+  router.put("/api/v1/admin/change-password", function (req, res) {
+    UserController.changePassword(req, res);
+  })
+
   router.delete("/api/v1/admin/user/:id", function (req, res, next) {
     UserController.deleteUserSystem(req, res, next);
   });

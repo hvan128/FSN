@@ -62,6 +62,19 @@ type ProductFilterProps = {
     type: string
 }
 
+type RequestFilterProps = {
+    status: string
+}
+
+type RequestProps = {
+    id: string
+    name: string
+    description: string
+    status: string
+    createdAt: string
+    updatedAt: string
+}
+
 //Product type
 type ProductProps = {
     label: string
@@ -105,4 +118,9 @@ type RecordWhitelistFilterProps = {
     cid: string
     phone: string
     status: string
+}
+
+type AnnouncementFilterProps = {
+    title: string
+    status: string | null
 }

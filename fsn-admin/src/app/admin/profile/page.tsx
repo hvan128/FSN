@@ -1,11 +1,11 @@
+import Main from "@/components/profile/main";
 import { Metadata } from "next";
-import Main from "@/components/request/main";
 
 export const metadata: Metadata = {
-  title: "Customer management | iFridge-Admin",
+  title: "Profile | iFridge-Admin",
   description: "Admin portal for iFridge staff",
 };
 
-export default function Request() {
+export default function Profile() {
   return <Main></Main>;
 }

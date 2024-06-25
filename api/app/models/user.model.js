@@ -170,6 +170,28 @@ User.update = (data, result) => {
   });
 };
 
+User.changePassword = (data, result) => {
+  db.query('SELECT password FROM user_system WHERE id = ?', [data.id], (err, res) => {
+    if (err) {
+      console.log(err);
+      result(err, null);
+    } else {
+      if (res[0].password == data.oldPassword) {
+        db.query('UPDATE user_system SET password = ? WHERE id = ?', [data.newPassword, data.id], (err, res) => {
+          if (err) {
+            console.log(err);
+            result(err, null);
+          } else {
+            result(null, { id: data.id, ...data });
+          }
+        });
+      } else {
+        result({ kind: "invalid" }, null);
+      }
+    }
+  })
+}
+
 User.deleteFridge = (fridgeId, result) => {
   db.query(
     `UPDATE users SET fridgeId = NULL WHERE fridgeId = ${fridgeId}`,

@@ -20,4 +20,5 @@ class Config {
   static const String COMMUNITY_API = "/api/v1/community";
   static const String SEND_NOTIFICATION_API = "/api/v1/send-notification";
   static const String NOTIFICATION_API = "/api/v1/notification";
+  static const String REQUEST_API = "/api/v1/request";
 }

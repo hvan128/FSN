@@ -15,10 +15,10 @@ export default function ListItem({ items }: Props) {
     const pathname = usePathname();
     const dispatch = useDispatch();
 
-    // useEffect(() => {
-    //     let userInformation = storage.getUserInforFromLocalStorage();
-    //     setAdminRole(userInformation?.adminRole?.code);
-    // }, []);
+    useEffect(() => {
+        let userInformation = storage.getUserInforFromLocalStorage();
+        setAdminRole(userInformation?.role);
+    }, []);
 
     const handleCloseSidebar = () => {
         dispatch(closeSidebar());

@@ -5,6 +5,7 @@ import 'package:frontend/models/category/category.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/my_fridge/add_category_detail_screen.dart';
 import 'package:frontend/screens/my_fridge/create_new_category_screen.dart';
+import 'package:frontend/screens/my_fridge/request_new_category.dart';
 import 'package:frontend/screens/search/search_screen.dart';
 import 'package:frontend/services/category/category_service.dart';
 import 'package:frontend/theme/color.dart';
@@ -69,15 +70,33 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                 ? selectedFood!.label
                 : "Thêm đồ ăn",
             bgColor: MyColors.white['c900']!,
-            rightIcon: IconButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const SearchScreen()));
-                },
-                icon: Image.asset('assets/icons/i16/search.png',
-                    width: 25, height: 25, color: MyColors.grey['c900']!)),
+            rightIcon: Row(
+              children: [
+                IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SearchScreen()));
+                    },
+                    icon: Image.asset('assets/icons/i16/search.png',
+                        width: 25, height: 25, color: MyColors.grey['c900']!)),
+                IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const RequestNewCategoryScreen()));
+                  },
+                  icon: Icon(
+                    Icons.post_add,
+                    size: 27,
+                    color: MyColors.grey['c900']!,
+                  ),
+                )
+              ],
+            ),
             leftIcon: IconButton(
                 icon: Icon(
                   Icons.close,
@@ -155,9 +174,10 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                                                     CreateNewCategoryScreen(
                                                       type: selectedFood!.value,
                                                     ))).then((value) {
-                                                      APICacheManager().deleteCache('categories_new');
-                                                      fetchNewCategory();
-                                                    });
+                                          APICacheManager()
+                                              .deleteCache('categories_new');
+                                          fetchNewCategory();
+                                        });
                                       },
                                       child: Padding(
                                         padding: const EdgeInsets.only(left: 9),

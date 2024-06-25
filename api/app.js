@@ -7,6 +7,7 @@ import fridgeRouter from "./app/routes/fridge.router.js";
 import invitationRouter from "./app/routes/invitation.router.js";
 import communityRouter from "./app/routes/community.router.js";
 import notificationRouter from "./app/routes/notification.router.js";
+import requestRouter from "./app/routes/request.router.js";
 import * as middleware from "./app/middleware/auth.js";
 import bodyParser from "body-parser";
 import errorHandler from "./app/middleware/errors.js";
@@ -47,6 +48,7 @@ userRouter(app);
 fridgeRouter(app);
 invitationRouter(app);
 communityRouter(app);
+requestRouter(app);
 app.use(errorHandler);
 
 app.listen(port, () => {

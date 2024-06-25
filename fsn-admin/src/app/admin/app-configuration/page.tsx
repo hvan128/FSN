@@ -1,11 +1,11 @@
+import Main from "@/components/app-configuration/main";
 import { Metadata } from "next";
-import Main from "@/components/request/main";
 
 export const metadata: Metadata = {
-  title: "Customer management | iFridge-Admin",
+  title: "App configuration | iFridge-Admin",
   description: "Admin portal for iFridge staff",
 };
 
-export default function Request() {
+export default function AppConfiguration() {
   return <Main></Main>;
 }

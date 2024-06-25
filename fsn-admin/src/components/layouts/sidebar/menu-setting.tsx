@@ -43,7 +43,6 @@ const manageItem: Array<MenuItemProps> = [
     icon: <NotificationImportantIcon></NotificationImportantIcon>,
     roles: [
       ROLES.SUPER_ADMIN.CODE,
-      ROLES.OPERATION_MANAGER.CODE,
       ROLES.ROOT_ROLE.CODE,
     ],
   },
@@ -71,18 +70,18 @@ const manageItem: Array<MenuItemProps> = [
       ROLES.ROOT_ROLE.CODE,
     ],
   },
-  {
-    id: "app-whitelist",
-    title: "Whitelist",
-    type: "item",
-    url: "/admin/white-list",
-    icon: <VerifiedUserIcon></VerifiedUserIcon>,
-    roles: [
-      ROLES.SUPER_ADMIN.CODE,
-      ROLES.OPERATION_MANAGER.CODE,
-      ROLES.ROOT_ROLE.CODE,
-    ],
-  },
+  // {
+  //   id: "app-whitelist",
+  //   title: "Whitelist",
+  //   type: "item",
+  //   url: "/admin/white-list",
+  //   icon: <VerifiedUserIcon></VerifiedUserIcon>,
+  //   roles: [
+  //     ROLES.SUPER_ADMIN.CODE,
+  //     ROLES.OPERATION_MANAGER.CODE,
+  //     ROLES.ROOT_ROLE.CODE,
+  //   ],
+  // },
 ];
 const management: MenuGroupProps = {
   id: "app-manage",

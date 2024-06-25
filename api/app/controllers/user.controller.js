@@ -107,6 +107,22 @@ export const update = (req, res) => {
   });
 };
 
+export const changePassword = (req, res) => {
+  User.changePassword(req.body, (err, data) => {
+    if (err) {
+      if (err.kind === "not_found") {
+        res.status(404).send({
+          message: `Not found User with id ${req.body.id}.`,
+        });
+      } else {
+        res.status(500).send({
+          message: "Error updating User with id " + req.body.id,
+        });
+      }
+    } else res.send(data);
+  });
+};
+
 export const deleteFridge = (req, res, next) => {
   User.deleteFridge(req.params.id, (err, data) => {
     if (err) {

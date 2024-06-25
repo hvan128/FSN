@@ -11,10 +11,10 @@ export default function Dashboard() {
     let route = "/admin";
     switch (role) {
       case ROLES.ROOT_ROLE.CODE:
-        route = '/admin/system-user';
+        route = '/admin/app-configuration';
         break;
       case ROLES.SUPER_ADMIN.CODE:
-        route = '/admin/system-user';
+        route = '/admin/app-configuration';
         break;
       case ROLES.OPERATION_MANAGER.CODE:
         route = '/admin/community';
@@ -31,7 +31,9 @@ export default function Dashboard() {
     if (!userInformation) {
       router.replace("/login");
     } else {
+      console.log(userInformation?.role);
       let defaultPage = initRouteByRoles(userInformation?.role);
+      console.log(defaultPage);
       router.replace(defaultPage);
     }
   }, [router]);
