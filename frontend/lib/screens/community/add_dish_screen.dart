@@ -889,6 +889,7 @@ class _AddDishScreenState extends State<AddDishScreen> {
       ingredients: ingredients,
       cookingTime: _cookingTimeController.text,
       type: dishType,
+      status: 'PENDING',
     );
     final response = await DishService.updateDish(dishModel, fileSelected);
     if (response) {

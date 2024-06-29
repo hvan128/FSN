@@ -14,6 +14,7 @@ class Dish {
     cookingTime,
     rangeOfPeople,
     type,
+    status,
     id
   ) {
     this.ownerId = ownerId;
@@ -23,6 +24,7 @@ class Dish {
     this.cookingTime = cookingTime;
     this.rangeOfPeople = rangeOfPeople;
     this.type = type;
+    this.status = status;
     this.id = id;
   }
 }
@@ -96,6 +98,7 @@ Dish.update = (data, result) => {
     ingredients,
     steps,
     rangeOfPeople,
+    status,
     id,
   } = data;
 
@@ -107,6 +110,7 @@ Dish.update = (data, result) => {
     cookingTime,
     rangeOfPeople,
     type,
+    status,
     id
   );
 
@@ -238,14 +242,14 @@ Dish.findById = (id, result) => {
     });
 };
 
-Dish.findByOwnerId = (ownerId, page, pageSize, type, result) => {
+Dish.findByOwnerId = (ownerId, page, pageSize, type, status, result) => {
   var offset = (page - 1) * pageSize;
   var limit = pageSize;
   var totalDishes = 0;
   var dishes = [];
 
   db.query(
-    `SELECT COUNT(*) as total FROM dish WHERE ownerId = ${ownerId} AND type = '${type}'`,
+    `SELECT COUNT(*) as total FROM dish WHERE ownerId = ${ownerId} AND type = '${type}' AND status = '${status}'`,
     (err, countResult) => {
       if (err) {
         console.log(err);
@@ -255,97 +259,109 @@ Dish.findByOwnerId = (ownerId, page, pageSize, type, result) => {
       totalDishes = countResult[0].total;
 
       db.query(
-        `SELECT * FROM dish WHERE ownerId = ${ownerId} AND type = '${type}' LIMIT ${limit} OFFSET ${offset}`,
+        `SELECT * FROM dish WHERE ownerId = ${ownerId} AND type = '${type}' AND status = '${status}' LIMIT ${limit} OFFSET ${offset}`,
         (err, res) => {
+          console.log(res);
           if (err) {
             console.log(err);
             result(err, null);
             return;
-          }
-
-          res.forEach((dish) => {
-            var dishId = dish.id;
-            var stepsPromise = new Promise((resolve, reject) => {
-              Step.getStepsByDishId(dishId, (err, steps) => {
-                if (err) {
-                  reject(err);
-                } else {
-                  resolve(steps);
-                }
-              });
+          } else if (res.length === 0) {
+            result(null, {
+              totalItems: totalDishes,
+              totalPages: Math.ceil(totalDishes / pageSize),
+              currentPage: page,
+              data: dishes,
             });
-
-            var ingredientsPromise = new Promise((resolve, reject) => {
-              Ingredient.getIngredientsByDishId(dishId, (err, ingredients) => {
-                if (err) {
-                  reject(err);
-                } else {
-                  resolve(ingredients);
-                }
-              });
-            });
-
-            var feelsPromise = new Promise((resolve, reject) => {
-              Feel.findByDishId(dishId, (err, feels) => {
-                if (err) {
-                  reject(err);
-                } else {
-                  resolve(feels);
-                }
-              });
-            });
-
-            var savesPromise = new Promise((resolve, reject) => {
-              Save.findByDishId(dishId, (err, saves) => {
-                if (err) {
-                  reject(err);
-                } else {
-                  resolve(saves);
-                }
-              });
-            });
-            var userPromise = new Promise((resolve, reject) => {
-              User.findById(dish.ownerId, (err, [owner]) => {
-                if (err) {
-                  reject(err);
-                } else {
-                  resolve(owner);
-                }
-              });
-            });
-
-            Promise.all([
-              stepsPromise,
-              ingredientsPromise,
-              feelsPromise,
-              savesPromise,
-              userPromise,
-            ])
-              .then(([steps, ingredients, feels, saves, owner]) => {
-                dishes.push({
-                  ...dish,
-                  steps,
-                  ingredients,
-                  feels,
-                  saves,
-                  owner,
+            return;
+          } else {
+            res.forEach((dish) => {
+              var dishId = dish.id;
+              var stepsPromise = new Promise((resolve, reject) => {
+                Step.getStepsByDishId(dishId, (err, steps) => {
+                  if (err) {
+                    reject(err);
+                  } else {
+                    resolve(steps);
+                  }
                 });
-
-                if (dishes.length === res.length) {
-                  var response = {
-                    totalItems: totalDishes,
-                    totalPages: Math.ceil(totalDishes / pageSize),
-                    currentPage: page,
-                    data: dishes,
-                  };
-                  result(null, response);
-                }
-              })
-              .catch((err) => {
-                console.log(err);
-                result(err, null);
               });
-          });
+
+              var ingredientsPromise = new Promise((resolve, reject) => {
+                Ingredient.getIngredientsByDishId(
+                  dishId,
+                  (err, ingredients) => {
+                    if (err) {
+                      reject(err);
+                    } else {
+                      resolve(ingredients);
+                    }
+                  }
+                );
+              });
+
+              var feelsPromise = new Promise((resolve, reject) => {
+                Feel.findByDishId(dishId, (err, feels) => {
+                  if (err) {
+                    reject(err);
+                  } else {
+                    resolve(feels);
+                  }
+                });
+              });
+
+              var savesPromise = new Promise((resolve, reject) => {
+                Save.findByDishId(dishId, (err, saves) => {
+                  if (err) {
+                    reject(err);
+                  } else {
+                    resolve(saves);
+                  }
+                });
+              });
+              var userPromise = new Promise((resolve, reject) => {
+                User.findById(dish.ownerId, (err, [owner]) => {
+                  if (err) {
+                    reject(err);
+                  } else {
+                    resolve(owner);
+                  }
+                });
+              });
+
+              Promise.all([
+                stepsPromise,
+                ingredientsPromise,
+                feelsPromise,
+                savesPromise,
+                userPromise,
+              ])
+                .then(([steps, ingredients, feels, saves, owner]) => {
+                  dishes.push({
+                    ...dish,
+                    steps,
+                    ingredients,
+                    feels,
+                    saves,
+                    owner,
+                  });
+
+                  if (dishes.length === res.length) {
+                    var response = {
+                      totalItems: totalDishes,
+                      totalPages: Math.ceil(totalDishes / pageSize),
+                      currentPage: page,
+                      data: dishes,
+                    };
+                    result(null, response);
+                  }
+                })
+                .catch((err) => {
+                  console.log(err);
+                  result(err, null);
+                });
+            });
+          }
         }
       );
     }
@@ -385,6 +401,11 @@ Dish.findByIngredients = (ingredient1, ingredient2, page, pageSize, result) => {
           matchedDishes = Array.from(matchedDishes);
 
           const totalCount = matchedDishes.length;
+
+          if (totalCount === 0) {
+            result(null, { total: 0, data: [] });
+            return;
+          }
 
           const paginatedDishes = matchedDishes.slice(
             offset,
@@ -486,7 +507,7 @@ Dish.getDishByKeyword = (keyword, type, page, pageSize, result) => {
       END) AS ingredient_score
     FROM dish d
     LEFT JOIN ingredient i ON d.id = i.dishId
-    WHERE (${dishConditions}) OR (${ingredientConditions})
+    WHERE (${dishConditions}) OR (${ingredientConditions}) AND d.status = 'APPROVED'
     ORDER BY (label_score + description_score + ingredient_score) DESC, d.createdAt DESC
     LIMIT ? OFFSET ?
   `;
@@ -511,6 +532,10 @@ Dish.getDishByKeyword = (keyword, type, page, pageSize, result) => {
         return;
       }
       const totalCount = countResult[0].total;
+      if (totalCount === 0) {
+        result(null, { total: 0, data: [] });
+        return;
+      }
       let uniqueIds = {};
       let dishes = [];
       for (let item of res) {
@@ -556,6 +581,10 @@ Dish.getAllDish = (page, pageSize, type, status, result) => {
       }
 
       const totalCount = countResult[0].total;
+      if (totalCount === 0) {
+        result(null, { total: 0, data: [] });
+        return;
+      } 
 
       db.query(
         `SELECT id FROM dish WHERE type = '${type}' AND status = '${status}' ORDER BY createdAt DESC LIMIT ${pageSize} OFFSET ${offset}`,
@@ -565,7 +594,6 @@ Dish.getAllDish = (page, pageSize, type, status, result) => {
             result(err, null);
             return;
           }
-          console.log(res);
 
           var promises = res.map((dishId) => {
             return new Promise((resolve, reject) => {
@@ -602,7 +630,7 @@ Dish.getSavedDishesByUserId = (userId, page, pageSize, type, callback) => {
       SELECT d.id
       FROM saved_dish sd
       JOIN dish d ON sd.dishId = d.id
-      WHERE sd.userId = ${userId} AND d.type = '${type}'
+      WHERE sd.userId = ${userId} AND d.type = '${type}' AND d.status = 'APPROVED'
       ORDER BY sd.savedAt DESC
       LIMIT ${pageSize} OFFSET ${offset}
     `;
@@ -611,6 +639,8 @@ Dish.getSavedDishesByUserId = (userId, page, pageSize, type, callback) => {
       console.error("Error fetching saved dishes:", err);
       callback(err, null);
       return;
+    } else if (results.length === 0) {
+      callback(null, { total: 0, data: [] });
     } else {
       const promises = results.map((dish) => {
         return new Promise((resolve, reject) => {

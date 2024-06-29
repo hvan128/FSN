@@ -441,7 +441,7 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
               'receiverToken': element.fcmToken,
               'title': 'Tủ lạnh',
               'body':
-                  '${element.displayName} đã thêm mới một đồ ăn vào tủ lạnh!',
+                  '${currentUser.displayName} đã thêm mới một đồ ăn vào tủ lạnh!',
               'data': {
                 'type': 'category',
                 'categoryId': category.id.toString(),

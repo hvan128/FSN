@@ -71,6 +71,7 @@ export const updateDish = (req, res, next) => {
         label: body.label,
         description: body.description,
         type: body.type,
+        status: body.status,
         image: fileSelected.some((file) => file === "image")
           ? file.image[0].filename
           : body.image,
@@ -126,8 +127,8 @@ export const getDishByOwnerId = (req, res, next) => {
   var page = req.query.page || 1;
   var pageSize = req.query.pageSize || 10;
   var type = req.query.type || 'recipes';
-  Dish.findByOwnerId(ownerId, page, pageSize, type, (err, result) => {
-    console.log('abc');  
+  var status = req.query.status || 'approved';
+  Dish.findByOwnerId(ownerId, page, pageSize, type, status, (err, result) => {
     if (err) {
       console.log('error', err);
       next(err);

@@ -606,9 +606,8 @@ class FunctionCore {
 
   static DateTime convertTime(String time) {
     DateTime date = !time.endsWith('Z')
-        ? DateFormat("yyyy-MM-ddTHH:mm:ss.SSS").parseUTC(time).toLocal()
+        ? DateFormat("yyyy-MM-ddTHH:mm:ss.SSS").parseUtc(time).toLocal()
         : DateFormat("yyyy-MM-ddTHH:mm:ss.SSS'Z'").parseUtc(time).toLocal();
-
     return date;
   }
 
@@ -623,7 +622,7 @@ class FunctionCore {
 
     if (difference.inDays > 0) {
       if (difference.inDays > 30) {
-        return '${date.minute}: ${date.hour} ngày ${date.day}/${date.month}/${date.year}';
+        return '${date.hour}:${date.minute} ngày ${date.day}/${date.month}/${date.year}';
       } else {
         return '${difference.inDays} ngày trước';
       }

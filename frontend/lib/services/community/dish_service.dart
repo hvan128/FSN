@@ -2,8 +2,11 @@ import 'dart:convert';
 
 import 'package:frontend/config.dart';
 import 'package:frontend/models/user/user.dart';
+import 'package:frontend/navigation/navigation.dart';
+import 'package:frontend/provider/user.dart';
 import 'package:frontend/services/api_service.dart';
 import 'package:frontend/services/auth/shared_service.dart';
+import 'package:provider/provider.dart';
 import '../../models/community/dish.dart';
 import 'package:http/http.dart' as http;
 
@@ -69,6 +72,7 @@ class DishService {
     request.fields['ingredients'] = jsonEncode(ingredients);
     request.fields['steps'] = jsonEncode(steps);
     request.fields['id'] = dish.id!.toString();
+    request.fields['status'] = dish.status!;
     if (fileSelected.contains('image')) {
       http.MultipartFile multipartFile = await http.MultipartFile.fromPath(
         'image',
@@ -103,7 +107,8 @@ class DishService {
     final queryParams = {
       'page': page.toString(),
       'pageSize': pageSize.toString(),
-      'type': type
+      'type': type,
+      'status': 'approved',
     };
     await ApiService.get(Config.DISH_API, queryParams: queryParams)
         .then((value) {
@@ -125,18 +130,26 @@ class DishService {
         dishes = dishFromJson(data);
       }
     });
-    return dishes;
+    return dishes.where((dish) => dish.status == 'approved').toList();
   }
 
   static Future<Map<String, dynamic>> getDishByOwnerId(
-      int? ownerId, int page, int pageSize, String? type) async {
+      int? ownerId, int page, int pageSize, String? type,
+      [String? status]) async {
     List<Dish> dishes = [];
     int total = 0;
-    final queryParams = {
-      'page': page.toString(),
-      'pageSize': pageSize.toString(),
-      'type': type
-    };
+    final queryParams = status != null
+        ? {
+            'page': page.toString(),
+            'pageSize': pageSize.toString(),
+            'type': type,
+            'status': status
+          }
+        : {
+            'page': page.toString(),
+            'pageSize': pageSize.toString(),
+            'type': type
+          };
     await ApiService.get('${Config.DISH_API}/owner/$ownerId',
             queryParams: queryParams)
         .then((value) {
@@ -221,12 +234,13 @@ class DishService {
       'dishId': feel.dishId,
       'feedbackId': feel.feedbackId
     };
+    var user = Provider.of<UserProvider>(Navigate().navigationKey.currentContext!, listen: false).user;
     await ApiService.post('${Config.DISH_API}/feel', model);
     if (owner != null && owner.fcmToken != null) {
       await ApiService.post(Config.SEND_NOTIFICATION_API, {
         'receiverToken': owner.fcmToken,
         'title': 'Thông báo',
-        'body': '${owner.displayName} đã bày tỏ cảm xúc vào bài viết của bạn!',
+        'body': '${user?.displayName} đã bày tỏ cảm xúc vào bài viết của bạn!',
         'data': {
           'type': 'category',
         }
