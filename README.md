@@ -1,5 +1,4 @@
-# FNS Project Setup Guide
------------------------
+## FNS Project Setup Guide
 
 Welcome to the FNS project! This guide will walk you through the steps required to set up and run the project locally. The project consists of multiple components organized into different folders as follows:
 
@@ -12,9 +11,9 @@ Welcome to the FNS project! This guide will walk you through the steps required 
 
 ### Prerequisites
 
--   Docker
--   Flutter SDK
--   MySQL Server
+- Docker
+- Flutter SDK
+- MySQL Server
 
 ### Step-by-Step Setup Instructions
 
@@ -22,17 +21,13 @@ Welcome to the FNS project! This guide will walk you through the steps required 
 
 Ensure you have MySQL Server installed and running on your local machine. You will need the following details:
 
--   MySQL username
--   MySQL password
--   MySQL database name
+- MySQL username
+- MySQL password
+- MySQL database name
 
 #### 2\. Running Docker Containers
 
 Navigate to the `docker` folder and run the following command to start the admin, api, and MySQL containers:
-
-sh
-
-Copy code
 
 `docker compose -p fsn up -d`
 
@@ -50,19 +45,11 @@ If you do not have Flutter installed, follow the official Flutter installation g
 
 Run the following command to ensure Flutter is set up correctly:
 
-sh
-
-Copy code
-
 `flutter doctor`
 
 ##### 3.3. Install Dependencies
 
 Run the following command to install the necessary dependencies for the project:
-
-sh
-
-Copy code
 
 `flutter pub get`
 
@@ -70,25 +57,13 @@ Copy code
 
 To run the Flutter application, use the following command:
 
-sh
-
-Copy code
-
 `flutter run`
 
 You might need to specify the device if multiple devices are connected. You can list connected devices using:
 
-sh
-
-Copy code
-
 `flutter devices`
 
 Then run the application on a specific device:
-
-sh
-
-Copy code
 
 `flutter run -d <device_id>`
 
@@ -102,19 +77,11 @@ Navigate to the `fsn-admin` folder and follow these steps:
 
 Make sure you have Node.js and npm installed. Then run the following command to install the necessary dependencies:
 
-sh
-
-Copy code
-
 `npm install`
 
 ##### 4.2. Run the Next.js Application
 
 To start the Next.js application, use the following command:
-
-sh
-
-Copy code
 
 `npm run dev`
 
