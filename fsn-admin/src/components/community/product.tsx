@@ -53,18 +53,6 @@ export default function Product({ filter }: Props) {
     return data;
   };
 
-  // const { data, loading, refetch } = useQuery(GET_ALL_PRODUCT, {
-  //     variables: {
-  //         filter: getFilterValue(),
-  //         options: {
-  //             page: page + 1,
-  //             perPage: rowsPage,
-  //             sortOrder: order,
-  //             sortField: orderBy,
-  //         }
-  //     },
-  // });
-
   const dispatch = useDispatch();
   const refetchQueries = useSelector((state: RootState) => state.refetch.time);
 
@@ -185,7 +173,6 @@ export default function Product({ filter }: Props) {
               status: item.status === "ACTIVE" ? "DISABLE" : "ACTIVE",
             },
           };
-          // await updateProduct({ variables });
           dispatch(
             openAlert({
               isOpen: true,
@@ -195,38 +182,10 @@ export default function Product({ filter }: Props) {
             })
           );
           dispatch(closeConfirm());
-          // refetch();
         } catch (error: any) {}
       },
     };
     dispatch(openConfirm(confirm));
-  };
-
-  const handleDeleteProduct = (item: ProductProps) => {
-    const confirm = {
-      isOpen: true,
-      title: "CONFIRM TO DO NEXT STEP",
-      message: "Are you sure you want to remove this product?",
-      feature: DELETE_PRODUCT,
-      onConfirm: async () => {
-        try {
-          const variables = {
-            deleteProductId: parseInt(item.id),
-          };
-          // await deleteProduct({ variables });
-          dispatch(
-            openAlert({
-              isOpen: true,
-              title: "DELETE PRODUCT",
-              message: `You've removed this product successfully`,
-              type: "success",
-            })
-          );
-          dispatch(closeConfirm());
-          // refetch();
-        } catch (error: any) {}
-      },
-    };
   };
 
   //Hiển thị các product
@@ -247,15 +206,15 @@ export default function Product({ filter }: Props) {
         <td className="px-1 py-4">
           {item.image && (
             <Image
-              onClick={() => handleOpenImageDetail(convertImageUrl(item.image))}
-              alt="Product"
-              loader={() => convertImageUrl(item.image)}
-              src={convertImageUrl(item.image)}
-              unoptimized
-              width="0"
-              height="0"
-              className="w-[200px] h-auto rounded-lg cursor-pointer"
-            ></Image>
+            onClick={() => handleOpenImageDetail(convertImageUrl(item.image))}
+            alt="Product"
+            loader={() => convertImageUrl(item.image)}
+            src={convertImageUrl(item.image)}
+            unoptimized
+            width={200}
+            height={200}
+            className="rounded-lg cursor-pointer object-cover w-[200px] h-[200px]"
+          />
           )}
         </td>
 
@@ -289,21 +248,23 @@ export default function Product({ filter }: Props) {
               </div>
             )}
 
-            {item.status !== "REJECTED" && <div>
-              <Tooltip title="Reject request">
-                <RemoveCircleOutlineIcon
-                  color="error"
-                  className="hover:cursor-pointer"
-                  onClick={() =>
-                    handleReject(
-                      item.id,
-                      "REJECTED",
-                      `You've rejected the post.`
-                    )
-                  }
-                />
-              </Tooltip>
-            </div>}
+            {item.status !== "REJECTED" && (
+              <div>
+                <Tooltip title="Reject request">
+                  <RemoveCircleOutlineIcon
+                    color="error"
+                    className="hover:cursor-pointer"
+                    onClick={() =>
+                      handleReject(
+                        item.id,
+                        "REJECTED",
+                        `You've rejected the post.`
+                      )
+                    }
+                  />
+                </Tooltip>
+              </div>
+            )}
           </div>
         </td>
       </tr>

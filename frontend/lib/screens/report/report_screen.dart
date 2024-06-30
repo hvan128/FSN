@@ -15,7 +15,6 @@ import 'package:frontend/widgets/calendar_picker/shared/picker_type.dart';
 import 'package:frontend/widgets/card_header.dart';
 import 'package:frontend/widgets/charts/donut_chart.dart';
 import 'package:frontend/widgets/divider.dart';
-import 'package:frontend/widgets/header.dart';
 import 'package:frontend/widgets/text.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
