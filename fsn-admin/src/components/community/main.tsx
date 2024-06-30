@@ -9,7 +9,6 @@ import { useDispatch } from "react-redux";
 import Product from "./product";
 import { useState } from "react";
 import Select from "@/lib/select";
-import AddProduct from "./modals/add-product";
 import { openModal } from "@/redux/slice/modalSlice";
 import { refetchComponent } from "@/redux/slice/refetchSlice";
 
@@ -125,17 +124,6 @@ export default function Main() {
     );
   };
 
-  // Open add product modal
-  const handleOpenAddProduct = () => {
-    const modal = {
-      isOpen: true,
-      title: "Add product",
-      content: <AddProduct></AddProduct>,
-      screen: SCREEN.BASE,
-    };
-    dispatch(openModal(modal));
-  };
-
   return (
     <div className="flex flex-col grow bg-white rounded-2xl px-4 py-4 min-h-[800px]">
       {/* Header */}
@@ -149,15 +137,6 @@ export default function Main() {
             {" "}
             Product{" "}
           </Typography>
-        </div>
-        <div>
-          <Button
-            color="primary"
-            endIcon={<AddCircleOutlineIcon></AddCircleOutlineIcon>}
-            onClick={handleOpenAddProduct}
-          >
-            Add product
-          </Button>
         </div>
       </div>
       {/* Divider */}

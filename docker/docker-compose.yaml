@@ -13,7 +13,7 @@ services:
 
   backend:
     build: 
-      context: ../../api
+      context: ../api
       dockerfile: Dockerfile
     restart: unless-stopped
     environment:
@@ -22,4 +22,13 @@ services:
     ports:
       - '8000:8000'
 
-# docker compose -p fsn-nodejs-mysql up -d
+  frontend:
+      build:
+        context: ../fsn-admin
+        dockerfile: Dockerfile
+      ports:
+        - '3000:3000'  
+      expose:
+        - 3000
+
+# docker compose -p fsn up -d

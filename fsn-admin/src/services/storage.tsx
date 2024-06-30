@@ -1,49 +1,90 @@
 class Storage {
   getLocalRefreshToken() {
-    return localStorage.getItem('refreshToken');
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('refreshToken');
+    }
   }
+
   getLocalAccessToken() {
-    return localStorage.getItem('accessToken');
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('accessToken');
+    }
   }
+
   getLocalUserId() {
-    return localStorage.getItem('userId');
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('userId');
+    }
   }
+
   getLocalListService() {
-    const listServices = localStorage.getItem('listService');
-    return JSON.parse(listServices!);
+    if (typeof window !== 'undefined') {
+      const listServices = localStorage.getItem('listService');
+      return listServices ? JSON.parse(listServices) : null;
+    }
   }
-  updateLocalAccessToken(accessToken : string) {
-    localStorage.setItem('accessToken', accessToken);
+
+  updateLocalAccessToken(accessToken: string) {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('accessToken', accessToken);
+    }
   }
-  updateLocalRefreshToken(refreshToken : string) {
-    localStorage.setItem('refreshToken', refreshToken);
+
+  updateLocalRefreshToken(refreshToken: string) {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('refreshToken', refreshToken);
+    }
   }
+
   updateLocalUserId(userId: string) {
-    localStorage.setItem('userId', userId);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('userId', userId);
+    }
   }
-  updateLocalListService(listServices : any) {
-    localStorage.setItem('listService', JSON.stringify(listServices));
+
+  updateLocalListService(listServices: any) {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('listService', JSON.stringify(listServices));
+    }
   }
+
   removeAccessToken() {
-    localStorage.removeItem('accessToken');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('accessToken');
+    }
   }
+
   removeRefreshToken() {
-    localStorage.removeItem('refreshToken');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('refreshToken');
+    }
   }
+
   removeUserInfoToLocalStorage() {
-    localStorage.removeItem('userInfor');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('userInfor');
+    }
   }
+
   clearLocal() {
-    this.removeAccessToken();
-    this.removeRefreshToken();
-    this.removeUserInfoToLocalStorage();
+    if (typeof window !== 'undefined') {
+      this.removeAccessToken();
+      this.removeRefreshToken();
+      this.removeUserInfoToLocalStorage();
+    }
   }
+
   saveUserInfoToLocalStorage(user: any) {
-    localStorage.setItem('userInfor', JSON.stringify(user));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('userInfor', JSON.stringify(user));
+    }
   }
+
   getUserInforFromLocalStorage() {
-    const user = localStorage.getItem('userInfor');
-    return JSON.parse(user!);
+    if (typeof window !== 'undefined') {
+      const user = localStorage.getItem('userInfor');
+      return user ? JSON.parse(user) : null;
+    }
   }
 }
 

@@ -33,17 +33,6 @@ export default function Sidebar() {
     const renderSidebarForm = () => {
         return (
             <div className="flex flex-col w-[250px] md:w-[300px] left-0 h-screen bg-white overflow-y-scroll shrink-0 border-r border-r-dashed border-r-white" id="sidenav-main-responsive">
-                <div className="flex shrink-0 px-8 items-center justify-between h-[84px]">
-                    <Link className="transition-color duration-200 ease-in-out" href="/">
-                        <Image alt="Logo" src="/logo.svg" height={60} width={160} priority style={{
-                            width: 'auto',
-                            height: '50px',
-                        }} />
-                    </Link>
-                </div>
-
-                <Divide></Divide>
-
                 <div className="flex items-center justify-between px-8 py-5">
                     <div className="flex items-center mr-5">
                         <div className="mr-5 xs:hidden md:flex">

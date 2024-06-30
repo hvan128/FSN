@@ -106,7 +106,6 @@ export default function Main() {
   const [openFilter, setOpenFilter] = useState(false);
   const [filter, setFilter] = useState<AnnouncementFilterProps>(initialFilter);
   const [announcements, setAnnouncements] = useState([]);
-  const userRole = storage.getUserInforFromLocalStorage()?.adminRole;
   const dispatch = useDispatch();
   const refetchQueries = useSelector((state: RootState) => state.refetch.time);
 
