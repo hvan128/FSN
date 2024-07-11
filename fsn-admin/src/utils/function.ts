@@ -32,5 +32,8 @@ export function removeCountryCode(phoneNumber: string, countryCode: string) {
 export function convertImageUrl(url: string): string {
     const baseAPI = process.env.NEXT_PUBLIC_CONSUMER_SERVICE;
     const baseURL = baseAPI?.slice(0, -7);    
+    if (url.startsWith('http')) {
+        return url;
+    }
     return `${baseURL}/uploads/${url}`;
 }

@@ -5,6 +5,7 @@ import 'package:frontend/components/modals/modal_classify.dart';
 import 'package:frontend/config.dart';
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/navigation/navigation.dart';
+import 'package:frontend/navigation/router/community.dart';
 import 'package:frontend/navigation/router/my_fridge.dart';
 import 'package:frontend/provider/category.dart';
 import 'package:frontend/provider/user.dart';
@@ -20,9 +21,8 @@ import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/date_picker.dart';
 import 'package:frontend/widgets/drop-down.dart';
 import 'package:frontend/widgets/header.dart';
-import 'package:frontend/widgets/input-form.dart';
+import 'package:frontend/widgets/input_form.dart';
 import 'package:frontend/widgets/text.dart';
-import 'package:frontend/widgets/text_area.dart';
 import 'package:provider/provider.dart';
 
 class EditCategoryDetailScreen extends StatefulWidget {
@@ -77,6 +77,7 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
   String? value;
   String? icon;
   String note = '';
+  String? tips;
 
   @override
   void initState() {
@@ -100,6 +101,12 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
           manufactureDate = category!.manufactureDate;
           expiryDate = category!.expiryDate;
           quantity = category!.quantity ?? 1;
+          tips = FunctionCore.getListCategoryByType(category!.type!)!
+              .firstWhere(
+                (e) => e.value == category!.value!,
+                orElse: () => Category(),
+              )
+              .note;
         });
       }
       setState(() {
@@ -138,6 +145,26 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
             MyHeader(
               title: "Chỉnh sửa đồ ăn",
               bgColor: MyColors.white['c900']!,
+              rightIcon: Row(
+                children: [
+                  IconButton(
+                    onPressed: searchDish,
+                    icon: Icon(
+                      Icons.saved_search,
+                      size: 32,
+                      color: MyColors.grey['c900'],
+                    ),
+                  ),
+                  tips == null ? const SizedBox() : IconButton(
+                    onPressed: moreInformation,
+                    icon: Icon(
+                      Icons.lightbulb_outline,
+                      size: 28,
+                      color: MyColors.grey['c900'],
+                    ),
+                  ),
+                ],
+              ),
             ),
             Expanded(
                 child: SingleChildScrollView(
@@ -277,7 +304,7 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 50),
                                   child: MyButton(
-                                      text: 'Thêm',
+                                      text: 'Lưu',
                                       onPressed: () {
                                         onPressAdd();
                                       }),
@@ -352,18 +379,18 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
                           icon: const Icon(Icons.add, size: 15))),
                 ]),
           )),
-      const SizedBox(
-        height: 20,
-      ),
-      InputForm(
-          label: 'Đơn vị',
-          content: MyDropDownButton(
-            items: listUnits ?? [Item(value: 'piece', label: 'Cái')],
-            selectedValue: unit,
-            onSelected: (value) => setState(() {
-              unit = value;
-            }),
-          )),
+      // const SizedBox(
+      //   height: 20,
+      // ),
+      // InputForm(
+      //     label: 'Đơn vị',
+      //     content: MyDropDownButton(
+      //       items: listUnits ?? [Item(value: 'piece', label: 'Cái')],
+      //       selectedValue: unit,
+      //       onSelected: (value) => setState(() {
+      //         unit = value;
+      //       }),
+      //     )),
       const SizedBox(
         height: 20,
       ),
@@ -376,22 +403,6 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
               position = value;
             }),
           )),
-      const SizedBox(
-        height: 20,
-      ),
-      InputForm(
-          label: 'Vị trí con',
-          content: MyDropDownButton(
-              items: listSubPositions,
-              selectedValue: subPosition,
-              otherAction: Item(
-                value: 'add',
-                label: 'Tạo mới',
-              ),
-              onTapOtherAction: () {},
-              onSelected: (value) => setState(() {
-                    subPosition = value;
-                  }))),
       const SizedBox(
         height: 20,
       ),
@@ -428,13 +439,41 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
       const SizedBox(
         height: 20,
       ),
-      MyTextArea(
-          hasError: false,
-          label: 'Ghi chú',
-          hintText: 'Nhấn để viết ghi nhớ',
-          onChange: (value) {
-            note = value;
-          })
+      Container(
+          // padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+          decoration: BoxDecoration(
+            color: MyColors.white['c900']!,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Theme(
+            data: ThemeData().copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              title: MyText(
+                text: 'Mẹo',
+                fontSize: FontSize.z14,
+                fontWeight: FontWeight.w600,
+                color: MyColors.grey['c900']!,
+              ),
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(left: 16, bottom: 32, right: 12),
+                  child: MyText(
+                      text: tips ?? '',
+                      fontSize: FontSize.z14,
+                      fontWeight: FontWeight.w700,
+                      color: MyColors.grey['c900']!),
+                )
+              ],
+            ),
+          )),
+
+      // MyTextArea(
+      //     hasError: false,
+      //     label: 'Ghi chú',
+      //     hintText: 'Nhấn để viết ghi nhớ',
+      //     onChange: (value) {
+      //       note = value;
+      //     })
     ]);
   }
 
@@ -481,5 +520,54 @@ class _EditCategoryDetailScreenState extends State<EditCategoryDetailScreen> {
             description: 'Chỉnh sửa đồ ăn thành công!',
           );
         });
+  }
+
+  void moreInformation() {
+    showDialog(
+        context: context,
+        builder: (context) => Align(
+            alignment: Alignment.center,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      MyText(
+                          text: tips!,
+                          fontSize: FontSize.z14,
+                          fontWeight: FontWeight.w700,
+                          color: MyColors.grey['c900']!),
+                      SizedBox(
+                        width: double.infinity,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigate.pop();
+                                },
+                                child: const Text('OK')),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            )));
+  }
+
+  void searchDish() {
+    Navigate.pushNamed(RouterCommunity.searchDish, arguments: {
+      'searchText': category?.label
+    });
   }
 }

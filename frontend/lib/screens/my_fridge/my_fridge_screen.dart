@@ -77,7 +77,6 @@ class _MyFridgeScreenState extends State<MyFridgeScreen>
     viewType = categoryProvider.viewType;
     classify = categoryProvider.classify;
     initialIndex = categoryProvider.positionTab;
-    print('initialIndex: $initialIndex');
     tabController =
         TabController(length: 3, vsync: this, initialIndex: initialIndex - 1);
     fetchCategories();

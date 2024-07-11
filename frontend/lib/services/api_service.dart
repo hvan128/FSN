@@ -26,16 +26,7 @@ class ApiService {
       }
       return response.body;
     } catch (e) {
-      showDialog(
-          context: Navigate().navigationKey.currentContext!,
-          builder: (context) {
-            return const MyAlert(
-              alertType: AlertType.error,
-              position: AlertPosition.topCenter,
-              title: 'Lỗi',
-              description: 'Hệ thống đang bận vui lòng thử lại sau!',
-            );
-          });
+      print(e);
     }
   }
 
@@ -57,16 +48,7 @@ class ApiService {
       }
       return response.body;
     } catch (e) {
-      showDialog(
-          context: Navigate().navigationKey.currentContext!,
-          builder: (context) {
-            return const MyAlert(
-              alertType: AlertType.error,
-              position: AlertPosition.topCenter,
-              title: 'Lỗi',
-              description: 'Hệ thống đang bận vui lòng thử lại sau!',
-            );
-          });
+      print(e);
     }
   }
 
@@ -88,16 +70,6 @@ class ApiService {
       }
       return response.body;
     } catch (e) {
-      showDialog(
-          context: Navigate().navigationKey.currentContext!,
-          builder: (context) {
-            return const MyAlert(
-              alertType: AlertType.error,
-              position: AlertPosition.topCenter,
-              title: 'Lỗi',
-              description: 'Hệ thống đang bận vui lòng thử lại sau!',
-            );
-          });
     }
   }
 
@@ -120,16 +92,6 @@ class ApiService {
         return false;
       }
     } catch (e) {
-      showDialog(
-          context: Navigate().navigationKey.currentContext!,
-          builder: (context) {
-            return const MyAlert(
-              alertType: AlertType.error,
-              position: AlertPosition.topCenter,
-              title: 'Lỗi',
-              description: 'Hệ thống đang bận vui lòng thử lại sau!',
-            );
-          });
       return false;
     }
   }

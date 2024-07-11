@@ -56,7 +56,6 @@ User.getAllUser = (result) => {
       console.log(err);
       result(err, null);
     } else {
-      console.log(res);
       result(null, res);
     }
   });
@@ -107,25 +106,32 @@ User.getAllUserSystem = (req, result) => {
   } = req.body;
 
   let query = "SELECT * FROM user_system";
+  let countQuery = "SELECT COUNT(*) as total FROM user_system";
   let conditions = [];
   let queryParams = [];
+  let countParams = [];
 
   // Filter conditions
   if (username) {
     conditions.push("username LIKE ?");
     queryParams.push(`%${username}%`);
+    countParams.push(`%${username}%`);
   }
   if (phone) {
     conditions.push("phone LIKE ?");
     queryParams.push(`%${phone}%`);
+    countParams.push(`%${phone}%`);
   }
   if (email) {
     conditions.push("email LIKE ?");
     queryParams.push(`%${email}%`);
+    countParams.push(`%${email}%`);
   }
 
   if (conditions.length > 0) {
-    query += " WHERE " + conditions.join(" AND ");
+    const whereClause = " WHERE " + conditions.join(" AND ");
+    query += whereClause;
+    countQuery += whereClause;
   }
 
   // Ordering
@@ -136,16 +142,28 @@ User.getAllUserSystem = (req, result) => {
   query += " LIMIT ? OFFSET ?";
   queryParams.push(perPage, offset);
 
-  // Execute query
-  db.query(query, queryParams, (err, res) => {
+  // Execute count query first to get total
+  db.query(countQuery, countParams, (err, countRes) => {
     if (err) {
       console.log(err);
       result(err, null);
     } else {
-      result(null, res);
+      // Execute main query
+      db.query(query, queryParams, (err, res) => {
+        if (err) {
+          console.log(err);
+          result(err, null);
+        } else {
+          result(null, {
+            total: countRes[0].total,
+            data: res
+          });
+        }
+      });
     }
   });
 };
+
 
 User.getUserSystemById = (id, result) => {
   db.query(`SELECT * FROM user_system WHERE id = ${id}`, (err, res) => {
@@ -157,6 +175,17 @@ User.getUserSystemById = (id, result) => {
     }
   });
 };
+User.getAllFCMToken = (result) => {
+  db.query("SELECT DISTINCT fcmToken FROM users WHERE fcmToken IS NOT NULL", (err, res) => {
+    if (err) {
+      console.log(err);
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
+};
+
 
 ///* Update User */
 User.update = (data, result) => {

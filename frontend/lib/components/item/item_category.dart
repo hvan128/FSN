@@ -5,7 +5,6 @@ import 'package:frontend/navigation/router/my_fridge.dart';
 import 'package:frontend/services/category/category_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
-import 'package:frontend/utils/functions_core.dart';
 import 'package:frontend/widgets/text.dart';
 
 class CategoryItem extends StatefulWidget {

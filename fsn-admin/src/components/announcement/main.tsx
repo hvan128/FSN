@@ -40,62 +40,11 @@ import moment from "moment";
 import { SkeletonTable } from "@/lib/skeleton";
 import CancelIcon from "@mui/icons-material/Cancel";
 import SearchIcon from "@mui/icons-material/Search";
+import api from "../../services/api";
 
 const initialFilter: AnnouncementFilterProps = {
   title: "",
-  status: null,
 };
-
-const liveTickerOptions = [
-  {
-    value: true,
-    label: "Yes",
-  },
-  {
-    value: false,
-    label: "No",
-  },
-];
-
-const statusOptions = [
-  { label: "Approved", value: "APPROVED" },
-  { label: "In-Progress", value: "IN_PROGRESS" },
-  { label: "Submit for Approval", value: "SUBMIT_FOR_APPROVAL" },
-  { label: "Submit for Termination", value: "SUBMIT_FOR_TERMINATION" },
-  { label: "Returned", value: "RETURNED" },
-  { label: "Rejected", value: "REJECTED" },
-];
-
-const ListStatusAnnouncement = [
-  {
-    value: "IN_PROGRESS",
-    title: "In-progress",
-  },
-  {
-    value: "SUBMIT_FOR_APPROVAL",
-    title: "Submit for Approval",
-  },
-  {
-    value: "SUBMIT_FOR_TERMINATION",
-    title: "Submit for Termination",
-  },
-  {
-    value: "APPROVED",
-    title: "Approve",
-  },
-  {
-    value: "REJECTED",
-    title: "Reject",
-  },
-  {
-    value: "RETURNED",
-    title: "Return",
-  },
-  {
-    value: "TERMINATED",
-    title: "Terminate",
-  },
-];
 
 export default function Main() {
   const [rowsPage, setRowsPage] = useState(rowsPerPage);
@@ -114,26 +63,43 @@ export default function Main() {
   // Cancel filter
   const onCancel = () => {};
 
-  // Change announcement status
-  const onChangeStatus = (status: string, id: string | number) => {
-    const statusItem = ListStatusAnnouncement.find((it) => it.value === status);
-    // Bật Confirm Modal
+
+  const onResentNotification = async (title: string, summary: string, detail: string) => {
     let confirm: ConfirmState = {
       isOpen: true,
-      title: `Confirm to ${statusItem?.title} announcement`,
-      message: `Are you sure you want to ${statusItem?.title.toLowerCase()} the announcement?`,
+      title: `Confirm to resent announcement`,
+      message: `Are you sure you want to resent the announcement?`,
       feature: "",
       onConfirm: async () => {
         try {
-          let alert: AlertState = {
-            isOpen: true,
-            title: "UPDATE STATUS ANNOUNCEMENT",
-            message: "Update status announcement successfully",
-            type: "success",
-          };
-
+          const variables = {
+            title: title,
+            summary: summary,
+            detail: detail,
+            type: 'admin',
+          }
+          api.post('/send-notification', variables).then((res) => {
+            console.log(res);
+            if (res.status === 200) {
+              let alert: any = {
+                isOpen: true,
+                title: "RESEND ANNOUNCEMENT",
+                message: `You've successfully created an announcement. An notification is sent to all users`,
+                type: "success",
+              };
+              dispatch(openAlert(alert));
+              dispatch(refetchComponent());
+            } else {
+              let alert: any = {
+                isOpen: true,
+                title: "CREATE ANNOUNCEMENT",
+                message: res.data.message,
+                type: "error",
+              };
+              dispatch(openAlert(alert));
+            }
+          });
           dispatch(openLoading());
-          dispatch(openAlert(alert));
           dispatch(refetchComponent());
         } catch (e: any) {
         } finally {
@@ -144,23 +110,71 @@ export default function Main() {
     dispatch(openConfirm(confirm));
   };
 
-  useEffect(() => {
-    // setAnnouncements(data?.ListAnnouncement?.items || []);
-    // setCount(data?.ListAnnouncement?.total ?? 0);
-  }, []);
+  const onDeleteAnnouncement = async (id: number) => {
+    let confirm: ConfirmState = {
+      isOpen: true,
+      title: `Confirm to delete announcement`,
+      message: `Are you sure you want to delete the announcement?`,
+      feature: "",
+      onConfirm: async () => {
+        try {
+          api.delete(`/notification/${id}`).then((res) => {
+            console.log(res);
+            if (res.status === 200) {
+              let alert: any = {
+                isOpen: true,
+                title: "DELETE ANNOUNCEMENT",
+                message: `You've successfully deleted an announcement`,
+                type: "success",
+              };  
+              dispatch(openAlert(alert));
+              dispatch(refetchComponent());
+            } else {
+              let alert: any = {
+                isOpen: true,
+                title: "DELETE ANNOUNCEMENT",
+                message: res.data.message,
+                type: "error",
+              };
+              dispatch(openAlert(alert));
+            }
+          });
+          dispatch(openLoading());
+          dispatch(refetchComponent());
+        } catch (e: any) {
+        } finally {
+          dispatch(closeLoading());
+        }
+      },
+    };
+    dispatch(openConfirm(confirm));
+  };
+
 
   useEffect(() => {
-    // refetch({
-    //   filter: filter,
-    //   options: {
-    //     page: page + 1,
-    //     perPage: rowsPage,
-    //     sortOrder: order,
-    //     sortField: orderBy,
-    //   },
-    // });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchData();
   }, [page, rowsPage, refetchQueries]);
+
+  const fetchData = async () => {
+    const params = {
+      ...filter,
+      page: page + 1,
+      perPage: rowsPage,
+      sortOrder: order,
+      sortField: orderBy,
+    };
+    try {
+      await api
+        .get("/notification/admin", {
+          params: params,
+        })
+        .then((res) => {
+          setAnnouncements(res.data.data.data);
+          setCount(res.data.data.total);
+          console.log(res.data.data);
+        });
+    } catch (error) {}
+  };
 
   const renderFilter = () => {
     return (
@@ -173,12 +187,13 @@ export default function Main() {
               label="Title"
               className={`${FontSize.BASE}`}
               value={filter?.title}
-              onChange={(e) =>
+              onChange={(e) => {
                 setFilter((pre) => ({
                   ...pre,
                   title: e.target.value,
-                }))
-              }
+                }));
+                dispatch(refetchComponent());
+              }}
             />
           </div>
         </div>
@@ -203,28 +218,20 @@ export default function Main() {
     );
   };
 
-  const announcementList = announcements.map((item: any, index: number) => {
+  const announcementList = announcements?.map((item: any, index: number) => {
     return (
       <tr className="hover:bg-primary-c50 hover:text-grey-c700" key={index}>
         <td className="pl-3 py-4">{rowsPage * page + index + 1}</td>
         <td className="px-1 py-4">{item.title}</td>
-        <td className="px-1 py-4">
-          <SwitchButton
-            checked={item.liveTicker}
-            handleClickSwitchButton={() => null}
-            disabled
-          />
-        </td>
-        <td className="px-1 py-4">
-          {/* {renderStatus(item.status.toLowerCase(), userRole?.code)} */}
-        </td>
+        <td className="px-1 py-4">{item.summary}</td>
+        <td className="px-1 py-4">{item.detail}</td>
         <td className="px-1 py-4">
           {moment(item.createdAt).format("DD/MM/YYYY hh:mm a")}
         </td>
         <td className="px-1 py-4 flex items-center justify-center">
           {/* Action Button */}
           <div className="flex flex-row gap-2 justify-start items-center">
-            <Tooltip title="View">
+            {/* <Tooltip title="View">
               <VisibilityIcon
                 sx={{ cursor: "pointer" }}
                 id={item?.id}
@@ -234,101 +241,36 @@ export default function Main() {
                 }}
               />
             </Tooltip>
-            {item?.status?.toLowerCase() !== "rejected" && (
-              <>
-                {item?.status?.toLowerCase() !== "approved" &&
-                  item?.status?.toLowerCase() !== "submit_for_termination" && (
-                    <Tooltip title="Edit">
-                      <EditIcon
-                        sx={{ cursor: "pointer" }}
-                        id={item?.id}
-                        color="success"
-                        onClick={() => {
-                          handleOpenEdit(item?.id);
-                        }}
-                      />
-                    </Tooltip>
-                  )}
-                {item?.status?.toLowerCase() !== "submit_for_approval" &&
-                  item?.status?.toLowerCase() !== "approved" && (
-                    <Tooltip title="Submit for approval">
-                      <ConfirmationNumberIcon
-                        color="info"
-                        sx={{ cursor: "pointer" }}
-                        onClick={() => {
-                          onChangeStatus("SUBMIT_FOR_APPROVAL", item?.id);
-                        }}
-                      />
-                    </Tooltip>
-                  )}
-                {item?.status?.toLowerCase() === "approved" && (
-                  <Tooltip title="Submit for termination">
-                    <DeleteIcon
-                      color="error"
-                      sx={{ cursor: "pointer" }}
-                      onClick={() => {
-                        onChangeStatus("SUBMIT_FOR_TERMINATION", item?.id);
-                      }}
-                    />
-                  </Tooltip>
-                )}
-              </>
-            )}
-            {item?.status?.toLowerCase() !== "approved" &&
-              item?.status?.toLowerCase() !== "rejected" && (
-                <>
-                  {(item?.status?.toLowerCase() === "approved" ||
-                    item?.status?.toLowerCase() === "submit_for_approval") && (
-                    <Tooltip title="Approval request">
-                      <AssignmentTurnedInIcon
-                        color="info"
-                        sx={{ cursor: "pointer" }}
-                        onClick={(e) => {
-                          onChangeStatus("APPROVED", item?.id);
-                        }}
-                      />
-                    </Tooltip>
-                  )}
+            <Tooltip title="Edit">
+              <EditIcon
+                sx={{ cursor: "pointer" }}
+                id={item?.id}
+                color="success"
+                onClick={() => {
+                  handleOpenEdit(item?.id);
+                }}
+              />
+            </Tooltip> */}
+            
 
-                  {(item?.status?.toLowerCase() === "terminated" ||
-                    item?.status?.toLowerCase() ===
-                      "submit_for_termination") && (
-                    <Tooltip title="Approval request">
-                      <AssignmentTurnedInIcon
-                        color="info"
-                        sx={{ cursor: "pointer" }}
-                        onClick={() => {
-                          onChangeStatus("TERMINATED", item?.id);
-                        }}
-                      />
-                    </Tooltip>
-                  )}
-                  {item?.status?.toLowerCase() !== "in_progress" &&
-                    item?.status?.toLowerCase() !== "returned" && (
-                      <Tooltip title="Reject request">
-                        <RemoveCircleOutlineIcon
-                          color="error"
-                          sx={{ cursor: "pointer" }}
-                          onClick={(e) => {
-                            onChangeStatus("REJECTED", item?.id);
-                          }}
-                        />
-                      </Tooltip>
-                    )}
-                  {item?.status?.toLowerCase() !== "in_progress" &&
-                    item?.status?.toLowerCase() !== "returned" && (
-                      <Tooltip title="Return">
-                        <SettingsBackupRestoreOutlinedIcon
-                          color="secondary"
-                          sx={{ cursor: "pointer" }}
-                          onClick={() => {
-                            onChangeStatus("RETURNED", item?.id);
-                          }}
-                        />
-                      </Tooltip>
-                    )}
-                </>
-              )}
+            <Tooltip title="Resend">
+              <SettingsBackupRestoreOutlinedIcon
+                color="success"
+                sx={{ cursor: "pointer" }}
+                onClick={() => {
+                  onResentNotification(item?.title, item?.summary, item?.detail);
+                }}
+              />
+            </Tooltip>
+            <Tooltip title="Delete announcement">
+              <DeleteIcon
+                color="error"
+                sx={{ cursor: "pointer" }}
+                onClick={() => {
+                  onDeleteAnnouncement(item?.id);
+                }}
+              />
+            </Tooltip>
           </div>
         </td>
       </tr>
@@ -389,7 +331,7 @@ export default function Main() {
             Announcement{" "}
           </Typography>
         </div>
-        { (
+        {
           <div>
             <Button
               color="primary"
@@ -399,7 +341,7 @@ export default function Main() {
               Add announcement
             </Button>
           </div>
-        )}
+        }
       </div>
       {/* Divider */}
       <Divide></Divide>
@@ -428,8 +370,8 @@ export default function Main() {
                 <tr className="hover:bg-secondary-c100 hover:text-grey-c700">
                   <th className="pl-3 py-4">No</th>
                   <th className="px-1 py-4">Title</th>
-                  <th className="px-1 py-4">Live Ticker</th>
-                  <th className="px-1 py-4">Status</th>
+                  <th className="px-1 py-4">Message Summary</th>
+                  <th className="px-1 py-4">Message Detail</th>
                   <th className="px-1 py-4">Create at</th>
                   <th className="px-1 py-4 text-center">Action</th>
                 </tr>

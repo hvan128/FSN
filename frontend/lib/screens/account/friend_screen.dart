@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:frontend/components/account/my_food_field.dart';
 import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/navigation.dart';
-import 'package:frontend/navigation/router/community.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
-import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_icon.dart';
 import 'package:frontend/widgets/text.dart';
 
@@ -42,7 +40,7 @@ class _FriendScreenState extends State<FriendScreen> {
             CustomScrollView(physics: const BouncingScrollPhysics(), slivers: [
       SliverAppBar(
           pinned: true,
-          expandedHeight: 200,
+          expandedHeight: 160,
           backgroundColor: MyColors.white['c900']!,
           automaticallyImplyLeading: false,
           title:
@@ -73,7 +71,7 @@ class _FriendScreenState extends State<FriendScreen> {
       SliverToBoxAdapter(
         child: Container(
           color: MyColors.primary['CulturalYellow']!['c50']!,
-          height: MediaQuery.of(context).size.height,
+          height: 1000,
           child: Column(
             children: [
               const SizedBox(height: 10),
@@ -95,10 +93,16 @@ class _FriendScreenState extends State<FriendScreen> {
         children: [
           const SizedBox(height: 50),
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            CircleAvatar(
-              radius: 40,
-              backgroundImage:
-                  user?.imageUrl == null ? null : NetworkImage(user!.imageUrl!),
+           ClipRRect(
+              borderRadius: BorderRadius.circular(100),
+              child: user?.imageUrl != null
+                  ? Image.network(
+                      user!.imageUrl!,
+                      width: 80,
+                      height: 80,
+                    )
+                  : Image.asset('assets/icons/i16/image-default.png',
+                      width: 80, height: 80),
             ),
             const SizedBox(width: 20),
             Column(
@@ -150,40 +154,5 @@ class _FriendScreenState extends State<FriendScreen> {
         ],
       ),
     ));
-  }
-
-  Widget _buildAddButton() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
-      width: double.infinity,
-      color: MyColors.white['c900']!,
-      child: Column(children: [
-        Image.asset('assets/images/new-food.png',
-            width: 150, color: MyColors.grey['c900']!),
-        const SizedBox(height: 10),
-        MyText(
-          text: 'Lưu trữ tất cả món bạn nấu ở cùng một nơi',
-          fontSize: FontSize.z20,
-          fontWeight: FontWeight.w600,
-          color: MyColors.grey['c800']!,
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 5),
-        MyText(
-          text: 'Và chia sẻ với gia đình & bạn bè',
-          fontSize: FontSize.z16,
-          fontWeight: FontWeight.w400,
-          color: MyColors.grey['c600']!,
-        ),
-        const SizedBox(height: 15),
-        MyButton(
-          width: 200,
-          text: 'Viết món mới',
-          onPressed: () {
-            Navigator.pushNamed(context, RouterCommunity.addDish);
-          },
-        )
-      ]),
-    );
   }
 }

@@ -20,6 +20,7 @@ class Category {
   int? completed;
   int? no;
   bool? deleted;
+  String? note;
 
   Category(
       {this.id,
@@ -37,6 +38,7 @@ class Category {
       this.defaultDuration,
       this.completed,
       this.no,
+      this.note,
       this.deleted});
 
   Category.fromJson(Map<String, dynamic> json) {

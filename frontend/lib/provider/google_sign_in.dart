@@ -79,10 +79,6 @@ class GoogleSignInProvider extends ChangeNotifier {
     _user = user;
     final googleAuth = await user.authentication;
     String token = googleAuth.idToken!;
-    print('token: ');
-    for (int i = 0; i < token.length; i += 500) {
-      print(token.substring(i, min(i + 500, token.length)));
-    }
     final currentUser = await SharedService.loginDetails();
     Map<String, dynamic>  loginResponse = {
           'message': 'Login successfully',

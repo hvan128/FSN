@@ -24,8 +24,7 @@ class MyListTitle extends StatelessWidget {
       child: ListTile(
         leading: Image.asset(src, width: 24, height: 24),
         trailing: deactivate != true
-            ? Image.asset("assets/icons/i16/logo.png",
-                width: 16, height: 16)
+            ? Icon(Icons.chevron_right, color: MyColors.grey['c900'],)
             : Image.asset("assets/icons/i16/logo.png",
                 width: 16, height: 16),
         onTap: onTap,

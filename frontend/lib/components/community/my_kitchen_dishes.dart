@@ -22,7 +22,7 @@ class MyKitchenDishes extends StatefulWidget {
 
 class _MyKitchenDishesState extends State<MyKitchenDishes> {
   List<Category> selectedCategories = [];
-  List<Category> allCategories = [];
+  List<Category>? allCategories;
   List<Dish>? dishes;
 
   @override
@@ -53,178 +53,192 @@ class _MyKitchenDishesState extends State<MyKitchenDishes> {
     if (mounted) {
       setState(() {
         allCategories = getUniqueLabelCategories(categories, 20);
-        if (allCategories.isNotEmpty) {
-          selectedCategories.add(categories[0]);
+        if (allCategories != null) {
+          if (allCategories!.isNotEmpty) {
+            selectedCategories.add(categories[0]);
+          }
+          if (allCategories!.length > 1) {
+            selectedCategories.add(categories[1]);
+          }
+          getAllDishesByIngredient(
+              selectedCategories.isNotEmpty ? selectedCategories[0] : null,
+              selectedCategories.length > 1 ? selectedCategories[1] : null);
         }
-        if (allCategories.length > 1) {
-          selectedCategories.add(categories[1]);
-        }
-        getAllDishes(
-            selectedCategories.isNotEmpty ? selectedCategories[0].value : null,
-            selectedCategories.length > 1 ? selectedCategories[1].value : null);
       });
     }
   }
 
-  Future<void> getAllDishes(String? ingredient1, String? ingredient2) async {
-    List<Dish> dishes =
-        await DishService.getDishByIngredient(ingredient1, ingredient2, 1, 10);
+  Future<void> getAllDishesByIngredient(
+      Category? ingredient1, Category? ingredient2) async {
+    List<Dish> listDishes = await DishService.getDishByIngredient(
+        ingredient1?.value, ingredient2?.value, 1, 10);
+    String? searchText = '${ingredient1?.label} ${ingredient2?.label}';
+    final res = await DishService.getDishByKeyword(
+        keyword: searchText, page: 1, pageSize: 5);
     setState(() {
-      this.dishes = dishes;
+      dishes = listDishes + res['dishes'];
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return allCategories.isEmpty
+    return allCategories == null
         ? categoryEmpty()
-        : Padding(
-            padding: const EdgeInsets.only(left: 16),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const SizedBox(
-                height: 10,
-              ),
-              MyText(
-                  text: 'Cảm hứng từ nhà bếp của bạn',
-                  fontSize: FontSize.z18,
-                  fontWeight: FontWeight.w600,
-                  color: MyColors.grey['c700']!),
-              const SizedBox(
-                height: 3,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 3.0),
-                child: MyText(
-                  text: 'Chọn đến 2 nguyên liệu',
-                  fontSize: FontSize.z14,
-                  fontWeight: FontWeight.w500,
-                  color: MyColors.grey['c600']!,
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: SizedBox(
-                  width: 110 * 20 / 2,
-                  child: Wrap(spacing: 8, runSpacing: 8, children: [
-                    ...allCategories
-                        .map((e) => GestureDetector(
-                            onTap: () {
-                              if (selectedCategories.contains(e)) {
-                                setState(() {
-                                  selectedCategories.remove(e);
-                                });
-                              } else {
-                                if (selectedCategories.length == 2) {
-                                  FunctionCore.showSnackBar(
-                                      context, 'Chọn tối đa 2 nguyên liệu');
-                                } else {
-                                  setState(() {
-                                    selectedCategories.add(e);
-                                  });
-                                }
-                              }
-                              var ingredient1 = selectedCategories.isNotEmpty
-                                  ? selectedCategories[0].value!
-                                  : '';
-                              var ingredient2 = selectedCategories.length == 2
-                                  ? selectedCategories[1].value!
-                                  : '';
-                              getAllDishes(ingredient1, ingredient2);
-                            },
-                            child: ItemIngredient(
-                                category: e,
-                                isSelected: selectedCategories.contains(e))))
-                        .toList(),
-                  ]),
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: dishes == null
-                    ? loading()
-                    : dishes!.isEmpty
-                        ? recipesEmpty()
-                        : Row(children: [
-                            ...dishes!
-                                .map((e) => Row(
-                                      children: [
-                                        FoodCard(
-                                          dish: e,
-                                        ),
-                                        const SizedBox(width: 10),
-                                      ],
-                                    ))
+        : allCategories!.isEmpty
+            ? Container()
+            : Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      MyText(
+                          text: 'Cảm hứng từ nhà bếp của bạn',
+                          fontSize: FontSize.z18,
+                          fontWeight: FontWeight.w600,
+                          color: MyColors.grey['c700']!),
+                      const SizedBox(
+                        height: 3,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 3.0),
+                        child: MyText(
+                          text: 'Chọn đến 2 nguyên liệu',
+                          fontSize: FontSize.z14,
+                          fontWeight: FontWeight.w500,
+                          color: MyColors.grey['c600']!,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: SizedBox(
+                          width: 110 * 20 / 2,
+                          child: Wrap(spacing: 8, runSpacing: 8, children: [
+                            ...allCategories!
+                                .map((e) => GestureDetector(
+                                    onTap: () {
+                                      if (selectedCategories.contains(e)) {
+                                        setState(() {
+                                          selectedCategories.remove(e);
+                                        });
+                                      } else {
+                                        if (selectedCategories.length == 2) {
+                                          FunctionCore.showSnackBar(context,
+                                              'Chọn tối đa 2 nguyên liệu');
+                                        } else {
+                                          setState(() {
+                                            selectedCategories.add(e);
+                                          });
+                                        }
+                                      }
+                                      Category? ingredient1 =
+                                          selectedCategories.isNotEmpty
+                                              ? selectedCategories[0]
+                                              : null;
+                                      Category? ingredient2 =
+                                          selectedCategories.length == 2
+                                              ? selectedCategories[1]
+                                              : null;
+                                      getAllDishesByIngredient(
+                                          ingredient1, ingredient2);
+                                    },
+                                    child: ItemIngredient(
+                                        category: e,
+                                        isSelected:
+                                            selectedCategories.contains(e))))
                                 .toList(),
-                            const SizedBox(width: 10),
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(100),
-                                      border: Border.all(
-                                        color: MyColors.grey['c300']!,
-                                      )),
-                                  child: Image.asset(
-                                      'assets/icons/i16/arrow-left.png',
-                                      width: 25,
-                                      height: 25,
-                                      color: MyColors.grey['c700']!),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(width: 20),
                           ]),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 16),
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: MyColors.grey['c100']!,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/icons/i16/search.png',
-                            width: 18,
-                            height: 18,
-                            color: MyColors.grey['c700'],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: dishes == null
+                            ? loading()
+                            : dishes!.isEmpty
+                                ? recipesEmpty()
+                                : Row(children: [
+                                    ...dishes!
+                                        .map((e) => Row(
+                                              children: [
+                                                FoodCard(
+                                                  dish: e,
+                                                ),
+                                                const SizedBox(width: 10),
+                                              ],
+                                            ))
+                                        .toList(),
+                                    const SizedBox(width: 10),
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(100),
+                                              border: Border.all(
+                                                color: MyColors.grey['c300']!,
+                                              )),
+                                          child: Image.asset(
+                                              'assets/icons/i16/arrow-left.png',
+                                              width: 25,
+                                              height: 25,
+                                              color: MyColors.grey['c700']!),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(width: 20),
+                                  ]),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 16),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 8,
                           ),
-                          const SizedBox(
-                            width: 12,
+                          decoration: BoxDecoration(
+                            color: MyColors.grey['c100']!,
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          MyText(
-                            text: 'Tìm những ý tưởng khác',
-                            fontSize: FontSize.z16,
-                            fontWeight: FontWeight.w400,
-                            color: MyColors.grey['c700']!,
-                          )
-                        ]),
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              )
-            ]),
-          );
+                          child: Center(
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    'assets/icons/i16/search.png',
+                                    width: 18,
+                                    height: 18,
+                                    color: MyColors.grey['c700'],
+                                  ),
+                                  const SizedBox(
+                                    width: 12,
+                                  ),
+                                  MyText(
+                                    text: 'Tìm những ý tưởng khác',
+                                    fontSize: FontSize.z16,
+                                    fontWeight: FontWeight.w400,
+                                    color: MyColors.grey['c700']!,
+                                  )
+                                ]),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      )
+                    ]),
+              );
   }
 
   loading() {

@@ -54,14 +54,17 @@ class _MyFoodScreenState extends State<MyFoodScreen> {
     if (isLoading || !hasMore) {
       return;
     }
-        isLoading = true;
+    isLoading = true;
 
-    final res = await DishService.getDishByOwnerId(userId!, page, pageSize, type);
+    final res =
+        await DishService.getDishByOwnerId(userId!, page, pageSize, type);
 
     setState(() {
       dishes.addAll(res['dishes']);
       total = res['total'];
       if (res['dishes'].length < pageSize) {
+          print('res[''].length < pageSize');
+
         hasMore = false;
       }
       isLoading = false;
@@ -133,18 +136,18 @@ class _MyFoodScreenState extends State<MyFoodScreen> {
                                     ],
                                   ))
                               .toList(),
-                              const SizedBox(
+                          const SizedBox(
                             height: 30,
                           ),
                           hasMore
                               ? const Center(child: CircularProgressIndicator())
                               : Center(
-                                child: MyText(
-                                    text: 'Không còn món nào nữa',
-                                    fontSize: FontSize.z18,
-                                    fontWeight: FontWeight.w600,
-                                    color: MyColors.grey['c800']!),
-                              ),
+                                  child: MyText(
+                                      text: 'Không còn món nào nữa',
+                                      fontSize: FontSize.z18,
+                                      fontWeight: FontWeight.w600,
+                                      color: MyColors.grey['c800']!),
+                                ),
                           const SizedBox(
                             height: 30,
                           )

@@ -70,8 +70,6 @@ export default function Product({ filter }: Props) {
           params: params,
         })
         .then((res) => {
-          console.log(params);
-          console.log(res.data.data);
           setProducts(res.data.data);
           setCount(res.data.total);
         });
@@ -123,7 +121,6 @@ export default function Product({ filter }: Props) {
         status: action,
       };
       await api.put(`/community/dish/status/${id}`, variables).then((res) => {
-        console.log(res);
         dispatch(refetchComponent());
       });
       dispatch(

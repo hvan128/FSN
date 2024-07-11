@@ -8,7 +8,6 @@ export default function Home() {
   useEffect(() => {
     const checkToken = () => {
       let accessToken = storage.getLocalAccessToken();
-      console.log('accessToken: ' + accessToken);
       
       if(accessToken){
         redirect('/admin')

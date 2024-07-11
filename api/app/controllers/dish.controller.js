@@ -55,6 +55,35 @@ export const createDish = (req, res, next) => {
   });
 };
 
+export const createDishFromAdmin = (req, res, next) => {
+  var body = req.body;
+  var data = {
+    ownerId: body.ownerId,
+    label: body.label,
+    description: body.description,
+    image: body.imageURL, // Lấy imageURL thay vì file.image[0].filename
+    cookingTime: body.cookingTime,
+    rangeOfPeople: body.rangeOfPeople,
+    type: body.type,
+    ingredients:
+      body.ingredients !== "" ? body.ingredients : [],
+    steps: body.steps.map((step, index) => ({
+      no: step.no,
+      description: step.description,
+      dishId: step.dishId,
+      image: step.imageURL, // Lấy imageURL của từng bước
+    })),
+  };
+
+  Dish.create(data, (err, result) => {
+    if (err) {
+      next(err);
+    } else {
+      res.send(result);
+    }
+  });
+};
+
 export const updateDish = (req, res, next) => {
   dishUpload(req, res, (err) => {
     if (err) {
@@ -160,9 +189,9 @@ export const getDishByIngredient = (req, res, next) => {
 
 export const getDishByKeyword = (req, res, next) => {
   var keyword = req.body.keyword;
-  var page = req.query.page || 1;
-  var pageSize = req.query.pageSize || 10;
-  var type = req.query.type || 'recipes';
+  var page = req.body.page || 1;
+  var pageSize = req.body.pageSize || 10;
+  var type = req.body.type || 'recipes';
   Dish.getDishByKeyword(keyword, type, page, pageSize, (err, result) => {
     if (err) {
       next(err);
@@ -199,3 +228,14 @@ export const getSavedDishesByUserId = (req, res, next) => {
     }
   });
 };
+
+export const deleteDish = (req, res, next) => {
+  var dishId = req.params.id;
+  Dish.delete(dishId, (err, result) => {
+    if(err) {
+      next(err)
+    } else {
+      res.send(result)
+    }
+  })
+}

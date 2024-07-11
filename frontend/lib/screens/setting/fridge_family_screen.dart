@@ -83,26 +83,6 @@ class _FridgeFamilySettingScreenState extends State<FridgeFamilySettingScreen> {
                       onPressed: onPressLeave,
                       child: const MenuAcceleratorLabel('&Rời khỏi tủ lạnh'),
                     ),
-              MenuItemButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Saved!'),
-                    ),
-                  );
-                },
-                child: const MenuAcceleratorLabel('&Save'),
-              ),
-              MenuItemButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Quit!'),
-                    ),
-                  );
-                },
-                child: const MenuAcceleratorLabel('&Quit'),
-              ),
             ],
             child: Icon(
               Icons.more_vert,
@@ -162,7 +142,7 @@ class _FridgeFamilySettingScreenState extends State<FridgeFamilySettingScreen> {
               alignment: Alignment.center,
               child: MyNotification(
                   title: 'Rời khỏi tủ lạnh gia đình',
-                  description: '½ sẽ rời khỏi toàn bộ dữ liệu tên lạnhgia đình',
+                  description: 'Bạn có chắc chắn muốn rời khỏi tủ lạnh không? Việc này sẽ không thể hoàn tác cho đến khi bạn được mời trở lại.',
                   notificationType: NotificationType.info,
                   btnList: [
                     MyButton(

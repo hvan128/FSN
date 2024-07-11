@@ -36,6 +36,10 @@ export default (router) => {
     dishController.createDish(req, res, next);
   });
 
+  router.post("/api/v1/community/dish/admin", function (req, res, next) {
+    dishController.createDishFromAdmin(req, res, next);
+  })
+
   router.post("/api/v1/community/dish/ingredient", function (req, res, next) {
     dishController.getDishByIngredient(req, res, next);
   });
@@ -71,4 +75,8 @@ export default (router) => {
   router.delete("/api/v1/community/dish/feedback/feel", function (req, res, next) {
     feelController.deleteFeelFeedback(req, res, next);
   })
+
+  router.delete("/api/v1/community/dish/:id", function (req, res, next) {
+    dishController.deleteDish(req, res, next);
+  });
 };

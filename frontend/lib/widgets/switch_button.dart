@@ -21,17 +21,20 @@ class _MySwitchState extends State<MySwitch> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Switch(
-          value: widget.value,
-          activeColor: MyColors.white['c900'],
-          inactiveThumbColor: MyColors.white['c900'],
-          inactiveTrackColor: MyColors.primary['CulturalYellow']!['c200'],
-          activeTrackColor: MyColors.primary['CulturalYellow']!['c700'],
-          onChanged: (value) {
-            if (widget.onChange != null) {
-              widget.onChange!(value);
-            }
-          },
+        SizedBox(
+          height: 30,
+          child: Switch(
+            value: widget.value,
+            activeColor: MyColors.white['c900'],
+            inactiveThumbColor: MyColors.white['c900'],
+            inactiveTrackColor: MyColors.primary['CulturalYellow']!['c200'],
+            activeTrackColor: MyColors.primary['CulturalYellow']!['c700'],
+            onChanged: (value) {
+              if (widget.onChange != null) {
+                widget.onChange!(value);
+              }
+            },
+          ),
         ),
       ],
     );

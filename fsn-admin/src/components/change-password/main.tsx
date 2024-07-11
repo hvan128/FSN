@@ -67,7 +67,6 @@ export default function Main() {
         oldPassword: oldPassword,
       };
       api.put('/admin/change-password', variables).then((res) => {
-        console.log(res);
       })
       resetForm();
       let alert: AlertState = {

@@ -6,7 +6,6 @@ export const createRequest = (req, res, next) => {
     if (err) {
       next(err);
     } else {
-      console.log(result);
       return res.status(200).send({
         message: "Success",
         data: result,
@@ -16,7 +15,6 @@ export const createRequest = (req, res, next) => {
 };
 
 export const getAllRequest = (req, res, next) => {
-console.log(req.query);
   const page = req.query.page || 1;
   const pageSize = req.query.perPage || 10;
   const status = req.query.status;  

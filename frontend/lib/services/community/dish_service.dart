@@ -123,14 +123,49 @@ class DishService {
   static Future<List<Dish>> getDishByIngredient(
       String? ingredient1, String? ingredient2, int page, int pageSize) async {
     List<Dish> dishes = [];
-    await ApiService.post('${Config.DISH_API}/ingredient',
-        {'ingredient1': ingredient1, 'ingredient2': ingredient2}).then((value) {
+    final queryParams = {
+      'page': page.toString(),
+      'pageSize': pageSize.toString(),
+    };
+    await ApiService.post('${Config.DISH_API}/ingredient', {
+      'ingredient1': ingredient1,
+      'ingredient2': ingredient2,
+      ...queryParams
+    }).then((value) {
       if (value != null) {
         final data = jsonDecode(value.toString())['data'];
         dishes = dishFromJson(data);
       }
     });
-    return dishes.where((dish) => dish.status == 'approved').toList();
+    return dishes.where((dish) => dish.status == 'APPROVED').toList();
+  }
+
+  static Future<Map<String, dynamic>> getDishByKeyword(
+      {required String keyword,
+      required int page,
+      required int pageSize,
+      String? type}) async {
+    List<Dish> dishes = [];
+    int total = 0;
+    var params = type != null
+        ? {'keyword': keyword, 'page': page, 'pageSize': pageSize, 'type': type}
+        : {
+            'keyword': keyword,
+            'page': page,
+            'pageSize': pageSize,
+          };
+
+    await ApiService.post('${Config.DISH_API}/keyword', params).then((value) {
+      if (value != null) {
+        final data = jsonDecode(value.toString())['data'];
+        total = jsonDecode(value.toString())['total'];
+        dishes = dishFromJson(data);
+      }
+    });
+    return {
+      'dishes': dishes.where((dish) => dish.status == 'APPROVED').toList(),
+      'total': total,
+    };
   }
 
   static Future<Map<String, dynamic>> getDishByOwnerId(
@@ -189,30 +224,6 @@ class DishService {
     };
   }
 
-  static Future<Map<String, dynamic>> getDishByKeyword(
-      {required String keyword,
-      required int page,
-      required int pageSize}) async {
-    List<Dish> dishes = [];
-    int total = 0;
-
-    await ApiService.post('${Config.DISH_API}/keyword', {
-      'keyword': keyword,
-      'page': page.toString(),
-      'pageSize': pageSize.toString(),
-    }).then((value) {
-      if (value != null) {
-        final data = jsonDecode(value.toString())['data'];
-        total = jsonDecode(value.toString())['total'];
-        dishes = dishFromJson(data);
-      }
-    });
-    return {
-      'dishes': dishes,
-      'total': total,
-    };
-  }
-
   static Future<Dish> getDishById({required int id}) async {
     return await ApiService.get('${Config.DISH_API}/$id').then((value) {
       if (value != null) {
@@ -234,17 +245,23 @@ class DishService {
       'dishId': feel.dishId,
       'feedbackId': feel.feedbackId
     };
-    var user = Provider.of<UserProvider>(Navigate().navigationKey.currentContext!, listen: false).user;
-    await ApiService.post('${Config.DISH_API}/feel', model);
-    if (owner != null && owner.fcmToken != null) {
-      await ApiService.post(Config.SEND_NOTIFICATION_API, {
-        'receiverToken': owner.fcmToken,
-        'title': 'Thông báo',
-        'body': '${user?.displayName} đã bày tỏ cảm xúc vào bài viết của bạn!',
-        'data': {
-          'type': 'category',
-        }
-      });
+    var user = Provider.of<UserProvider>(
+            Navigate().navigationKey.currentContext!,
+            listen: false)
+        .user;
+    if (user?.id != owner?.id) {
+      await ApiService.post('${Config.DISH_API}/feel', model);
+      if (owner != null && owner.fcmToken != null) {
+        await ApiService.post(Config.SEND_NOTIFICATION_API, {
+          'receiverToken': owner.fcmToken,
+          'title': 'Thông báo',
+          'body':
+              '${user?.displayName} đã bày tỏ cảm xúc vào bài viết của bạn!',
+          'data': {
+            'type': 'community',
+          }
+        });
+      }
     }
   }
 

@@ -40,7 +40,7 @@ class _MyLoadingState extends State<MyLoading>
             );
           },
           child: Image.asset(
-            'assets/icons/i16/logo.png',
+            'assets/icons/i16/ring.png',
             width: 112,
             height: 112,
           ),

@@ -1,11 +1,9 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
 import 'package:frontend/widgets/text.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 class MoreInfo extends StatelessWidget {
   const MoreInfo({super.key});

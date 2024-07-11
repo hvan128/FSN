@@ -17,7 +17,7 @@ import 'package:frontend/utils/functions_core.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/date_picker.dart';
 import 'package:frontend/widgets/drop-down.dart';
-import 'package:frontend/widgets/input-form.dart';
+import 'package:frontend/widgets/input_form.dart';
 import 'package:frontend/widgets/text.dart';
 import 'package:frontend/widgets/text_area.dart';
 import 'package:provider/provider.dart';
@@ -112,7 +112,7 @@ class _CardAddCategoryState extends State<CardAddCategory> {
                   height: 16,
                 ),
                 MyText(
-                  text: 'Thêm thức ăn',
+                  text: 'Thêm thực phẩm',
                   fontSize: FontSize.z20,
                   fontWeight: FontWeight.w700,
                   color: MyColors.grey['c900']!,
@@ -120,7 +120,128 @@ class _CardAddCategoryState extends State<CardAddCategory> {
                 const SizedBox(
                   height: 22,
                 ),
-                
+                 Row(children: [
+            GestureDetector(
+              onTap: () {
+                chooseIcon();
+              },
+              child: Container(
+                width: 80,
+                height: 80,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                    color: MyColors.primary['CulturalYellow']!['c100']!,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: MyColors.grey['c300']!,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: MyColors.grey['c300']!,
+                        blurRadius: 2,
+                        offset: const Offset(1, 2),
+                      )
+                    ]),
+                child: SizedBox(
+                  height: 60,
+                  width: 60,
+                  child: Image.asset(
+                    icon ??
+                        'assets/icons/i16/image-default.png',
+                    width: 50,
+                    height: 50,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(
+              width: 20,
+            ),
+            Expanded(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: MyColors.primary['CulturalYellow']!['c800']!,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: MyColors
+                                    .primary['CulturalYellow']!['c800']!,
+                                blurRadius: 4,
+                                offset: const Offset(1, 2),
+                              )
+                            ],
+                          ),
+                          child: GestureDetector(
+                            onTap: () {
+                              chooseType();
+                            },
+                            child: MyText(
+                              text: labelType!,
+                              fontSize: FontSize.z16,
+                              fontWeight: FontWeight.w500,
+                              color: MyColors.white['c900']!,
+                            ),
+                          ),
+                        ),
+                        helperText != ''
+                            ? const SizedBox(height: 5)
+                            : Container(),
+                        helperText != '' &&
+                                helperText != null
+                            ? Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: MyText(
+                                  text: helperText!,
+                                  fontSize: FontSize.z12,
+                                  fontWeight: FontWeight.w500,
+                                  color: MyColors.support['Error']!['c900']!,
+                                ),
+                              )
+                            : Container(),
+                      ],
+                    ),
+                    TextField(
+                      controller: _controller,
+                      onChanged: (value) {
+                        setState(() {
+                          _controller.text = value;
+                        });
+                      },
+                      style: TextStyle(
+                        color: MyColors.grey['c900']!,
+                        fontSize: FontSize.z16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      decoration: InputDecoration(
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 8),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: MyColors.grey['c500']!),
+                        ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                              width: 2,
+                              color:
+                                  MyColors.primary['CulturalYellow']!['c600']!),
+                        ),
+                      ),
+                    ),
+                  ]),
+            )
+          ]),
+          const SizedBox(
+            height: 20,
+          ),
                 const SizedBox(
                   height: 20,
                 ),

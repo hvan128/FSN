@@ -1,4 +1,5 @@
 import 'package:api_cache_manager/api_cache_manager.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:frontend/components/card/feedback_card.dart';
@@ -25,10 +26,8 @@ import 'package:frontend/utils/functions_core.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_icon.dart';
 import 'package:frontend/widgets/divider.dart';
-import 'package:frontend/widgets/image.dart';
 import 'package:frontend/widgets/reaction_button.dart';
 import 'package:frontend/widgets/text.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 
 class DishDetailScreen extends StatefulWidget {
@@ -227,7 +226,9 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
                       ? SubmenuButton(
                           menuChildren: <Widget>[
                             MenuItemButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                onRemove();
+                              },
                               child: const MenuAcceleratorLabel('&Xóa món ăn'),
                             ),
                             MenuItemButton(
@@ -268,14 +269,15 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
                 flexibleSpace: FlexibleSpaceBar(
                   background: dish != null && dish!.image != null
                       ? GestureDetector(
-                        onTap: () {
-                          FunctionCore.showImageDetail(context, FunctionCore.convertImageUrl(dish!.image!));
-                        },
-                        child: Image.network(
+                          onTap: () {
+                            FunctionCore.showImageDetail(context,
+                                FunctionCore.convertImageUrl(dish!.image!));
+                          },
+                          child: Image.network(
                             FunctionCore.convertImageUrl(dish!.image!),
                             fit: BoxFit.cover,
                           ),
-                      )
+                        )
                       : Container(),
                 )),
             SliverToBoxAdapter(
@@ -619,7 +621,15 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          ClipRRect(borderRadius: BorderRadius.circular(100), child: image),
+          GestureDetector(
+              onTap: () {
+                isMine
+                    ? Navigate.pushNamed(RouterAccount.account)
+                    : Navigate.pushNamed(RouterAccount.friend,
+                        arguments: {'owner': owner});
+              },
+              child: ClipRRect(
+                  borderRadius: BorderRadius.circular(100), child: image)),
           const SizedBox(height: 10),
           MyText(
             text: 'Được đăng bởi',
@@ -645,8 +655,8 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
                   fontWeight: FontWeight.w500,
                   color: MyColors.grey['c900']!,
                 ),
-          const SizedBox(height: 15),
-          MyButton(text: 'Theo dõi', onPressed: () {}),
+          // const SizedBox(height: 15),
+          // MyButton(text: 'Theo dõi', onPressed: () {}),
         ],
       ),
     );
@@ -994,5 +1004,20 @@ class _DishDetailScreenState extends State<DishDetailScreen> {
     );
 
     reactionToUpdate.isSelected = isSelected;
+  }
+
+  void onRemove() async {
+    await DishService.deleteDish(dish!.id!);
+    Navigate.pop();
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const MyAlert(
+            alertType: AlertType.success,
+            position: AlertPosition.topCenter,
+            title: 'Thành công',
+            description: 'Xóa món ăn thành công!',
+          );
+        });
   }
 }

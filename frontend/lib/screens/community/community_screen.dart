@@ -8,7 +8,6 @@ import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/community.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/account/account_screen.dart';
-import 'package:frontend/screens/search/search_screen.dart';
 import 'package:frontend/services/community/dish_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';

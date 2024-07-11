@@ -141,7 +141,6 @@ Category.getAllCategoryInFridge = (fridgeId, result) => {
         console.log(err);
         result(err, null);
       } else {
-        console.log(res);
         result(null, res);
       }
     }

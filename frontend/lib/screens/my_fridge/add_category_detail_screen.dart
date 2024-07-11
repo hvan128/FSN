@@ -3,7 +3,6 @@
 import 'dart:convert';
 
 import 'package:api_cache_manager/api_cache_manager.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/components/modals/alert_modal.dart';
 import 'package:frontend/components/modals/modal_classify.dart';
@@ -11,8 +10,10 @@ import 'package:frontend/config.dart';
 import 'package:frontend/models/category/category.dart';
 import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/navigation.dart';
+import 'package:frontend/navigation/router/community.dart';
 import 'package:frontend/navigation/router/my_fridge.dart';
 import 'package:frontend/provider/category.dart';
+import 'package:frontend/provider/notification.dart';
 import 'package:frontend/services/notification/local_notification.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/home_screen.dart';
@@ -26,7 +27,7 @@ import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/date_picker.dart';
 import 'package:frontend/widgets/drop-down.dart';
 import 'package:frontend/widgets/header.dart';
-import 'package:frontend/widgets/input-form.dart';
+import 'package:frontend/widgets/input_form.dart';
 import 'package:frontend/widgets/text.dart';
 import 'package:frontend/widgets/text_area.dart';
 import 'package:provider/provider.dart';
@@ -75,6 +76,7 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
   DateTime? manufactureDate;
   int quantity = 1;
   String note = '';
+  String? tips;
 
   @override
   void initState() {
@@ -87,12 +89,20 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
     manufactureDate = DateTime.now();
     expDate =
         DateTime.now().add(Duration(days: widget.category!.defaultDuration!));
+    tips = FunctionCore.getListCategoryByType(widget.category!.type!)!
+        .firstWhere((e) => e.value == widget.category!.value!)
+        .note;
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  void searchDish() {
+    Navigate.pushNamed(RouterCommunity.searchDish,
+        arguments: {'searchText': widget.category?.label});
   }
 
   @override
@@ -109,6 +119,28 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
             MyHeader(
               title: "Thêm đồ ăn",
               bgColor: MyColors.white['c900']!,
+              rightIcon: Row(
+                children: [
+                  IconButton(
+                    onPressed: searchDish,
+                    icon: Icon(
+                      Icons.saved_search,
+                      size: 32,
+                      color: MyColors.grey['c900'],
+                    ),
+                  ),
+                  tips == null
+                      ? const SizedBox()
+                      : IconButton(
+                          onPressed: moreInformation,
+                          icon: Icon(
+                            Icons.lightbulb_outline,
+                            size: 28,
+                            color: MyColors.grey['c900'],
+                          ),
+                        ),
+                ],
+              ),
             ),
             Expanded(
                 child: SingleChildScrollView(
@@ -347,21 +379,21 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
       const SizedBox(
         height: 20,
       ),
-      InputForm(
-          label: 'Vị trí con',
-          content: MyDropDownButton(
-              items: listSubPositions,
-              otherAction: Item(
-                value: 'add',
-                label: 'Tạo mới',
-              ),
-              onTapOtherAction: () {},
-              onSelected: (value) => setState(() {
-                    subPosition = value;
-                  }))),
-      const SizedBox(
-        height: 20,
-      ),
+      // InputForm(
+      //     label: 'Vị trí con',
+      //     content: MyDropDownButton(
+      //         items: listSubPositions,
+      //         otherAction: Item(
+      //           value: 'add',
+      //           label: 'Tạo mới',
+      //         ),
+      //         onTapOtherAction: () {},
+      //         onSelected: (value) => setState(() {
+      //               subPosition = value;
+      //             }))),
+      // const SizedBox(
+      //   height: 20,
+      // ),
       InputForm(
         label: 'Ngày nhập',
         content: MyDatePicker(
@@ -390,6 +422,45 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
       const SizedBox(
         height: 20,
       ),
+      // Container(
+      //     // padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+      //     decoration: BoxDecoration(
+      //       color: MyColors.white['c900']!,
+      //       borderRadius: BorderRadius.circular(20),
+      //     ),
+      //     child: Theme(
+      //       data: ThemeData().copyWith(dividerColor: Colors.transparent),
+      //       child: ExpansionTile(
+      //         title: MyText(
+      //           text: 'Mẹo',
+      //           fontSize: FontSize.z14,
+      //           fontWeight: FontWeight.w600,
+      //           color: MyColors.grey['c900']!,
+      //         ),
+      //         children: [
+      //           Padding(
+      //             padding: EdgeInsets.only(left: 16, bottom: 32, right: 12),
+      //             child: MyText(
+      //                 text: 'Sức khỏe\n\n'
+      //                     '- Giàu chất xơ, giúp cải thiện tiêu hóa và ngăn ngừa táo bón.\n'
+      //                     '- Chứa nhiều vitamin C và K, giúp tăng cường hệ miễn dịch và bảo vệ tế bào khỏi tổn thương.\n'
+      //                     '- Có chất chống oxy hóa giúp giảm nguy cơ mắc bệnh tim và ung thư.\n'
+      //                     '- Chứa chất chống viêm, có thể giúp giảm viêm và đau khớp.\n'
+      //                     '- Giúp kiểm soát cân nặng, vì quả lê có lượng calo thấp nhưng lại tạo cảm giác no lâu.\n\n'
+      //                     'Ăn uống\n\n'
+      //                     '- Có thể ăn trực tiếp hoặc chế biến thành nhiều món ăn khác nhau như salad, nước ép, và mứt.\n'
+      //                     '- Nên ăn lê cùng với vỏ để tận dụng hết các chất dinh dưỡng và chất xơ.\n\n'
+      //                     'Bảo quản\n\n'
+      //                     '- Bảo quản quả lê ở nhiệt độ phòng nếu bạn muốn chúng chín nhanh hơn.\n'
+      //                     '- Để kéo dài thời gian sử dụng, hãy bảo quản trong tủ lạnh.\n'
+      //                     '- Kiểm tra thường xuyên và loại bỏ những quả lê bị dập hoặc hỏng để tránh lây lan đến các quả khác.',
+      //                 fontSize: FontSize.z14,
+      //                 fontWeight: FontWeight.w700,
+      //                 color: MyColors.grey['c900']!),
+      //           )
+      //         ],
+      //       ),
+      //     )),
       MyTextArea(
           hasError: false,
           label: 'Ghi chú',
@@ -426,15 +497,24 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
         final data = jsonDecode(value.toString())['data'];
         Category category = Category.fromJson(data);
         final DateTime expiryDate = category.expiryDate!;
-
-        NotificationService.showNotification(
-          id: category.id!,
-          title: 'Hết hạn',
-          body: '${category.label} cần được tiêu thụ gấp trong hôm nay!',
-          scheduled: true,
-          time: DateTime(
-              expiryDate.year, expiryDate.month, expiryDate.day, 9, 0, 0),
-        );
+        var notificationProvider =
+            Provider.of<NotificationProvider>(context, listen: false);
+        int notificationDaysInAdvance =
+            notificationProvider.notificationDaysInAdvance;
+        int duration = expiryDate.difference(DateTime.now()).inDays;
+        int notificationDay = duration > notificationDaysInAdvance
+            ? expiryDate.day - notificationDaysInAdvance
+            : expiryDate.day;
+        if (notificationProvider.getExpirationNotification == true) {
+          NotificationService.showNotification(
+            id: category.id!,
+            title: 'Hết hạn',
+            body: '${category.label} cần được tiêu thụ gấp trong hôm nay!',
+            scheduled: true,
+            time: DateTime(
+                expiryDate.year, expiryDate.month, notificationDay, 9, 0, 0),
+          );
+        }
         for (var element in users) {
           if (element.id != currentUser.id && element.fcmToken != null) {
             ApiService.post(Config.SEND_NOTIFICATION_API, {
@@ -499,5 +579,48 @@ class _AddCategoryDetailScreenState extends State<AddCategoryDetailScreen> {
       }
     });
     return listUsers;
+  }
+
+  void moreInformation() {
+    showDialog(
+        context: context,
+        builder: (context) => Align(
+            alignment: Alignment.center,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      MyText(
+                          text: tips!,
+                          fontSize: FontSize.z14,
+                          fontWeight: FontWeight.w700,
+                          color: MyColors.grey['c900']!),
+                      SizedBox(
+                        width: double.infinity,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigate.pop();
+                                },
+                                child: const Text('OK')),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            )));
   }
 }
