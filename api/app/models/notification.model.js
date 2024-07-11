@@ -41,6 +41,31 @@ Notification.create = (data, result) => {
   });
 };
 
+Notification.getAdminNotification = (page, pageSize, title, result) => {
+  var offset = (page - 1) * pageSize;
+  db.query(`SELECT COUNT(*) as total FROM notification WHERE title LIKE '%${title}%' AND type = 'admin'`, (err, total) => { 
+    if (err) {
+      console.log(err);
+      result(err, null);
+    } else {
+      db.query(
+        `SELECT * FROM notification WHERE title LIKE '%${title}%' AND type = 'admin' ORDER BY id DESC LIMIT ${pageSize} OFFSET ${offset}`,
+        (err, res) => {
+          if (err) {
+            console.log(err);
+            result(err, null);
+          } else {
+            result(null, {
+              data: res,
+              total: total[0].total,
+            });
+          }
+        }
+      );
+    }
+  });
+};
+
 Notification.getByTargetId = (id, result) => {
   db.query(`SELECT * FROM notification WHERE targetId = ${id}`, (err, res) => {
     if (err) {
@@ -148,4 +173,14 @@ Notification.read = (id, result) => {
   );
 };
 
+Notification.delete = (id, result) => {
+  db.query("DELETE FROM notification WHERE id = ?", [id], (err, res) => {
+    if (err) {
+      console.log(err);
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
+};
 export default Notification;

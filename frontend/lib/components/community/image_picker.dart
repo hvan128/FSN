@@ -28,8 +28,6 @@ class _MyImagePickerState extends State<MyImagePicker> {
                 GestureDetector(
                   onTap: () async {
                     final selectedImagePath = await selectImageFromGallery();
-                    print('Image_Path:-');
-                    print(selectedImagePath);
                     if (selectedImagePath != '') {
                       Navigator.pop(context);
                       widget.onImageSelected(selectedImagePath);
@@ -57,9 +55,6 @@ class _MyImagePickerState extends State<MyImagePicker> {
                 GestureDetector(
                   onTap: () async {
                     final selectedImagePath = await selectImageFromCamera();
-                    print('Image_Path:-');
-                    print(selectedImagePath);
-
                     if (selectedImagePath != '') {
                       Navigator.pop(context);
                       widget.onImageSelected(selectedImagePath);

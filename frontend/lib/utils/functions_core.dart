@@ -53,6 +53,10 @@ class FunctionCore {
     return (value / divideNumber).toStringAsFixed(0) + suffix;
   }
 
+  static List<Category>? getListCategoryByType(String type) {
+    return foods.firstWhere((element) => element.value == type).categories;
+  }
+
   static String convertMoneyFormat<T>(T? amount, Format type) {
     double? doubleAmount;
 
@@ -601,6 +605,9 @@ class FunctionCore {
   }
 
   static String convertImageUrl(String url) {
+    if (url.startsWith('http')) {
+      return url;
+    }
     return 'http://${Config.API_URL}/uploads/$url';
   }
 

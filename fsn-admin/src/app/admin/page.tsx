@@ -27,13 +27,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     let userInformation = storage.getUserInforFromLocalStorage();
-    console.log(userInformation);
     if (!userInformation) {
       router.replace("/login");
     } else {
-      console.log(userInformation?.role);
       let defaultPage = initRouteByRoles(userInformation?.role);
-      console.log(defaultPage);
       router.replace(defaultPage);
     }
   }, [router]);

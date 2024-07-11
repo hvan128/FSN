@@ -90,7 +90,7 @@ class _AccountScreenState extends State<AccountScreen>
       SliverToBoxAdapter(
         child: Container(
           color: MyColors.primary['CulturalYellow']!['c50']!,
-          height: 1220,
+          height: 1250,
           child: TabBarView(
             controller: _tabController,
             children: <Widget>[

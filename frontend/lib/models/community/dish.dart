@@ -175,7 +175,7 @@ List<Ingredient> ingredientsFromJson(dynamic str) =>
 class Ingredient {
   String? value;
   String? label;
-  int? quantity;
+  String? quantity;
   String? unit;
 
   Ingredient({

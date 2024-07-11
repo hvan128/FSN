@@ -17,7 +17,7 @@ import 'package:frontend/widgets/date_picker.dart';
 import 'package:frontend/widgets/divider.dart';
 import 'package:frontend/widgets/drop-down.dart';
 import 'package:frontend/widgets/header.dart';
-import 'package:frontend/widgets/input-form.dart';
+import 'package:frontend/widgets/input_form.dart';
 import 'package:frontend/widgets/text.dart';
 import 'package:provider/provider.dart';
 

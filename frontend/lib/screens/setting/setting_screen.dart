@@ -3,10 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/components/settings/my_list_title.dart';
 import 'package:frontend/components/settings/profile_management.dart';
+import 'package:frontend/models/user/user.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/introduction.dart';
 import 'package:frontend/navigation/router/settings.dart';
 import 'package:frontend/provider/google_sign_in.dart';
+import 'package:frontend/provider/user.dart';
 import 'package:frontend/services/auth/shared_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
@@ -24,21 +26,19 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
-  void clickNextProfileScreen() {
-  }
+  void clickNextProfileScreen() {}
 
   void clickNextFridgeFamilyScreen() {
     Navigate.pushNamed(RouterSetting.fridgeFamily);
   }
 
   void clickNextNotificationScreen() {
+    Navigate.pushNamed(RouterSetting.notificationSetting);
   }
 
-  void clickNextContactUsScreen() {
-  }
+  void clickNextContactUsScreen() {}
 
-  void clickDeActiveApp() {
-  }
+  void clickDeActiveApp() {}
 
   void clickLogout() async {
     Loading.showLoading();
@@ -56,16 +56,18 @@ class _SettingScreenState extends State<SettingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    UserModel? user = Provider.of<UserProvider>(context, listen: false).user;
     return Scaffold(
       backgroundColor: MyColors.white["c900"]!,
       body: SafeArea(
         child: Container(
-          color: MyColors.primary['KiduBlue']!['c50']!,
+          color: MyColors.primary['CulturalYellow']!['c50']!,
           child: Column(children: [
             MyHeader(
               disableLeftButton: true,
               bgColor: MyColors.white['c900'],
-              title: 'Setting',
+              title: 'Cài đặt',
+              onRightPressed: () => Navigate.pop(),
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -80,7 +82,7 @@ class _SettingScreenState extends State<SettingScreen> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(
-                                top: 10, right: 8,left: 8, bottom: 4),
+                                top: 10, right: 8, left: 8, bottom: 4),
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
@@ -89,8 +91,10 @@ class _SettingScreenState extends State<SettingScreen> {
                               child: Column(
                                 children: [
                                   MyProfileContent(
-                                    text: 'Profile management',
-                                    name: 'Machs Do',
+                                    imageUrl: user?.imageUrl,
+                                    trailing: Icon(Icons.chevron_right, color: MyColors.grey['c900'],),
+                                    text: user!.username!,
+                                    name: user.displayName ?? '',
                                     onTap: clickNextProfileScreen,
                                   )
                                 ],
@@ -107,7 +111,7 @@ class _SettingScreenState extends State<SettingScreen> {
                               child: Column(
                                 children: [
                                   MyListTitle(
-                                    src: 'assets/icons/i16/logo.png',
+                                    src: 'assets/icons/i16/fr.png',
                                     text: 'Tủ lạnh gia đình',
                                     onTap: clickNextFridgeFamilyScreen,
                                   ),
@@ -120,8 +124,8 @@ class _SettingScreenState extends State<SettingScreen> {
                                   ),
                                   //Notifications list title
                                   MyListTitle(
-                                    src: 'assets/icons/i16/logo.png',
-                                    text: 'Notifications',
+                                    src: 'assets/icons/i16/b.png',
+                                    text: 'Thông báo',
                                     onTap: clickNextNotificationScreen,
                                   ), //security list title
                                 ],
@@ -138,8 +142,8 @@ class _SettingScreenState extends State<SettingScreen> {
                               child: Column(
                                 children: [
                                   MyListTitle(
-                                    src: 'assets/icons/i16/logo.png',
-                                    text: 'Contact us',
+                                    src: 'assets/icons/i16/ct.png',
+                                    text: 'Liên hệ',
                                     onTap: clickNextContactUsScreen,
                                   ),
                                   Padding(
@@ -150,8 +154,8 @@ class _SettingScreenState extends State<SettingScreen> {
                                         bdColor: MyColors.grey['c100']),
                                   ),
                                   MyListTitle(
-                                    src: 'assets/icons/i16/logo.png',
-                                    text: 'Terms and conditions',
+                                    src: 'assets/icons/i16/tm.png',
+                                    text: 'Điều khoản',
                                     onTap: onTapPrivacyPolicy,
                                   ),
                                   Padding(
@@ -162,30 +166,9 @@ class _SettingScreenState extends State<SettingScreen> {
                                         bdColor: MyColors.grey['c100']),
                                   ),
                                   MyListTitle(
-                                    src:
-                                        'assets/icons/i16/logo.png',
+                                    src: 'assets/icons/i16/pr.png',
                                     text: 'Privacy policy',
                                     onTap: onTapPrivacyPolicy,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: MyColors.white['c900'],
-                              ),
-                              child: Column(
-                                children: [
-                                  MyListTitle(
-                                    src:
-                                        'assets/icons/i16/logo.png',
-                                    text: 'Deactivate app',
-                                    deactivate: true,
-                                    onTap: clickDeActiveApp,
                                   ),
                                 ],
                               ),
@@ -217,16 +200,20 @@ class _SettingScreenState extends State<SettingScreen> {
                                 padding: const EdgeInsets.only(left: 8.0),
                                 child: Row(
                                   children: [
+                                    Icon(
+                                      Icons.logout,
+                                      size: 14,
+                                      color: MyColors.support['Error']!['c700'],
+                                    ),
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
                                     MyText(
-                                        text: "Logout",
+                                        text: "Đăng xuất",
                                         color:
                                             MyColors.support['Error']!['c900']!,
                                         fontSize: FontSize.z15,
                                         fontWeight: FontWeight.w600),
-                                    Image.asset(
-                                        "assets/icons/i16/logo.png",
-                                        width: 16,
-                                        height: 16),
                                   ],
                                 ),
                               ),

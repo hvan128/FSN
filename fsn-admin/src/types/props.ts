@@ -122,5 +122,4 @@ type RecordWhitelistFilterProps = {
 
 type AnnouncementFilterProps = {
     title: string
-    status: string | null
 }

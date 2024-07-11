@@ -51,9 +51,6 @@ class _FeedbackCardState extends State<FeedbackCard> {
   void initState() {
     super.initState();
     fetchUser();
-    widget.feedbackModel.feels?.forEach((element) {
-      print(element.toJson());
-    });
     processFeels(
         widget.feedbackModel.feels!,
         Provider.of<UserProvider>(context, listen: false).user!.id!,
@@ -434,11 +431,6 @@ class _FeedbackCardState extends State<FeedbackCard> {
   }
 
   void onReactionChanged(EReaction reaction) async {
-    print(reaction.name);
-    print(listReactions
-        .firstWhere((element) => element.type == reaction.name,
-            orElse: () => Reaction())
-        .isSelected);
     if (listReactions
             .firstWhere((element) => element.type == reaction.name,
                 orElse: () => Reaction())

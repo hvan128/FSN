@@ -124,7 +124,6 @@ export const adminRegister = (req, res) => {
         });
       }
     } else if (data.kind === "exist") {
-      console.log(data);
       res.send({
         message: "Username or Email already exist!",
         data: null,

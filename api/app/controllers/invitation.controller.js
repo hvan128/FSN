@@ -3,7 +3,6 @@ import Invitation from "../models/invitation.model.js";
 export const getAllInvitationByReceiver = (req, res, next) => {
   var id = req.params.receiverId;
   Invitation.getAllInvitationByReceiver(id, (err, data) => {
-    console.log(data);
     if (err) {
       return next(err);
     } else if (data == null || data.length == 0) {

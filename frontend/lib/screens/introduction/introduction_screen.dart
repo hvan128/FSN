@@ -252,13 +252,12 @@ class IntroductionScreen extends StatelessWidget {
             loginResponseJson(jsonEncode(loginResponse)));
         FirebaseMessaging.instance.getToken().then((value) {
           currentUser.fcmToken = value;
-          print('currentUser.toJson(): ${currentUser.toJson()}');
+          print(currentUser.fcmToken);
           ApiService.put(Config.USER_API, currentUser.toJson());
         });
         Navigator.pushReplacementNamed(context, RouterIntroduction.afterLogin);
       }
     } catch (e) {
-      print('onPressLoginGoogle lỗi');
       print(e);
     }
   }

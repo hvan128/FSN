@@ -260,6 +260,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     ? Image.network(
                         FunctionCore.convertImageUrl(dish.image!),
                         width: 88,
+                        height: 88,
+                        fit: BoxFit.cover,
                       )
                     : category != null
                         ? Image.asset(category.icon!, width: 50)
@@ -275,13 +277,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const SizedBox(height: 4),
-                      MyText(
-                          text: announcement.type == 'community'
-                              ? dish!.description!
-                              : 'Hết hạn',
-                          fontSize: FontSize.z13,
-                          fontWeight: FontWeight.w500,
-                          color: MyColors.grey["c500"]!),
+                      announcement.type == 'community'
+                          ? Text(dish!.description!,
+                              maxLines: 2, overflow: TextOverflow.ellipsis)
+                          : MyText(
+                              text: 'Hết hạn',
+                              fontSize: FontSize.z13,
+                              fontWeight: FontWeight.w500,
+                              color: MyColors.grey["c500"]!),
                       const SizedBox(height: 4),
                       user != null
                           ? MyText(

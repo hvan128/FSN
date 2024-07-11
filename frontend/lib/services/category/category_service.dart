@@ -46,7 +46,7 @@ class CategoryService {
                           'sort': sort.name,
                         }
                       : null;
-                      print('queryParams: $queryParams');
+      print('queryParams: $queryParams');
       await ApiService.get(
               '${Config.CATEGORIES_API}/position/$positionId/${user.fridgeId}',
               queryParams: queryParams)
@@ -81,12 +81,12 @@ class CategoryService {
         if (value != null) {
           final data = jsonDecode(value.toString())['data'];
           categories = categoryFromJson(data);
+          APICacheDBModel cacheDBModel = APICacheDBModel(
+            key: 'categories_new',
+            syncData: value.toString(),
+          );
+          APICacheManager().addCacheData(cacheDBModel);
         }
-        APICacheDBModel cacheDBModel = APICacheDBModel(
-          key: 'categories_new',
-          syncData: value.toString(),
-        );
-        APICacheManager().addCacheData(cacheDBModel);
       });
     }
     return categories;

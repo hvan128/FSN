@@ -64,8 +64,6 @@ export default function Request({ filter }: Props) {
           params: params,
         })
         .then((res) => {
-          console.log(params);
-          console.log(res.data.data);
           setRequests(res.data.data);
           setCount(res.data.total);
         });
@@ -132,7 +130,6 @@ export default function Request({ filter }: Props) {
         status: action,
       };
       await api.put(`/request/${id}`, variables).then((res) => {
-        console.log(res);
         dispatch(refetchComponent());
       });
       dispatch(
@@ -181,7 +178,6 @@ export default function Request({ filter }: Props) {
       onConfirm: async () => {
         try {
           await api.delete(`request/${item.id}`).then((res) => {
-            console.log("res.data", res.data);
           });
           dispatch(refetchComponent());
           dispatch(

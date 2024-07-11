@@ -443,7 +443,7 @@ class _AddDishScreenState extends State<AddDishScreen> {
           onChange: (value) {
             var input = FunctionCore().parseInput(value);
             ingredientsList[index].quantity =
-                input['quantity'] != null ? int.tryParse(input['quantity']) : 0;
+                input['quantity'] != null ? (input['quantity']) : 0;
             ingredientsList[index].unit = input['unit'];
           },
         ),

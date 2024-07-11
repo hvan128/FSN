@@ -1,11 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:frontend/components/card/food_card.dart';
 import 'package:frontend/models/community/dish.dart';
 import 'package:frontend/navigation/navigation.dart';
 import 'package:frontend/navigation/router/account.dart';
 import 'package:frontend/navigation/router/community.dart';
+import 'package:frontend/provider/user.dart';
 import 'package:frontend/services/community/dish_service.dart';
 import 'package:frontend/theme/color.dart';
 import 'package:frontend/theme/font_size.dart';
@@ -13,6 +12,7 @@ import 'package:frontend/utils/functions_core.dart';
 import 'package:frontend/widgets/button.dart';
 import 'package:frontend/widgets/button_icon.dart';
 import 'package:frontend/widgets/text.dart';
+import 'package:provider/provider.dart';
 
 class MyFoodField extends StatefulWidget {
   final int userId;
@@ -29,12 +29,19 @@ class _MyFoodFieldState extends State<MyFoodField> {
   int? totalTips;
   List<Dish>? drafts;
   int? totalDrafts;
+  bool isOwner = false;
   @override
   void initState() {
     super.initState();
     getAllRecipes(1, 5);
     getAllTips(1, 5);
-    getAllDrafts(1, 20);
+    setState(() {
+      isOwner = widget.userId ==
+          Provider.of<UserProvider>(context, listen: false).user!.id;
+    });
+    if (isOwner) {
+      getAllDrafts(1, 20);
+    }
   }
 
   Future<void> getAllRecipes(int page, int pageSize) async {
@@ -96,7 +103,9 @@ class _MyFoodFieldState extends State<MyFoodField> {
                     _buildDrafts(drafts!),
                   ],
                 )),
-        const SizedBox(height: 10),
+        drafts == null || drafts!.isEmpty
+            ? const SizedBox()
+            : const SizedBox(height: 10),
         recipes == null
             ? const Center(child: CircularProgressIndicator())
             : recipes!.isEmpty
@@ -147,8 +156,8 @@ class _MyFoodFieldState extends State<MyFoodField> {
                             ]),
                         const SizedBox(height: 20),
                         _buildListDish(recipes, 'recipes'),
-                        const SizedBox(height: 20),
-                        Row(
+                        !isOwner ? const SizedBox() : const SizedBox(height: 20),
+                        !isOwner ? const SizedBox() : Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             MyButton(
@@ -168,8 +177,8 @@ class _MyFoodFieldState extends State<MyFoodField> {
                     ),
                   ),
         const SizedBox(height: 10),
-        tips == null || tips!.isEmpty
-            ? _buildAddTipsButton()
+        tips == null || tips!.isEmpty ? (isOwner
+            ? _buildAddTipsButton() : const SizedBox())
             : Container(
                 color: MyColors.white['c900']!,
                 padding:

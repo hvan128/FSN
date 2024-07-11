@@ -31,7 +31,6 @@ import storage from "@/services/storage";
 import { SkeletonTable } from "@/lib/skeleton";
 import CancelIcon from "@mui/icons-material/Cancel";
 import SearchIcon from "@mui/icons-material/Search";
-import { Tooltip } from "@mui/material";
 import api from "@/services/api";
 import { refetchComponent } from "@/redux/slice/refetchSlice";
 
@@ -55,16 +54,13 @@ export default function Main() {
   const dispatch = useDispatch();
   const refetchQueries = useSelector((state: RootState) => state.refetch.time);
   const adminData = storage.getUserInforFromLocalStorage();
-  // const [deleteUserAdmin, { error: errorDeleteUserAdmin }] =
-  //   useMutation(DELETE_USER_ADMIN);
-  // const [resetPasswordUserAdmin, { error: errorResetPasswordUserAdmin }] =
-  //   useMutation(RESET_PASSWORD_USER_ADMIN);
   const handleClickSearch = () => {
     setSystemUserFilter({
       username: searchUser,
       phone: phone,
       email: email,
     });
+    dispatch(refetchComponent());
   };
   const handleCancelFilter = () => {
     setSearchUser("");
@@ -76,6 +72,7 @@ export default function Main() {
       email: "",
     });
     setOpenFilter(false);
+    dispatch(refetchComponent());
   };
   const getFilterValue = () => {
     let data = {};
@@ -92,9 +89,8 @@ export default function Main() {
   };
 
   useEffect(() => {
-    console.log(refetchQueries);
     fetchData();
-  }, [refetchQueries]);
+  }, [page, rowsPage, refetchQueries]);
 
   const fetchData = () => {
     api
@@ -106,9 +102,8 @@ export default function Main() {
         ...getFilterValue(),
       })
       .then((res) => {
-        console.log(res.data);
-        setListSystemUser(res.data);
-        // setCount(res.data.count);
+        setListSystemUser(res.data.data);
+        setCount(res.data.total);
       });
   };
 
@@ -145,7 +140,6 @@ export default function Main() {
       onConfirm: async () => {
         try {
           api.delete(`admin/user/${id}`).then((res) => {
-            console.log("res.data", res.data);
           });
           dispatch(refetchComponent());
           dispatch(

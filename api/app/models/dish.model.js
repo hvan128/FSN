@@ -49,7 +49,8 @@ Dish.create = (data, result) => {
     image,
     cookingTime,
     rangeOfPeople,
-    type
+    type,
+    'PENDING',
   );
 
   db.query("INSERT INTO dish SET ?", dish, (err, res) => {
@@ -261,7 +262,6 @@ Dish.findByOwnerId = (ownerId, page, pageSize, type, status, result) => {
       db.query(
         `SELECT * FROM dish WHERE ownerId = ${ownerId} AND type = '${type}' AND status = '${status}' LIMIT ${limit} OFFSET ${offset}`,
         (err, res) => {
-          console.log(res);
           if (err) {
             console.log(err);
             result(err, null);
@@ -443,29 +443,28 @@ Dish.getDishByKeyword = (keyword, type, page, pageSize, result) => {
   const keywords = keyword
     .trim()
     .split(" ")
-    .map((word) => `%${word}%`); // Tạo mảng các từ khóa tìm kiếm
-
+    .map((word) => `%${word}%`); 
   const dishConditions = keywords
     .map((word) => `(d.label LIKE ? OR d.description LIKE ?)`)
-    .join(" OR ");
+    .join(" OR ").concat(` AND d.type = '${type}'`);
   const ingredientConditions = keywords
     .map((word) => `(i.label LIKE ?)`)
-    .join(" OR ");
+    .join(" OR ").concat(` AND d.type = '${type}'`);
   var labelParams = [keyword];
-  var labelScore = "WHEN d.label LIKE ? THEN 2";
+  var labelScore = "WHEN d.label LIKE ? THEN 4";
   keywords.forEach((word) => {
     labelScore += " WHEN d.label LIKE ? THEN 1";
     labelParams.push(word);
   });
   var descriptionParams = [keyword];
-  var descriptionScore = "WHEN d.description LIKE ? THEN 3";
+  var descriptionScore = "WHEN d.description LIKE ? THEN 5";
   keywords.forEach((word) => {
     descriptionScore += " WHEN d.description LIKE ? THEN 1";
     descriptionParams.push(word);
   });
 
   var ingredientParams1 = [keyword];
-  var ingredientScore = "WHEN i.label LIKE ? THEN 3";
+  var ingredientScore = "WHEN i.label LIKE ? THEN 5";
   keywords.forEach((word) => {
     ingredientScore += " WHEN i.label LIKE ? THEN 1";
     ingredientParams1.push(word);
@@ -489,10 +488,9 @@ Dish.getDishByKeyword = (keyword, type, page, pageSize, result) => {
     ...ingredientParams,
     pageSize,
     offset,
-  ]; // Thêm các tham số vào params
-
+  ]; 
   const query = `
-    SELECT d.id,
+    SELECT DISTINCT d.id, d.createdAt,
       (CASE 
         ${labelScore}
         ELSE 0 
@@ -507,7 +505,7 @@ Dish.getDishByKeyword = (keyword, type, page, pageSize, result) => {
       END) AS ingredient_score
     FROM dish d
     LEFT JOIN ingredient i ON d.id = i.dishId
-    WHERE (${dishConditions}) OR (${ingredientConditions}) AND d.status = 'APPROVED'
+    WHERE (${dishConditions}) OR (${ingredientConditions})
     ORDER BY (label_score + description_score + ingredient_score) DESC, d.createdAt DESC
     LIMIT ? OFFSET ?
   `;
@@ -569,7 +567,6 @@ Dish.getDishByKeyword = (keyword, type, page, pageSize, result) => {
 
 Dish.getAllDish = (page, pageSize, type, status, result) => {
   const offset = (page - 1) * pageSize;
-  console.log(type);
 
   db.query(
     `SELECT COUNT(*) AS total FROM dish WHERE type = '${type}' AND status = '${status}'`,

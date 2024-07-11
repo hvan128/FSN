@@ -12,7 +12,7 @@ const connection = mysql.createConnection({
 
   connection.connect((err) => {
       if (err) {
-        console.log('Lỗi kết nối:', err);
+        console.log('Lỗi kết nối :', process.env.DB_HOST, err);
       } else {
         console.log('Connected!');
       }

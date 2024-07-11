@@ -51,7 +51,6 @@ export default function Main() {
         password: values.password,
       };
       await api.post("/admin/login", variables).then((res) => {
-        console.log(res);
         if (res.data && res.data.data) {
           storage.updateLocalAccessToken(res?.data?.data.token);
           storage.saveUserInfoToLocalStorage(res?.data?.data);
